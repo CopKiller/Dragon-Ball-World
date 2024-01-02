@@ -1,0 +1,10 @@
+client/data\ files/logs
+client/data\ files/maps
+client/data\ files/music
+client/data\ files/sound
+client/data\ files/video
+client/MSSCCPRJ.SCC
+server/data/*/
+server/server.vbw
+server/MSSCCPRJ.SCC
+client/client.vbw
