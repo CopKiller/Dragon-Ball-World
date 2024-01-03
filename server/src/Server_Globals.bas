@@ -46,7 +46,6 @@ Public FrameTime As Long
 Public tmr25 As Long
 Public tmr500 As Long
 Public tmr1000 As Long
-Public tmrTrapResist As Long
 Public LastUpdateSavePlayers
 Public LastUpdateMapSpawnItems As Long
 Public LastUpdatePlayerVitals As Long

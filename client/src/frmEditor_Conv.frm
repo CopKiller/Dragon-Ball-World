@@ -386,17 +386,6 @@ Private Sub cmbEvent_Click()
         Next
 
         cmbEventNum.ListIndex = 0
-    ElseIf (cmbEvent.ListIndex = EventType.Event_OpenQuest) Then
-        cmbEventNum.visible = True
-        ' build EventNum combo
-        cmbEventNum.Clear
-        cmbEventNum.AddItem "None"
-
-        For i = 1 To MAX_MISSIONS
-            cmbEventNum.AddItem Trim$(Mission(i).Name)
-        Next
-
-        cmbEventNum.ListIndex = 0
     Else
         cmbEventNum.visible = False
     End If

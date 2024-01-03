@@ -133,7 +133,7 @@ End Sub
 ' :: Player attack packet ::
 ' ::::::::::::::::::::::::::
 Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim i As Long, N As Long, damage As Long, TempIndex As Long, x As Long, y As Long, mapnum As Long, dirReq As Long
+    Dim i As Long, N As Long, Damage As Long, TempIndex As Long, x As Long, Y As Long, mapnum As Long, dirReq As Long
     
     ' can't attack whilst casting
     If TempPlayer(index).spellBuffer.Spell > 0 Then Exit Sub
@@ -162,11 +162,11 @@ Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAd
     ' check if we've got a remote chat tile
     mapnum = GetPlayerMap(index)
     x = GetPlayerX(index)
-    y = GetPlayerY(index)
-    If Map(mapnum).TileData.Tile(x, y).Type = TILE_TYPE_CHAT Then
-        dirReq = Map(mapnum).TileData.Tile(x, y).Data2
+    Y = GetPlayerY(index)
+    If Map(mapnum).TileData.Tile(x, Y).Type = TILE_TYPE_CHAT Then
+        dirReq = Map(mapnum).TileData.Tile(x, Y).Data2
         If Player(index).Dir = dirReq Then
-            InitChat index, mapnum, Map(mapnum).TileData.Tile(x, y).Data1, True
+            InitChat index, mapnum, Map(mapnum).TileData.Tile(x, Y).Data1, True
             Exit Sub
         End If
     End If
@@ -177,25 +177,25 @@ Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAd
 
             If GetPlayerY(index) = 0 Then Exit Sub
             x = GetPlayerX(index)
-            y = GetPlayerY(index) - 1
+            Y = GetPlayerY(index) - 1
         Case DIR_DOWN
 
             If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.MaxY Then Exit Sub
             x = GetPlayerX(index)
-            y = GetPlayerY(index) + 1
+            Y = GetPlayerY(index) + 1
         Case DIR_LEFT
 
             If GetPlayerX(index) = 0 Then Exit Sub
             x = GetPlayerX(index) - 1
-            y = GetPlayerY(index)
+            Y = GetPlayerY(index)
         Case DIR_RIGHT
 
             If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.MaxX Then Exit Sub
             x = GetPlayerX(index) + 1
-            y = GetPlayerY(index)
+            Y = GetPlayerY(index)
     End Select
     
-    CheckResource index, x, y
+    CheckResource index, x, Y
 End Sub
 
 ' :::::::::::::::::
@@ -259,19 +259,19 @@ End Sub
 ' :: Search packet ::
 ' :::::::::::::::::::
 Public Sub HandleTarget(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim Buffer As clsBuffer, target As Long, targetType As Long
+    Dim Buffer As clsBuffer, Target As Long, targetType As Long
 
     Set Buffer = New clsBuffer
     
     Buffer.WriteBytes Data()
     
-    target = Buffer.ReadLong
+    Target = Buffer.ReadLong
     targetType = Buffer.ReadLong
     
     Buffer.Flush: Set Buffer = Nothing
     
     ' set player's target - no need to send, it's client side
-    TempPlayer(index).target = target
+    TempPlayer(index).Target = Target
     TempPlayer(index).targetType = targetType
 End Sub
 
@@ -550,47 +550,6 @@ Public Sub HandleHotbarUse(ByVal index As Long, ByRef Data() As Byte, ByVal Star
 End Sub
 
 ' :::::::::::::::::::::::
-' ::   MISSION packet  ::
-' :::::::::::::::::::::::
-
-Public Sub HandleAcceptMissionRequest(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim Buffer As clsBuffer
-    Dim MissionID As Long, i As Long
-    Dim ItemNum As Long, ItemCount As Long
-    
-    Set Buffer = New clsBuffer
-    Buffer.WriteBytes Data()
-    
-    MissionID = Buffer.ReadLong
-    If MissionID <= 0 Or MissionID > MAX_MISSIONS Then Exit Sub
-    
-    For i = 1 To MAX_PLAYER_MISSIONS
-        If Player(index).Mission(i).ID = 0 Then
-            Player(index).Mission(i).ID = MissionID
-            Player(index).Mission(i).Count = 0
-            'Let's check for any existing items in their inventory and update their counter!
-            If Mission(MissionID).Type = MissionType.Mission_TypeCollect Then
-                ItemNum = Mission(MissionID).CollectItem
-                ItemCount = HasItem(index, ItemNum)
-                If ItemCount > 0 Then
-                    Player(index).Mission(i).Count = ItemCount
-                End If
-            End If
-            TempPlayer(index).MissionRequest = 0
-            Call PlayerMsg(index, "Mission Accepted!", Yellow)
-            Call SendPlayerData(index)
-            Exit Sub
-        End If
-    Next i
-    Set Buffer = Nothing
-End Sub
-
-Public Sub HandleDeclineMissionRequest(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    ' clear the missionRequest server-side
-    TempPlayer(index).MissionRequest = 0
-End Sub
-
-' :::::::::::::::::::::::
 ' ::    TRADE packet   ::
 ' :::::::::::::::::::::::
 
@@ -631,9 +590,9 @@ Public Sub HandleTradeRequest(ByVal index As Long, ByRef Data() As Byte, ByVal S
     
     ' make sure they're stood next to each other
     tX = Player(tradeTarget).x
-    tY = Player(tradeTarget).y
+    tY = Player(tradeTarget).Y
     sX = Player(index).x
-    sY = Player(index).y
+    sY = Player(index).Y
     
     ' within range?
     If tX < sX - 1 Or tX > sX + 1 Then

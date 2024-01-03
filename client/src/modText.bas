@@ -64,7 +64,7 @@ Public Type ChatStruct
     text As String
     Color As Long
     visible As Boolean
-    timer As Long
+    Timer As Long
     Channel As Byte
 End Type
 Public Const ColourChar As String * 1 = "½"
@@ -94,20 +94,20 @@ Sub LoadFonts()
 End Sub
 
 Sub SetFont(ByVal fontNum As Long, ByVal texName As String, ByVal Size As Long, Optional ByVal xOffset As Long, Optional ByVal yOffset As Long)
-Dim Data() As Byte, f As Long, w As Long, h As Long, Path As String
+Dim data() As Byte, f As Long, w As Long, h As Long, Path As String
     ' set the path
     Path = App.Path & PathFont & texName & GFX_EXT
     ' load the texture
     f = FreeFile
     Open Path For Binary As #f
-        ReDim Data(0 To LOF(f) - 1)
-        Get #f, , Data
+        ReDim data(0 To LOF(f) - 1)
+        Get #f, , data
     Close #f
     ' get size
-    font(fontNum).TextureSize.X = ByteToInt(Data(18), Data(19))
-    font(fontNum).TextureSize.Y = ByteToInt(Data(22), Data(23))
+    font(fontNum).TextureSize.X = ByteToInt(data(18), data(19))
+    font(fontNum).TextureSize.Y = ByteToInt(data(22), data(23))
     ' set to struct
-    Set font(fontNum).Texture = D3DX.CreateTextureFromFileInMemoryEx(D3DDevice, Data(0), AryCount(Data), font(fontNum).TextureSize.X, font(fontNum).TextureSize.Y, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, D3DX_FILTER_POINT, D3DX_FILTER_POINT, 0, ByVal 0, ByVal 0)
+    Set font(fontNum).Texture = D3DX.CreateTextureFromFileInMemoryEx(D3DDevice, data(0), AryCount(data), font(fontNum).TextureSize.X, font(fontNum).TextureSize.Y, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, D3DX_FILTER_POINT, D3DX_FILTER_POINT, 0, ByVal 0, ByVal 0)
     font(fontNum).xOffset = xOffset
     font(fontNum).yOffset = yOffset
     LoadFontHeader font(fontNum), texName & ".dat"
@@ -227,28 +227,28 @@ Dim v As Single
 
         'Set the verticies
         With theFont.HeaderInfo.CharVA(LoopChar)
-            .Vertex(0).Colour = D3DColorARGB(255, 0, 0, 0)   'Black is the most common color
+            .Vertex(0).colour = D3DColorARGB(255, 0, 0, 0)   'Black is the most common color
             .Vertex(0).RHW = 1
             .Vertex(0).tu = u
             .Vertex(0).tv = v
             .Vertex(0).X = 0
             .Vertex(0).Y = 0
             .Vertex(0).z = 0
-            .Vertex(1).Colour = D3DColorARGB(255, 0, 0, 0)
+            .Vertex(1).colour = D3DColorARGB(255, 0, 0, 0)
             .Vertex(1).RHW = 1
             .Vertex(1).tu = u + theFont.ColFactor
             .Vertex(1).tv = v
             .Vertex(1).X = theFont.HeaderInfo.CellWidth
             .Vertex(1).Y = 0
             .Vertex(1).z = 0
-            .Vertex(2).Colour = D3DColorARGB(255, 0, 0, 0)
+            .Vertex(2).colour = D3DColorARGB(255, 0, 0, 0)
             .Vertex(2).RHW = 1
             .Vertex(2).tu = u
             .Vertex(2).tv = v + theFont.RowFactor
             .Vertex(2).X = 0
             .Vertex(2).Y = theFont.HeaderInfo.CellHeight
             .Vertex(2).z = 0
-            .Vertex(3).Colour = D3DColorARGB(255, 0, 0, 0)
+            .Vertex(3).colour = D3DColorARGB(255, 0, 0, 0)
             .Vertex(3).RHW = 1
             .Vertex(3).tu = u + theFont.ColFactor
             .Vertex(3).tv = v + theFont.RowFactor
@@ -318,10 +318,10 @@ Dim tmpNum As Long
                     TempVA(3).X = TempVA(1).X
                     TempVA(3).Y = TempVA(2).Y
                     'Set the colors
-                    TempVA(0).Colour = TempColor
-                    TempVA(1).Colour = TempColor
-                    TempVA(2).Colour = TempColor
-                    TempVA(3).Colour = TempColor
+                    TempVA(0).colour = TempColor
+                    TempVA(1).colour = TempColor
+                    TempVA(2).colour = TempColor
+                    TempVA(3).colour = TempColor
                     'Draw the verticies
                     Call D3DDevice.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, TempVA(0), FVF_Size)
                     'Shift over the the position to render the next character
@@ -479,12 +479,12 @@ Dim i As Long
     Chat(1).text = text
     Chat(1).Color = Color
     Chat(1).visible = True
-    Chat(1).timer = getTime
+    Chat(1).Timer = getTime
     Chat(1).Channel = Channel
 End Sub
 
 Sub RenderChat()
-Dim Xo As Long, Yo As Long, Colour As Long, yOffset As Long, rLines As Long, lineCount As Long
+Dim Xo As Long, Yo As Long, colour As Long, yOffset As Long, rLines As Long, lineCount As Long
 Dim tmpText As String, i As Long, isVisible As Boolean, topWidth As Long, tmpArray() As String, X As Long
     
     ' set the position
@@ -508,7 +508,7 @@ Dim tmpText As String, i As Long, isVisible As Boolean, topWidth As Long, tmpArr
         ' make sure it's visible
         If isVisible Then
             ' render line
-            Colour = Chat(i).Color
+            colour = Chat(i).Color
             ' check if we need to word wrap
             If TextWidth(font(Fonts.verdana_12), Chat(i).text) > ChatWidth Then
                 ' word wrap
@@ -517,7 +517,7 @@ Dim tmpText As String, i As Long, isVisible As Boolean, topWidth As Long, tmpArr
                 If rLines + lineCount > 9 Then Exit Do
                 ' continue on
                 yOffset = yOffset - (14 * lineCount)
-                RenderText font(Fonts.verdana_12), tmpText, Xo, Yo + yOffset, Colour
+                RenderText font(Fonts.verdana_12), tmpText, Xo, Yo + yOffset, colour
                 rLines = rLines + lineCount
                 ' set the top width
                 tmpArray = Split(tmpText, vbNewLine)
@@ -527,7 +527,7 @@ Dim tmpText As String, i As Long, isVisible As Boolean, topWidth As Long, tmpArr
             Else
                 ' normal
                 yOffset = yOffset - 14
-                RenderText font(Fonts.verdana_12), Chat(i).text, Xo, Yo + yOffset, Colour
+                RenderText font(Fonts.verdana_12), Chat(i).text, Xo, Yo + yOffset, colour
                 rLines = rLines + 1
                 ' set the top width
                 If TextWidth(font(Fonts.verdana_12), Chat(i).text) > topWidth Then topWidth = TextWidth(font(Fonts.verdana_12), Chat(i).text)
@@ -676,15 +676,15 @@ Public Function WordWrap(theFont As CustomFont, ByVal text As String, ByVal MaxL
 End Function
 
 Public Sub DrawPlayerName(ByVal Index As Long)
-    Dim textX As Long, textY As Long, text As String, textSize As Long, Colour As Long
+    Dim textX As Long, textY As Long, text As String, textSize As Long, colour As Long
     
     text = Trim$(GetPlayerName(Index))
     textSize = TextWidth(font(Fonts.rockwell_15), text)
     ' get the colour
-    Colour = White
+    colour = White
 
-    If GetPlayerAccess(Index) > 0 Then Colour = Pink
-    If GetPlayerPK(Index) > 0 Then Colour = BrightRed
+    If GetPlayerAccess(Index) > 0 Then colour = Pink
+    If GetPlayerPK(Index) > 0 Then colour = BrightRed
     textX = Player(Index).X * PIC_X + Player(Index).xOffset + (PIC_X \ 2) - (textSize \ 2)
     textY = Player(Index).Y * PIC_Y + Player(Index).yOffset - 32
 
@@ -692,44 +692,68 @@ Public Sub DrawPlayerName(ByVal Index As Long)
         textY = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - (mTexture(TextureChar(GetPlayerSprite(Index))).RealHeight / 4) + 12
     End If
 
-    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), Colour)
+    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
 End Sub
 
 Public Sub DrawNpcName(ByVal Index As Long)
-    Dim textX As Long, textY As Long, text As String, textSize As Long, NpcNum As Long, Colour As Long
+    Dim textX As Long, textY As Long, text As String, textSize As Long, NpcNum As Long, colour As Long, i As Long
     NpcNum = MapNpc(Index).Num
-    text = Trim$(Npc(NpcNum).Name)
+    text = Trim$(NPC(NpcNum).Name)
     textSize = TextWidth(font(Fonts.rockwell_15), text)
 
-    If Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
+    If NPC(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or NPC(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
         ' get the colour
-        If Npc(NpcNum).Level <= GetPlayerLevel(MyIndex) - 3 Then
-            Colour = Grey
-        ElseIf Npc(NpcNum).Level <= GetPlayerLevel(MyIndex) - 2 Then
-            Colour = Green
-        ElseIf Npc(NpcNum).Level > GetPlayerLevel(MyIndex) Then
-            Colour = Red
+        If NPC(NpcNum).Level <= GetPlayerLevel(MyIndex) - 3 Then
+            colour = Grey
+        ElseIf NPC(NpcNum).Level <= GetPlayerLevel(MyIndex) - 2 Then
+            colour = Green
+        ElseIf NPC(NpcNum).Level > GetPlayerLevel(MyIndex) Then
+            colour = Red
         Else
-            Colour = White
+            colour = White
         End If
     Else
-        Colour = White
+        colour = White
     End If
 
     textX = MapNpc(Index).X * PIC_X + MapNpc(Index).xOffset + (PIC_X \ 2) - (textSize \ 2)
     textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - 32
 
-    If Npc(NpcNum).sprite >= 1 And Npc(NpcNum).sprite <= CountChar Then
-        textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - (mTexture(TextureChar(Npc(NpcNum).sprite)).RealHeight / 4) + 12
+    If NPC(NpcNum).sprite >= 1 And NPC(NpcNum).sprite <= CountChar Then
+        textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - (mTexture(TextureChar(NPC(NpcNum).sprite)).RealHeight / 4) + 12
     End If
 
-    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), Colour)
+    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
+    
+    For i = 1 To MAX_QUESTS
+        'check if the npc is the next task to any quest: [?] symbol
+        If Trim$(Quest(i).Name) <> "" Then
+            If Player(MyIndex).PlayerQuest(i).Status = QUEST_STARTED Then
+                If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).NPC = NpcNum Then
+                    If NPC(NpcNum).sprite > 0 Then
+                        textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (mTexture(TextureGUI(5)).Width / 2)
+                        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (mTexture(TextureChar(NPC(NpcNum).sprite)).Height / 4)
+                        RenderTexture_Animated TextureGUI(5), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
+
+                        If GlobalX >= textX And GlobalX <= textX + 13 Then
+                            If GlobalY >= textY And GlobalY <= textY + 13 Then
+                                If VerifyWindowsIsInCur Then Exit Sub
+                                text = "Objective!"
+                                Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), text) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), text) + 10, 20, 5, 200)
+                                Call RenderText(font(Fonts.georgiaBold_16), text, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), text) / 2)), GlobalY - 32, Yellow)
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    Next
 End Sub
 
-Function GetColStr(Colour As Long)
-    If Colour < 10 Then
-        GetColStr = "0" & Colour
+Function GetColStr(colour As Long)
+    If colour < 10 Then
+        GetColStr = "0" & colour
     Else
-        GetColStr = Colour
+        GetColStr = colour
     End If
 End Function

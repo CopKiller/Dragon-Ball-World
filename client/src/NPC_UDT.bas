@@ -11,7 +11,6 @@ Public Type NpcRec
     sprite As Long
     SpawnSecs As Long
     Behaviour As Byte
-    Mission As Long
     Range As Byte
     Stat(1 To Stats.Stat_Count - 1) As Byte
     HP As Long

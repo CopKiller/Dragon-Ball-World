@@ -35,11 +35,6 @@ Public Type DoTRec
     StartTime As Long
 End Type
 
-Private Type PlayerMission
-    ID As Long
-    Count As Long
-End Type
-
 Public Type PlayerRec
     ' General
     Name As String * ACCOUNT_LENGTH
@@ -78,16 +73,15 @@ Public Type PlayerRec
     ' Variables
     Variable(1 To MAX_BYTE) As Long
     
-    ' Missions
-    Mission(1 To MAX_PLAYER_MISSIONS) As PlayerMission
-    CompletedMission(1 To MAX_MISSIONS) As Long
-    
     ' Tutorial
     TutorialState As Byte
     
     ' Banned
     isBanned As Byte
     isMuted As Byte
+    
+    ' Quests
+    PlayerQuest(1 To MAX_QUESTS) As PlayerQuestRec
 End Type
 
 Public Type PartyRec
@@ -105,7 +99,7 @@ Private Type ProjectileRec
     Y As Double
     StartX As Double
     StartY As Double
-    pic As Long
+    Pic As Long
     Range As Long
     Damage As Long
     Speed As Long
@@ -115,13 +109,13 @@ End Type
 
 Public Type TempPlayerRec
     ' Non saved local vars
-    buffer As clsBuffer
+    Buffer As clsBuffer
     InGame As Boolean
     AttackTimer As Long
     DataTimer As Long
     DataBytes As Long
     DataPackets As Long
-    targetType As Byte
+    TargetType As Byte
     Target As Long
     SpellCastType As Long
     Projectile(1 To MAX_PROJECTILE_PLAYER) As ProjectileRec
@@ -131,8 +125,6 @@ Public Type TempPlayerRec
     StunTimer As Long
     StunDuration As Long
     InBank As Boolean
-    ' mission
-    MissionRequest As Long
     ' trade
     TradeRequest As Long
     InTrade As Long
@@ -161,6 +153,9 @@ Public Type TempPlayerRec
     
     ' character selection
     charNum As Long
+    
+    ImpactedBy As Long
+    ImpactedTick As Long
 End Type
 
 Private Type ClassRec

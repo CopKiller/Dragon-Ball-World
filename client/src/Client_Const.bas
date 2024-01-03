@@ -16,6 +16,9 @@ Public Const CLIENT_REVISION As Byte = 0
 ' Connection details
 Public Const GAME_SERVER_IP As String = "127.0.0.1" ' "46.23.70.66"
 Public Const GAME_SERVER_PORT As Long = 7001 ' the port used by the main game server
+' Boolean constants
+Public Const NO As Byte = 0
+Public Const YES As Byte = 1
 ' Resolution count
 Public Const RES_COUNT As Long = 16
 ' Music
@@ -36,8 +39,8 @@ Public Const BankOffsetY As Long = 6
 Public Const BankOffsetX As Long = 6
 Public Const BankColumns As Long = 10
 ' Inventory constants
-Public Const InvTop As Long = 48
-Public Const InvLeft As Long = 9
+Public Const InvTop As Long = 45
+Public Const InvLeft As Long = 6
 Public Const InvOffsetY As Long = 6
 Public Const InvOffsetX As Long = 6
 Public Const InvColumns As Long = 5
@@ -47,8 +50,8 @@ Public Const EqLeft As Long = 178
 Public Const EqOffsetX As Long = 6
 Public Const EqColumns As Long = 6
 ' Inventory constants
-Public Const SkillTop As Long = 28
-Public Const SkillLeft As Long = 9
+Public Const SkillTop As Long = 45
+Public Const SkillLeft As Long = 6
 Public Const SkillOffsetY As Long = 6
 Public Const SkillOffsetX As Long = 6
 Public Const SkillColumns As Long = 5
@@ -118,7 +121,6 @@ Public Const PIC_Y As Long = 32
 ' ********************************************************
 ' General constants
 Public Const MAX_PLAYERS As Long = 200
-Public Const MAX_PLAYER_MISSIONS As Long = 12
 Public Const MAX_OFFER As Long = 3
 Public Const MAX_ITEMS As Long = 255
 Public Const MAX_NPCS As Long = 255
@@ -230,7 +232,7 @@ Public Const EDITOR_SHOP As Byte = 4
 Public Const EDITOR_RESOURCE As Byte = 5
 Public Const EDITOR_ANIMATION As Byte = 6
 Public Const EDITOR_CONV As Byte = 7
-Public Const EDITOR_Mission As Byte = 8
+Public Const EDITOR_QUEST As Byte = 8
 ' Target type constants
 Public Const TARGET_TYPE_NONE As Byte = 0
 Public Const TARGET_TYPE_PLAYER As Byte = 1

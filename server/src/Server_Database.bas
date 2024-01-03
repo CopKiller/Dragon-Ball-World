@@ -14,7 +14,7 @@ Public Sub CheckDirs()
     ChkDir App.Path & "\data\", "shops"
     ChkDir App.Path & "\data\", "spells"
     ChkDir App.Path & "\data\", "convs"
-    ChkDir App.Path & "\data\", "missions"
+    ChkDir App.Path & "\data\", "quests"
 End Sub
 Public Sub LoadGameData()
     Call SetStatus("Loading classes...")
@@ -36,7 +36,7 @@ Public Sub LoadGameData()
     Call SetStatus("Loading conversations...")
     Call LoadConvs
     Call SetStatus("Loading quests...")
-    Call LoadMissions
+    Call LoadQuests
 End Sub
 
 Public Sub ClearGameData()
@@ -63,5 +63,5 @@ Public Sub ClearGameData()
     Call SetStatus("Clearing conversations...")
     Call ClearConvs
     Call SetStatus("Clearing quests...")
-    Call ClearMissions
+    Call ClearQuests
 End Sub

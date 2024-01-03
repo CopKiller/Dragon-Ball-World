@@ -1,7 +1,7 @@
 VERSION 5.00
-Object = "{248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0"; "MSWINSCK.OCX"
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "mscomctl.ocx"
+Object = "{248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0"; "Mswinsck.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form frmServer 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Loading..."
@@ -42,6 +42,7 @@ Begin VB.Form frmServer
       _ExtentY        =   5953
       _Version        =   393216
       Style           =   1
+      Tab             =   2
       TabHeight       =   503
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Verdana"
@@ -54,7 +55,7 @@ Begin VB.Form frmServer
       EndProperty
       TabCaption(0)   =   "Console"
       TabPicture(0)   =   "frmServer.frx":1708A
-      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "lblCPS"
       Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "lblCpsLock"
@@ -71,14 +72,16 @@ Begin VB.Form frmServer
       Tab(1).ControlCount=   1
       TabCaption(2)   =   "Control "
       TabPicture(2)   =   "frmServer.frx":170C2
-      Tab(2).ControlEnabled=   0   'False
+      Tab(2).ControlEnabled=   -1  'True
       Tab(2).Control(0)=   "fraDatabase"
+      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).Control(1)=   "fraServer"
+      Tab(2).Control(1).Enabled=   0   'False
       Tab(2).ControlCount=   2
       Begin VB.Frame fraServer 
          Caption         =   "Server"
          Height          =   1575
-         Left            =   -71880
+         Left            =   3120
          TabIndex        =   1
          Top             =   360
          Width           =   1815
@@ -111,10 +114,18 @@ Begin VB.Form frmServer
       Begin VB.Frame fraDatabase 
          Caption         =   "Reload"
          Height          =   2775
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   8
          Top             =   360
          Width           =   2895
+         Begin VB.CommandButton Command1 
+            Caption         =   "Quests"
+            Height          =   375
+            Left            =   1440
+            TabIndex        =   19
+            Top             =   1680
+            Width           =   1215
+         End
          Begin VB.CommandButton cmdReloadAnimations 
             Caption         =   "Animations"
             Height          =   375
@@ -182,14 +193,14 @@ Begin VB.Form frmServer
       End
       Begin VB.TextBox txtChat 
          Height          =   375
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   3
          Top             =   2880
          Width           =   6255
       End
       Begin VB.TextBox txtText 
          Height          =   2175
-         Left            =   120
+         Left            =   -74880
          MultiLine       =   -1  'True
          ScrollBars      =   2  'Vertical
          TabIndex        =   2
@@ -252,7 +263,7 @@ Begin VB.Form frmServer
          Caption         =   "[Unlock]"
          ForeColor       =   &H00FF0000&
          Height          =   195
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   18
          Top             =   360
          Width           =   720
@@ -260,7 +271,7 @@ Begin VB.Form frmServer
       Begin VB.Label lblCPS 
          Caption         =   "CPS: 0"
          Height          =   255
-         Left            =   960
+         Left            =   -74040
          TabIndex        =   17
          Top             =   360
          Width           =   1815
@@ -296,6 +307,17 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Sub Command1_Click()
+    Dim I As Long
+    Call LoadQuests
+    Call TextAdd("All Quests reloaded.")
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendQuests I
+        End If
+    Next
+End Sub
+
 Private Sub lblCPSLock_Click()
     If CPSUnlock Then
         CPSUnlock = False
@@ -309,24 +331,24 @@ End Sub
 ' ********************
 ' ** Winsock object **
 ' ********************
-Private Sub Socket_ConnectionRequest(index As Integer, ByVal RequestID As Long)
-    Call AcceptConnection(index, RequestID)
+Private Sub Socket_ConnectionRequest(Index As Integer, ByVal RequestID As Long)
+    Call AcceptConnection(Index, RequestID)
 End Sub
 
-Private Sub Socket_Accept(index As Integer, SocketId As Integer)
-    Call AcceptConnection(index, SocketId)
+Private Sub Socket_Accept(Index As Integer, SocketId As Integer)
+    Call AcceptConnection(Index, SocketId)
 End Sub
 
-Private Sub Socket_DataArrival(index As Integer, ByVal bytesTotal As Long)
+Private Sub Socket_DataArrival(Index As Integer, ByVal bytesTotal As Long)
 
-    If IsConnected(index) Then
-        Call IncomingData(index, bytesTotal)
+    If IsConnected(Index) Then
+        Call IncomingData(Index, bytesTotal)
     End If
 
 End Sub
 
-Private Sub Socket_Close(index As Integer)
-    Call CloseSocket(index)
+Private Sub Socket_Close(Index As Integer)
+    Call CloseSocket(Index)
 End Sub
 
 ' ********************
@@ -344,89 +366,89 @@ Private Sub cmdExit_Click()
 End Sub
 
 Private Sub cmdReloadClasses_Click()
-Dim i As Long
+Dim I As Long
     Call LoadClasses
     Call TextAdd("All classes reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendClasses i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendClasses I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadItems_Click()
-Dim i As Long
+Dim I As Long
     Call LoadItems
     Call TextAdd("All items reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendItems i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendItems I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadMaps_Click()
-Dim i As Long
+Dim I As Long
     Call LoadMaps
     Call TextAdd("All maps reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            PlayerWarp i, GetPlayerMap(i), GetPlayerX(i), GetPlayerY(i)
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            PlayerWarp I, GetPlayerMap(I), GetPlayerX(I), GetPlayerY(I)
         End If
     Next
 End Sub
 
 Private Sub cmdReloadNPCs_Click()
-Dim i As Long
+Dim I As Long
     Call LoadNpcs
     Call TextAdd("All npcs reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendNpcs i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendNpcs I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadShops_Click()
-Dim i As Long
+Dim I As Long
     Call LoadShops
     Call TextAdd("All shops reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendShops i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendShops I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadSpells_Click()
-Dim i As Long
+Dim I As Long
     Call LoadSpells
     Call TextAdd("All spells reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendSpells i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendSpells I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadResources_Click()
-Dim i As Long
+Dim I As Long
     Call LoadResources
     Call TextAdd("All Resources reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendResources i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendResources I
         End If
     Next
 End Sub
 
 Private Sub cmdReloadAnimations_Click()
-Dim i As Long
+Dim I As Long
     Call LoadAnimations
     Call TextAdd("All Animations reloaded.")
-    For i = 1 To Player_HighIndex
-        If IsPlaying(i) Then
-            SendAnimations i
+    For I = 1 To Player_HighIndex
+        If IsPlaying(I) Then
+            SendAnimations I
         End If
     Next
 End Sub
@@ -470,7 +492,7 @@ Private Sub lvwInfo_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
         lvwInfo.SortOrder = lvwAscending
     End If
 
-    lvwInfo.SortKey = ColumnHeader.index - 1
+    lvwInfo.SortKey = ColumnHeader.Index - 1
     lvwInfo.Sorted = True
 End Sub
 
@@ -493,22 +515,22 @@ Private Sub txtChat_KeyPress(KeyAscii As Integer)
 End Sub
 
 Sub UsersOnline_Start()
-    Dim i As Long
+    Dim I As Long
 
-    For i = 1 To MAX_PLAYERS
-        frmServer.lvwInfo.ListItems.Add (i)
+    For I = 1 To MAX_PLAYERS
+        frmServer.lvwInfo.ListItems.Add (I)
 
-        If i < 10 Then
-            frmServer.lvwInfo.ListItems(i).Text = "00" & i
-        ElseIf i < 100 Then
-            frmServer.lvwInfo.ListItems(i).Text = "0" & i
+        If I < 10 Then
+            frmServer.lvwInfo.ListItems(I).Text = "00" & I
+        ElseIf I < 100 Then
+            frmServer.lvwInfo.ListItems(I).Text = "0" & I
         Else
-            frmServer.lvwInfo.ListItems(i).Text = i
+            frmServer.lvwInfo.ListItems(I).Text = I
         End If
 
-        frmServer.lvwInfo.ListItems(i).SubItems(1) = vbNullString
-        frmServer.lvwInfo.ListItems(i).SubItems(2) = vbNullString
-        frmServer.lvwInfo.ListItems(i).SubItems(3) = vbNullString
+        frmServer.lvwInfo.ListItems(I).SubItems(1) = vbNullString
+        frmServer.lvwInfo.ListItems(I).SubItems(2) = vbNullString
+        frmServer.lvwInfo.ListItems(I).SubItems(3) = vbNullString
     Next
 
 End Sub

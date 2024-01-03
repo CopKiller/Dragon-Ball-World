@@ -31,7 +31,6 @@ Public Const MAX_LINES As Long = 500 ' Used for frmServer.txtText
 ' ********************************************************
 ' General constants
 Public Const MAX_PLAYERS As Long = 200
-Public Const MAX_PLAYER_MISSIONS As Long = 12
 Public Const MAX_ITEMS As Long = 255
 Public Const MAX_NPCS As Long = 255
 Public Const MAX_ANIMATIONS As Long = 255

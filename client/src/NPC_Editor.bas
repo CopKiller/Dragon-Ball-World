@@ -36,26 +36,17 @@ Public Sub NpcEditorInit()
         .txtAttackSay.text = Trim$(Npc(EditorIndex).AttackSay)
 
         If Npc(EditorIndex).sprite < 0 Or Npc(EditorIndex).sprite > .scrlSprite.max Then Npc(EditorIndex).sprite = 0
-        .scrlSprite.value = Npc(EditorIndex).sprite
+        .scrlSprite.Value = Npc(EditorIndex).sprite
         .txtSpawnSecs.text = CStr(Npc(EditorIndex).SpawnSecs)
         .cmbBehaviour.ListIndex = Npc(EditorIndex).Behaviour
-        ' Build cmbClassReq
-            .cmbMission.Clear
-            .cmbMission.AddItem "None"
-    
-            For i = 1 To MAX_MISSIONS
-                .cmbMission.AddItem Trim$(Mission(i).Name)
-            Next
-    
-            .cmbMission.ListIndex = Npc(EditorIndex).Mission
         
-        .scrlRange.value = Npc(EditorIndex).Range
+        .scrlRange.Value = Npc(EditorIndex).Range
         .txtHP.text = Npc(EditorIndex).HP
         .txtEXP.text = Npc(EditorIndex).EXP
         .txtLevel.text = Npc(EditorIndex).Level
         .txtDamage.text = Npc(EditorIndex).Damage
-        .scrlConv.value = Npc(EditorIndex).Conv
-        .scrlAnimation.value = Npc(EditorIndex).Animation
+        .scrlConv.Value = Npc(EditorIndex).Conv
+        .scrlAnimation.Value = Npc(EditorIndex).Animation
 
         ' find the sound we have set
         If .cmbSound.ListCount >= 0 Then
@@ -73,12 +64,12 @@ Public Sub NpcEditorInit()
         End If
 
         For i = 1 To Stats.Stat_Count - 1
-            .scrlStat(i).value = Npc(EditorIndex).Stat(i)
+            .scrlStat(i).Value = Npc(EditorIndex).Stat(i)
         Next
 
         ' show 1 data
-        .scrlDrop.value = 1
-        .scrlSpell.value = 1
+        .scrlDrop.Value = 1
+        .scrlSpell.Value = 1
     End With
 
     NPC_Changed(EditorIndex) = True

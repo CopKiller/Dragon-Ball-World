@@ -8,8 +8,8 @@ Public Sub Main()
 End Sub
 
 Public Sub InitServer()
-    Dim i As Long
-    Dim f As Long
+    Dim I As Long
+    Dim F As Long
     Dim time1 As Long
     Dim time2 As Long
     
@@ -49,9 +49,9 @@ Public Sub InitServer()
     ' Init all the player sockets
     Call SetStatus("Initializing player array...")
 
-    For i = 1 To MAX_PLAYERS
-        Call ClearPlayer(i)
-        Load frmServer.Socket(i)
+    For I = 1 To MAX_PLAYERS
+        Call ClearPlayer(I)
+        Load frmServer.Socket(I)
     Next
 
     ' Serves as a constructor
@@ -61,22 +61,22 @@ Public Sub InitServer()
     Call SpawnAllMapsItems
     Call SetStatus("Spawning map npcs...")
     Call SpawnAllMapNpcs
-    Call SetStatus("Creating map cache...")
-    Call CreateFullMapCache
+    Call SetStatus("Creating full cache...")
+    Call CreateFullCache
     Call SetStatus("Loading System Tray...")
     Call LoadSystemTray
 
     ' Check if the master charlist file exists for checking duplicate names, and if it doesnt make it
     If Not FileExist(App.Path & "data\accounts\_charlist.txt") Then
-        f = FreeFile
-        Open App.Path & "\data\accounts\_charlist.txt" For Output As #f
-        Close #f
+        F = FreeFile
+        Open App.Path & "\data\accounts\_charlist.txt" For Output As #F
+        Close #F
     End If
     
     SetStatus "Caching map CRC32 checksums..."
     ' cache map crc32s
-    For i = 1 To MAX_MAPS
-        GetMapCRC32 i
+    For I = 1 To MAX_MAPS
+        GetMapCRC32 I
     Next
     
     ' Start listening
@@ -93,7 +93,7 @@ Public Sub InitServer()
 End Sub
 
 Public Sub DestroyServer()
-    Dim i As Long
+    Dim I As Long
     ServerOnline = False
     Call SetStatus("Destroying System Tray...")
     Call DestroySystemTray
@@ -102,8 +102,8 @@ Public Sub DestroyServer()
     Call ClearGameData
     Call SetStatus("Unloading sockets...")
 
-    For i = 1 To MAX_PLAYERS
-        Unload frmServer.Socket(i)
+    For I = 1 To MAX_PLAYERS
+        Unload frmServer.Socket(I)
     Next
     End
 End Sub
@@ -114,18 +114,18 @@ Public Sub SetStatus(ByVal Status As String)
 End Sub
 
 Public Sub SetHighIndex()
-    Dim i As Integer
-    Dim X As Integer
+    Dim I As Integer
+    Dim x As Integer
 
-    For i = 0 To MAX_PLAYERS
-        X = MAX_PLAYERS - i
+    For I = 0 To MAX_PLAYERS
+        x = MAX_PLAYERS - I
 
-        If IsConnected(X) = True Then
-            Player_HighIndex = X
+        If IsConnected(x) = True Then
+            Player_HighIndex = x
             Exit Sub
         End If
 
-    Next i
+    Next I
 
     Player_HighIndex = 0
 

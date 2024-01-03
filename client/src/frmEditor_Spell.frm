@@ -331,12 +331,20 @@ Begin VB.Form frmEditor_Spell
          Top             =   120
          Visible         =   0   'False
          Width           =   3255
+         Begin VB.HScrollBar scrlImpact 
+            Height          =   135
+            Left            =   120
+            Max             =   10
+            TabIndex        =   98
+            Top             =   1440
+            Width           =   1695
+         End
          Begin VB.CheckBox chkTrap 
             Caption         =   "Is Trap?"
             Height          =   255
-            Left            =   120
+            Left            =   1920
             TabIndex        =   97
-            Top             =   200
+            Top             =   2040
             Width           =   1215
          End
          Begin VB.HScrollBar scrlDurationProjectile 
@@ -354,7 +362,7 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             SmallChange     =   50
             TabIndex        =   95
-            Top             =   630
+            Top             =   480
             Width           =   1695
          End
          Begin VB.HScrollBar scrlDamageProjectile 
@@ -362,16 +370,16 @@ Begin VB.Form frmEditor_Spell
             LargeChange     =   5
             Left            =   120
             TabIndex        =   94
-            Top             =   1110
+            Top             =   960
             Width           =   1695
          End
          Begin VB.CheckBox chkRecuringDamage 
-            Caption         =   "Chain Damage"
+            Caption         =   "Chain Dam"
             Height          =   255
-            Left            =   120
+            Left            =   1920
             TabIndex        =   73
-            Top             =   1400
-            Width           =   1455
+            Top             =   2280
+            Width           =   1215
          End
          Begin VB.CheckBox chkProjectileAoE 
             Caption         =   "Damage AoE"
@@ -492,6 +500,15 @@ Begin VB.Form frmEditor_Spell
             Top             =   240
             Width           =   960
          End
+         Begin VB.Label lblImpact 
+            AutoSize        =   -1  'True
+            Caption         =   "Impact Range: 0"
+            Height          =   180
+            Left            =   120
+            TabIndex        =   99
+            Top             =   1200
+            Width           =   1260
+         End
          Begin VB.Label lblAoEProjectile 
             Caption         =   "No AoE damage settings"
             Height          =   255
@@ -526,7 +543,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   81
-            Top             =   900
+            Top             =   720
             Width           =   1575
          End
          Begin VB.Label lblAnimOnHit 
@@ -553,7 +570,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   78
-            Top             =   420
+            Top             =   240
             Width           =   1575
          End
          Begin VB.Label lblProjectilePic 
@@ -879,7 +896,7 @@ Private Sub chkDirectionalProjectile_Click()
 End Sub
 
 Private Sub chkProjectileAoE_Click()
-    If chkProjectileAoE.Value = 0 Then
+    If chkProjectileAoE.Value = NO Then
         Spell(EditorIndex).IsAoE = False
         scrlProjectileRadiusX.enabled = False
         scrlProjectileRadiusY.enabled = False
@@ -955,8 +972,8 @@ Private Sub cmbDirection_Click()
         scrlProjectileRadiusX.Value = Spell(EditorIndex).DirectionAoE(cmbDirection.ListIndex).X
         scrlProjectileRadiusY.Value = Spell(EditorIndex).DirectionAoE(cmbDirection.ListIndex).Y
         
-        scrlProjectileRadiusX_Change
-        scrlProjectileRadiusY_Change
+        'scrlProjectileRadiusX_Change
+        'scrlProjectileRadiusY_Change
     End If
 End Sub
 
@@ -1093,7 +1110,7 @@ Private Sub scrlDir_Change()
     End Select
 
     lblDir.caption = "Dir: " & sDir
-    Spell(EditorIndex).Dir = scrlDir.Value
+    Spell(EditorIndex).dir = scrlDir.Value
 End Sub
 
 Private Sub scrlDuration_Change()
@@ -1127,6 +1144,11 @@ Private Sub scrlIcon_Change()
     End If
 
     Spell(EditorIndex).icon = scrlIcon.Value
+End Sub
+
+Private Sub scrlImpact_Change()
+    lblImpact.caption = "Impact Range: " & scrlImpact.Value
+    Spell(EditorIndex).Projectile.ImpactRange = scrlImpact.Value
 End Sub
 
 Private Sub scrlIndex_Change()

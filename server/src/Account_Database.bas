@@ -5,9 +5,6 @@ Option Explicit
 Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpString As String, ByVal lpfilename As String) As Long
 Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationname As String, ByVal lpKeyname As Any, ByVal lpdefault As String, ByVal lpreturnedstring As String, ByVal nsize As Long, ByVal lpfilename As String) As Long
 
-'For Clear functions
-Private Declare Sub ZeroMemory Lib "Kernel32.dll" Alias "RtlZeroMemory" (Destination As Any, ByVal Length As Long)
-
 ' *************
 ' ** Account **
 ' *************
@@ -181,7 +178,7 @@ Public Sub MergeAccount(ByVal index As Long, ByVal charNum As Long, ByVal oldAcc
         ' Inventory
         For i = 1 To MAX_INV
             .Inv(i).Num = Val(GetVar(filename, charHeader, "InvNum" & i))
-            .Inv(i).Value = Val(GetVar(filename, charHeader, "InvValue" & i))
+            .Inv(i).value = Val(GetVar(filename, charHeader, "InvValue" & i))
             .Inv(i).Bound = Val(GetVar(filename, charHeader, "InvBound" & i))
         Next
 
@@ -200,7 +197,7 @@ Public Sub MergeAccount(ByVal index As Long, ByVal charNum As Long, ByVal oldAcc
         ' Position
         .Map = Val(GetVar(filename, charHeader, "Map"))
         .x = Val(GetVar(filename, charHeader, "X"))
-        .y = Val(GetVar(filename, charHeader, "Y"))
+        .Y = Val(GetVar(filename, charHeader, "Y"))
         .Dir = Val(GetVar(filename, charHeader, "Dir"))
 
         ' Tutorial
@@ -241,7 +238,7 @@ Public Sub MergeAccount(ByVal index As Long, ByVal charNum As Long, ByVal oldAcc
         ' Inventory
         For i = 1 To MAX_INV
             PutVar filename, charHeader, "InvNum" & i, Val(.Inv(i).Num)
-            PutVar filename, charHeader, "InvValue" & i, Val(.Inv(i).Value)
+            PutVar filename, charHeader, "InvValue" & i, Val(.Inv(i).value)
             PutVar filename, charHeader, "InvBound" & i, Val(.Inv(i).Bound)
         Next
 
@@ -260,7 +257,7 @@ Public Sub MergeAccount(ByVal index As Long, ByVal charNum As Long, ByVal oldAcc
         ' Position
         PutVar filename, charHeader, "Map", Val(.Map)
         PutVar filename, charHeader, "X", Val(.x)
-        PutVar filename, charHeader, "Y", Val(.y)
+        PutVar filename, charHeader, "Y", Val(.Y)
         PutVar filename, charHeader, "Dir", Val(.Dir)
 
         ' Tutorial

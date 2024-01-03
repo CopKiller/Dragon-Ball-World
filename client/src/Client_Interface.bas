@@ -43,6 +43,7 @@ Public Enum DesignTypes
     DesignWindowClear
     designWindowDescription
     designWindowShadow
+    DesignWindowClearIcon
     DesignWindowNormalIcon
 
     DesignParchment
@@ -90,12 +91,12 @@ End Enum
 Public Enum Alignment
     AlignLeft = 0
     AlignRight
-    AlignCentre
+    alignCentre
 End Enum
 
 ' Part Types
 Public Enum PartType
-    PartNone = 0
+    partNone = 0
     PartItem
     Partspell
 End Enum
@@ -191,6 +192,14 @@ Private zOrder_Con As Long
 
 Public Function SetzOrder_Win(ByVal Value As Long)
     zOrder_Win = Value
+End Function
+
+Public Function GetOrder_Win() As Long
+    GetOrder_Win = zOrder_Win
+End Function
+
+Public Function SetzOrder_Con(ByVal Value As Long)
+    zOrder_Con = Value
 End Function
 
 Public Sub CreateEntity(winNum As Long, zOrder As Long, Name As String, tType As EntityTypes, ByRef design() As Long, ByRef image() As Long, ByRef entCallBack() As Long, _
@@ -346,7 +355,7 @@ End Sub
 
 Public Sub RenderEntity(winNum As Long, entNum As Long)
     Dim Xo As Long, Yo As Long, hor_centre As Long, ver_centre As Long, Height As Long, Width As Long, Left As Long, texNum As Long, xOffset As Long
-    Dim Callback As Long, taddText As String, Colour As Long, textArray() As String, Count As Long, yOffset As Long, i As Long, Y As Long, X As Long
+    Dim Callback As Long, taddText As String, colour As Long, textArray() As String, Count As Long, yOffset As Long, i As Long, Y As Long, X As Long
 
     ' check if the window exists
     If winNum <= 0 Or winNum > windowCount Then
@@ -430,14 +439,14 @@ Public Sub RenderEntity(winNum As Long, entNum As Long)
             End If
             ' get the colour
             If .state = Hover Then
-                Colour = .textColourHover
+                colour = .textColourHover
             ElseIf .state = MouseDown Then
-                Colour = .textColourClick
+                colour = .textColourClick
 
             Else
-                Colour = .textColour
+                colour = .textColour
             End If
-            RenderText font(.font), .text, hor_centre, ver_centre, Colour
+            RenderText font(.font), .text, hor_centre, ver_centre, colour
 
             ' labels
         Case EntityTypes.EntityLabel
@@ -476,7 +485,7 @@ Public Sub RenderEntity(winNum As Long, entNum As Long)
                         Left = .Left + .Width - TextWidth(font(.font), .text)
                         RenderText font(.font), .text, Left + Xo, .Top + Yo, .textColour, .alpha
                     End If
-                Case Alignment.AlignCentre
+                Case Alignment.alignCentre
                     ' check if need to word wrap
                     If TextWidth(font(.font), .text) > .Width Then
                         ' wrap text
@@ -512,7 +521,7 @@ Public Sub RenderEntity(winNum As Long, entNum As Long)
                     Left = .Left + 18 + Xo
                 Case Alignment.AlignRight
                     Left = .Left + 18 + (.Width - 18) - TextWidth(font(.font), .text) + Xo
-                Case Alignment.AlignCentre
+                Case Alignment.alignCentre
                     Left = .Left + 18 + ((.Width - 18) / 2) - (TextWidth(font(.font), .text) / 2) + Xo
                 End Select
                 ' render text
@@ -642,6 +651,16 @@ Public Sub RenderWindow(winNum As Long)
             ' render window
             RenderDesign DesignTypes.designWindowShadow, .Left, .Top, .Width, .Height
             
+        Case DesignTypes.DesignWindowClearIcon
+            ' render window
+            RenderDesign DesignTypes.DesignWoodEmpty, .Left, .Top, .Width, .Height
+            RenderDesign DesignTypes.DesignGreenNormal, .Left, .Top, .Width, 40
+            ' render the icon
+            Width = mTexture(.icon).Width
+            Height = mTexture(.icon).Height
+            RenderTexture .icon, .Left + .xOffset, .Top - (Width - 24) + .yOffset, 0, 0, Width + 10, Height + 10, Width, Height
+            ' render the caption
+            RenderText font(.font), Trim$(.text), .Left + Height + 20, .Top + 15, .textColour
         Case DesignTypes.DesignWindowNormalIcon
             ' render window
             RenderDesign DesignTypes.DesignWoodNormal, .Left, .Top, .Width, .Height
@@ -663,12 +682,12 @@ Public Sub RenderWindow(winNum As Long)
 End Sub
 
 Public Sub RenderDesign(design As Long, Left As Long, Top As Long, Width As Long, Height As Long, Optional alpha As Long = 255, Optional ByVal Color As Long = -1)
-    Dim bs As Long, Colour As Long
+    Dim bs As Long, colour As Long
 
     If Color = -1 Then
-        Colour = DX8Colour(White, alpha)
+        colour = DX8Colour(White, alpha)
     Else
-        Colour = Color
+        colour = Color
     End If
 
     Select Case design
@@ -685,14 +704,14 @@ Public Sub RenderDesign(design As Long, Left As Long, Top As Long, Width As Long
     Case DesignTypes.DesignColor
 
         ' render the option
-        RenderTexture TextureBlank, Left, Top, 0, 0, Width, Height, 32, 32, Colour
+        RenderTexture TextureBlank, Left, Top, 0, 0, Width, Height, 32, 32, colour
 
     Case DesignTypes.DesignWoodNormal
         bs = 2
         ' render the wood box
         RenderEntity_Square TextureDesign(1), Left, Top, Width, Height, bs, alpha
         ' render wood texture
-        RenderTexture TextureGUI(1), Left + bs, Top + bs, 100, 100, Width - (bs * 2), Height - (bs * 2), Width - (bs * 2), Height - (bs * 2), Colour
+        RenderTexture TextureGUI(1), Left + bs, Top + bs, 100, 100, Width - (bs * 2), Height - (bs * 2), Width - (bs * 2), Height - (bs * 2), colour
 
     Case DesignTypes.DesignWoodEmpty
 
@@ -705,91 +724,91 @@ Public Sub RenderDesign(design As Long, Left As Long, Top As Long, Width As Long
         ' render the green box
         RenderEntity_Square TextureDesign(9), Left, Top, Width, Height, bs, alpha
         ' render green gradient overlay
-        RenderTexture TextureGradient(1), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(1), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGreenHover
         bs = 2
         ' render the green box
         RenderEntity_Square TextureDesign(9), Left, Top, Width, Height, bs, alpha
         ' render green gradient overlay
-        RenderTexture TextureGradient(2), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(2), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGreenClick
         bs = 2
         ' render the green box
         RenderEntity_Square TextureDesign(9), Left, Top, Width, Height, bs, alpha
         ' render green gradient overlay
-        RenderTexture TextureGradient(3), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(3), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignRedNormal
         bs = 2
         ' render the red box
         RenderEntity_Square TextureDesign(10), Left, Top, Width, Height, bs, alpha
         ' render red gradient overlay
-        RenderTexture TextureGradient(4), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(4), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignRedHover
         bs = 2
         ' render the red box
         RenderEntity_Square TextureDesign(10), Left, Top, Width, Height, bs, alpha
         ' render red gradient overlay
-        RenderTexture TextureGradient(5), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(5), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignRedClick
         bs = 2
         ' render the red box
         RenderEntity_Square TextureDesign(10), Left, Top, Width, Height, bs, alpha
         ' render red gradient overlay
-        RenderTexture TextureGradient(6), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(6), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignBlueNormal
         bs = 2
         ' render the Blue box
         RenderEntity_Square TextureDesign(11), Left, Top, Width, Height, bs, alpha
         ' render Blue gradient overlay
-        RenderTexture TextureGradient(7), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(7), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignBlueHover
         bs = 2
         ' render the Blue box
         RenderEntity_Square TextureDesign(11), Left, Top, Width, Height, bs, alpha
         ' render Blue gradient overlay
-        RenderTexture TextureGradient(8), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(8), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignBlueClick
         bs = 2
         ' render the Blue box
         RenderEntity_Square TextureDesign(11), Left, Top, Width, Height, bs, alpha
         ' render Blue gradient overlay
-        RenderTexture TextureGradient(9), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(9), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGoldNormal
         bs = 2
         ' render the Orange box
         RenderEntity_Square TextureDesign(12), Left, Top, Width, Height, bs, alpha
         ' render Orange gradient overlay
-        RenderTexture TextureGradient(10), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(10), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGoldHover
         bs = 2
         ' render the Orange box
         RenderEntity_Square TextureDesign(12), Left, Top, Width, Height, bs, alpha
         ' render Orange gradient overlay
-        RenderTexture TextureGradient(11), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(11), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGoldClick
         bs = 2
         ' render the Orange box
         RenderEntity_Square TextureDesign(12), Left, Top, Width, Height, bs, alpha
         ' render Orange gradient overlay
-        RenderTexture TextureGradient(12), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(12), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignGrey
         bs = 2
         ' render the Orange box
         RenderEntity_Square TextureDesign(13), Left, Top, Width, Height, bs, alpha
         ' render Orange gradient overlay
-        RenderTexture TextureGradient(13), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, Colour
+        RenderTexture TextureGradient(13), Left + bs, Top + bs, 0, 0, Width - (bs * 2), Height - (bs * 2), 128, 128, colour
 
     Case DesignTypes.DesignParchment
         bs = 2
@@ -825,29 +844,29 @@ Public Sub RenderDesign(design As Long, Left As Long, Top As Long, Width As Long
 End Sub
 
 Public Sub RenderEntity_Square(texNum As Long, X As Long, Y As Long, Width As Long, Height As Long, borderSize As Long, Optional alpha As Long = 255)
-    Dim bs As Long, Colour As Long
+    Dim bs As Long, colour As Long
     ' change colour for alpha
-    Colour = DX8Colour(White, alpha)
+    colour = DX8Colour(White, alpha)
     ' Set the border size
     bs = borderSize
     ' Draw centre
-    RenderTexture texNum, X + bs, Y + bs, bs + 1, bs + 1, Width - (bs * 2), Height - (bs * 2), 1, 1, Colour
+    RenderTexture texNum, X + bs, Y + bs, bs + 1, bs + 1, Width - (bs * 2), Height - (bs * 2), 1, 1, colour
     ' Draw top side
-    RenderTexture texNum, X + bs, Y, bs, 0, Width - (bs * 2), bs, 1, bs, Colour
+    RenderTexture texNum, X + bs, Y, bs, 0, Width - (bs * 2), bs, 1, bs, colour
     ' Draw left side
-    RenderTexture texNum, X, Y + bs, 0, bs, bs, Height - (bs * 2), bs, 1, Colour
+    RenderTexture texNum, X, Y + bs, 0, bs, bs, Height - (bs * 2), bs, 1, colour
     ' Draw right side
-    RenderTexture texNum, X + Width - bs, Y + bs, bs + 3, bs, bs, Height - (bs * 2), bs, 1, Colour
+    RenderTexture texNum, X + Width - bs, Y + bs, bs + 3, bs, bs, Height - (bs * 2), bs, 1, colour
     ' Draw bottom side
-    RenderTexture texNum, X + bs, Y + Height - bs, bs, bs + 3, Width - (bs * 2), bs, 1, bs, Colour
+    RenderTexture texNum, X + bs, Y + Height - bs, bs, bs + 3, Width - (bs * 2), bs, 1, bs, colour
     ' Draw top left corner
-    RenderTexture texNum, X, Y, 0, 0, bs, bs, bs, bs, Colour
+    RenderTexture texNum, X, Y, 0, 0, bs, bs, bs, bs, colour
     ' Draw top right corner
-    RenderTexture texNum, X + Width - bs, Y, bs + 3, 0, bs, bs, bs, bs, Colour
+    RenderTexture texNum, X + Width - bs, Y, bs + 3, 0, bs, bs, bs, bs, colour
     ' Draw bottom left corner
-    RenderTexture texNum, X, Y + Height - bs, 0, bs + 3, bs, bs, bs, bs, Colour
+    RenderTexture texNum, X, Y + Height - bs, 0, bs + 3, bs, bs, bs, bs, colour
     ' Draw bottom right corner
-    RenderTexture texNum, X + Width - bs, Y + Height - bs, bs + 3, bs + 3, bs, bs, bs, bs, Colour
+    RenderTexture texNum, X + Width - bs, Y + Height - bs, bs + 3, bs + 3, bs, bs, bs, bs, colour
 End Sub
 
 Sub Combobox_AddItem(winIndex As Long, controlIndex As Long, text As String)
@@ -1163,8 +1182,8 @@ Public Sub CreateWindow_Login()
     CreatePictureBox windowCount, "picShadow_2", 15, WindowTopBar + 56, 242, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
 
     ' Textos
-    CreateLabel windowCount, "lblUsername", 15, WindowTopBar + 10, 242, , "User", Default, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblPassword", 15, WindowTopBar + 52, 242, , "Password", Default, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblUsername", 15, WindowTopBar + 10, 242, , "User", Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblPassword", 15, WindowTopBar + 52, 242, , "Password", Default, White, Alignment.alignCentre
 
     ' Textboxes
     CreateTextbox windowCount, "txtUser", 15, WindowTopBar + 27, 242, 26, Options.Username, Fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4
@@ -1184,21 +1203,21 @@ Public Sub CreateWindow_Login()
 End Sub
 
 Public Sub StrongPassword()
-    Dim X, Y, passwordLenght, Colour As Long
+    Dim X, Y, passwordLenght, colour As Long
 
     X = Windows(GetWindowIndex("winRegister")).Window.Left
     Y = Windows(GetWindowIndex("winRegister")).Window.Top
     passwordLenght = Len(Windows(GetWindowIndex("winRegister")).Controls(GetControlIndex("winRegister", "txtPass2")).text)
 
     If passwordLenght <= 6 Then
-        Colour = D3DColorARGB(200, 200, 60, 60)
+        colour = D3DColorARGB(200, 200, 60, 60)
     ElseIf passwordLenght <= 10 Then
-        Colour = D3DColorARGB(200, 220, 200, 50)
+        colour = D3DColorARGB(200, 220, 200, 50)
     ElseIf passwordLenght > 10 Then
-        Colour = D3DColorARGB(200, 80, 220, 50)
+        colour = D3DColorARGB(200, 80, 220, 50)
     End If
 
-    RenderDesign DesignTypes.DesignColor, X + 15, Y + (WindowTopBar + 136), 242, 4, , Colour
+    RenderDesign DesignTypes.DesignColor, X + 15, Y + (WindowTopBar + 136), 242, 4, , colour
 End Sub
 
 Public Sub CreateWindow_Register()
@@ -1226,11 +1245,11 @@ Public Sub CreateWindow_Register()
     CreatePictureBox windowCount, "picShadow_5", 15, WindowTopBar + 188, 242, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
 
     ' Textos
-    CreateLabel windowCount, "lblUsername", 15, (WindowTopBar + 14) - 4, 242, , "Usuario", Fonts.Default, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblPassword", 15, (WindowTopBar + 56) - 4, 242, , "Senha", Fonts.Default, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblPassword2", 15, (WindowTopBar + 98) - 4, 242, , "Repetir Senha", Fonts.Default, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblCode", 15, (WindowTopBar + 146) - 4, 242 - 4, , "Código Secreto", Fonts.Default, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblCaptcha", 15, (WindowTopBar + 188) - 4, 242, , "Captcha", Fonts.Default, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblUsername", 15, (WindowTopBar + 14) - 4, 242, , "Usuario", Fonts.Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblPassword", 15, (WindowTopBar + 56) - 4, 242, , "Senha", Fonts.Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblPassword2", 15, (WindowTopBar + 98) - 4, 242, , "Repetir Senha", Fonts.Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblCode", 15, (WindowTopBar + 146) - 4, 242 - 4, , "Código Secreto", Fonts.Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblCaptcha", 15, (WindowTopBar + 188) - 4, 242, , "Captcha", Fonts.Default, White, Alignment.alignCentre
 
     ' Textboxes
     CreateTextbox windowCount, "txtAccount", 15, WindowTopBar + 27, 242, 26, vbNullString, Fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click)
@@ -1267,11 +1286,11 @@ Public Sub CreateWindow_Characters()
     CreatePictureBox windowCount, "picParchment", 6, 26, 352, 197, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Names
     CreatePictureBox windowCount, "picShadow_1", 22, 41, 98, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblCharName_1", 22, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblCharName_1", 22, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.alignCentre
     CreatePictureBox windowCount, "picShadow_2", 132, 41, 98, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblCharName_2", 132, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblCharName_2", 132, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.alignCentre
     CreatePictureBox windowCount, "picShadow_3", 242, 41, 98, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblCharName_3", 242, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblCharName_3", 242, 37, 98, , "Blank Slot", rockwellDec_15, White, Alignment.alignCentre
     ' Scenery Boxes
     CreatePictureBox windowCount, "picScene_1", 23, 55, 96, 96, , , , , TextureGUI(2), TextureGUI(2), TextureGUI(2)
     CreatePictureBox windowCount, "picScene_2", 133, 55, 96, 96, , , , , TextureGUI(2), TextureGUI(2), TextureGUI(2)
@@ -1302,7 +1321,7 @@ Public Sub CreateWindow_Loading()
     ' Text background
     CreatePictureBox windowCount, "picRecess", 26, 39, 226, 22, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Label
-    CreateLabel windowCount, "lblLoading", 6, 43, 266, , "Loading Game Data...", rockwell_15, , Alignment.AlignCentre
+    CreateLabel windowCount, "lblLoading", 6, 43, 266, , "Loading Game Data...", rockwell_15, , Alignment.alignCentre
 End Sub
 
 Public Sub CreateWindow_Dialogue()
@@ -1327,11 +1346,11 @@ Public Sub CreateWindow_Dialogue()
     ' Header
     CreatePictureBox windowCount, "picShadow", 15, WindowTopBar + 13, 358, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     
-    CreateLabel windowCount, "lblHeader", 15, WindowTopBar + 9, 358, , "Header", Fonts.Default, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblHeader", 15, WindowTopBar + 9, 358, , "Header", Fonts.Default, White, Alignment.alignCentre
     
     ' Labels
-    CreateLabel windowCount, "lblBody_1", 15, WindowTopBar + 30, 358, , "Invalid username or password.", Fonts.Default, DarkGrey, Alignment.AlignCentre
-    CreateLabel windowCount, "lblBody_2", 15, WindowTopBar + 48, 358, , "Please try again.", Fonts.Default, DarkGrey, Alignment.AlignCentre
+    CreateLabel windowCount, "lblBody_1", 15, WindowTopBar + 30, 358, , "Invalid username or password.", Fonts.Default, DarkGrey, Alignment.alignCentre
+    CreateLabel windowCount, "lblBody_2", 15, WindowTopBar + 48, 358, , "Please try again.", Fonts.Default, DarkGrey, Alignment.alignCentre
     
     ' Buttons
     CreateButton windowCount, "btnYes", 15, WindowTopBar + 87, 177, 30, "Sim", Default, , , False, , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf Dialogue_Yes)
@@ -1339,7 +1358,7 @@ Public Sub CreateWindow_Dialogue()
     CreateButton windowCount, "btnOkay", 15, WindowTopBar + 87, 358, 30, "Confirmar", Fonts.Default, , , True, , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf Dialogue_Okay)
     
     ' Input
-    CreateTextbox windowCount, "txtInput", 15, WindowTopBar + 48, 358, 26, , Default, DarkGrey, Alignment.AlignCentre, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4
+    CreateTextbox windowCount, "txtInput", 15, WindowTopBar + 48, 358, 26, , Default, DarkGrey, Alignment.alignCentre, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4
     ' set active control
     SetActiveControl windowCount, GetControlIndex("winDialogue", "txtInput")
 End Sub
@@ -1360,7 +1379,7 @@ Public Sub CreateWindow_Classes()
     CreatePictureBox windowCount, "picParchment", 6, 26, 352, 197, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment, , , , , , GetAddress(AddressOf Classes_DrawFace)
     ' Class Name
     CreatePictureBox windowCount, "picShadow", 183, 42, 98, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblClassName", 183, 39, 98, , "Warrior", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblClassName", 183, 39, 98, , "Warrior", rockwellDec_15, White, Alignment.alignCentre
     ' Select Buttons
     CreateButton windowCount, "btnLeft", 171, 40, 11, 13, , , , , , , TextureGUI(12), TextureGUI(13), TextureGUI(14), , , , , , GetAddress(AddressOf btnClasses_Left)
     CreateButton windowCount, "btnRight", 282, 40, 11, 13, , , , , , , TextureGUI(15), TextureGUI(16), TextureGUI(17), , , , , , GetAddress(AddressOf btnClasses_Right)
@@ -1388,22 +1407,22 @@ Public Sub CreateWindow_NewChar()
     CreatePictureBox windowCount, "picParchment", 6, 26, 278, 140, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Name
     CreatePictureBox windowCount, "picShadow_1", 29, 42, 124, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblName", 29, 39, 124, , "Name", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblName", 29, 39, 124, , "Name", rockwellDec_15, White, Alignment.alignCentre
     ' Textbox
     CreateTextbox windowCount, "txtName", 29, 55, 124, 19, , Fonts.rockwell_15, , Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 5, 3
     ' Gender
     CreatePictureBox windowCount, "picShadow_2", 29, 85, 124, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblGender", 29, 82, 124, , "Gender", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblGender", 29, 82, 124, , "Gender", rockwellDec_15, White, Alignment.alignCentre
     ' Checkboxes
-    CreateCheckbox windowCount, "chkMale", 29, 103, 55, , 1, "Male", rockwell_15, , Alignment.AlignCentre, , , DesignTypes.DesignCheckbox, , , GetAddress(AddressOf chkNewChar_Male), , , 1
-    CreateCheckbox windowCount, "chkFemale", 90, 103, 62, , 0, "Female", rockwell_15, , Alignment.AlignCentre, , , DesignTypes.DesignCheckbox, , , GetAddress(AddressOf chkNewChar_Female), , , 1
+    CreateCheckbox windowCount, "chkMale", 29, 103, 55, , 1, "Male", rockwell_15, , Alignment.alignCentre, , , DesignTypes.DesignCheckbox, , , GetAddress(AddressOf chkNewChar_Male), , , 1
+    CreateCheckbox windowCount, "chkFemale", 90, 103, 62, , 0, "Female", rockwell_15, , Alignment.alignCentre, , , DesignTypes.DesignCheckbox, , , GetAddress(AddressOf chkNewChar_Female), , , 1
 
     ' Buttons
     CreateButton windowCount, "btnAccept", 29, 127, 60, 24, "Accept", rockwellDec_15, , , , , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf btnNewChar_Accept)
     CreateButton windowCount, "btnCancel", 93, 127, 60, 24, "Cancel", rockwellDec_15, , , , , , , , DesignTypes.DesignRedNormal, DesignTypes.DesignRedHover, DesignTypes.DesignRedClick, , , GetAddress(AddressOf btnNewChar_Cancel)
     ' Sprite
     CreatePictureBox windowCount, "picShadow_3", 175, 42, 76, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblSprite", 175, 39, 76, , "Sprite", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblSprite", 175, 39, 76, , "Sprite", rockwellDec_15, White, Alignment.alignCentre
     ' Scene
     CreatePictureBox windowCount, "picScene", 165, 55, 96, 96, , , , , TextureGUI(2), TextureGUI(2), TextureGUI(2), , , , , , , , , GetAddress(AddressOf NewChar_OnDraw)
     ' Buttons
@@ -1448,9 +1467,9 @@ Public Sub CreateWindow_Bars()
     ' Draw the bars
     CreatePictureBox windowCount, "picBlank", 0, 0, 0, 0, , , , , , , , , , , , , , , , GetAddress(AddressOf Bars_OnDraw)
     ' Labels
-    CreateLabel windowCount, "lblHP", 15, 14, 209, 12, "999/999", rockwellDec_10, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblMP", 15, 31, 209, 12, "999/999", rockwellDec_10, White, Alignment.AlignCentre
-    CreateLabel windowCount, "lblEXP", 15, 48, 209, 12, "999/999", rockwellDec_10, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblHP", 15, 14, 209, 12, "999/999", rockwellDec_10, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblMP", 15, 31, 209, 12, "999/999", rockwellDec_10, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblEXP", 15, 48, 209, 12, "999/999", rockwellDec_10, White, Alignment.alignCentre
 End Sub
 
 Public Sub CreateWindow_Menu()
@@ -1491,7 +1510,7 @@ End Sub
 
 Public Sub CreateWindow_Inventory()
 ' Create window
-    CreateWindow "winInventory", "Inventory", zOrder_Win, 0, 0, 202, 339, TextureItem(1), False, Fonts.Default, , 2, 7, DesignTypes.DesignWindowNormalIcon, DesignTypes.DesignWindowNormalIcon, DesignTypes.DesignWindowNormalIcon, , , , , GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_MouseDown), GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_DblClick), , , GetAddress(AddressOf DrawInventory)
+    CreateWindow "winInventory", "Inventory", zOrder_Win, 0, 0, 196, 333, TextureItem(1), False, Fonts.Default, , 2, 7, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, , , , , GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_MouseDown), GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_DblClick), , , GetAddress(AddressOf DrawInventory)
 
     ' Centralise it
     CentraliseWindow windowCount
@@ -1537,7 +1556,7 @@ Public Sub CreateWindow_Character()
     CreateLabel windowCount, "lblExperience", 18, 156, 147, 16, "Experience", rockwellDec_10
     ' Attributes
     CreatePictureBox windowCount, "picShadow", 18, 176, 138, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblLabel", 18, 173, 138, , "Character Attributes", rockwellDec_15, , Alignment.AlignCentre
+    CreateLabel windowCount, "lblLabel", 18, 173, 138, , "Character Attributes", rockwellDec_15, , Alignment.alignCentre
     ' Black boxes
     CreatePictureBox windowCount, "picBlackBox", 13, 186, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 206, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
@@ -1573,45 +1592,6 @@ Public Sub CreateWindow_Character()
     CreateLabel windowCount, "lblPoints", 18, 288, 100, , "255", rockwellDec_10
 End Sub
 
-Public Sub CreateWindow_PlayerQuest()
-' Create window
-    CreateWindow "winPlayerQuests", "Quests", zOrder_Win, 0, 0, 450, 412, TextureItem(23), False, Fonts.rockwellDec_15, , 2, 7, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, , , , , GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_MouseDown), GetAddress(AddressOf Inventory_MouseMove), GetAddress(AddressOf Inventory_DblClick), , , GetAddress(AddressOf DrawWinQuest)
-
-    ' Centralise it
-    CentraliseWindow windowCount
-
-    ' Set the index for spawning controls
-    zOrder_Con = 1
-
-    ' Close button
-    CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 39, 2, 36, 36, , , , , , , TextureGUI(3), TextureGUI(4), TextureGUI(5), , , , , , GetAddress(AddressOf btnMenu_Quest)
-
-    CreateButton windowCount, "btnMission1", 5, 24, 125, 30, "Quest 1", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest1)
-    CreateButton windowCount, "btnMission2", 5, 56, 125, 30, "Quest 2", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest2)
-    CreateButton windowCount, "btnMission3", 5, 88, 125, 30, "Quest 3", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest3)
-    CreateButton windowCount, "btnMission4", 5, 120, 125, 30, "Quest 4", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest4)
-    CreateButton windowCount, "btnMission5", 5, 152, 125, 30, "Quest 5", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest5)
-    CreateButton windowCount, "btnMission6", 5, 184, 125, 30, "Quest 6", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest6)
-    CreateButton windowCount, "btnMission7", 5, 216, 125, 30, "Quest 7", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest7)
-    CreateButton windowCount, "btnMission8", 5, 248, 125, 30, "Quest 8", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest8)
-    CreateButton windowCount, "btnMission9", 5, 280, 125, 30, "Quest 9", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest9)
-    CreateButton windowCount, "btnMission10", 5, 312, 125, 30, "Quest 10", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest10)
-    CreateButton windowCount, "btnMission11", 5, 344, 125, 30, "Quest 11", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest11)
-    CreateButton windowCount, "btnMission12", 5, 376, 125, 30, "Quest 12", verdana_12, White, , False, , , , , DesignTypes.DesignMenuHover, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, , , GetAddress(AddressOf btnQuest12)
-
-    ' Description
-    CreateLabel windowCount, "lblDescrip", 142, 27, 150, 20, "Description:", Fonts.verdana_12, Grey, Alignment.AlignLeft, True
-    CreatePictureBox windowCount, "picDescription", 137, 43, 307, 150, True, False, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
-    CreateLabel windowCount, "lblDescription", 142, 47, 297, 140, "", Fonts.verdana_12, White, Alignment.AlignLeft, True
-
-    ' Goal
-    CreateLabel windowCount, "lblGo", 142, 197, 150, 20, "Goal:", Fonts.verdana_12, Grey, Alignment.AlignLeft, True
-    CreatePictureBox windowCount, "picGoal", 137, 212, 307, 150, True, False, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
-    CreateLabel windowCount, "lblGoal", 142, 217, 297, 140, "", Fonts.verdana_12, White, Alignment.AlignLeft, True
-
-    CreateLabel windowCount, "lblExp", 335, 381, 101, , "1.000.000 EXP", rockwellDec_15, LightGreen, Alignment.AlignCentre
-End Sub
-
 Public Sub CreateWindow_Description()
 ' Create window
     CreateWindow "winDescription", "", zOrder_Win, 0, 0, 193, 142, 0, , , , , , DesignTypes.designWindowDescription, DesignTypes.designWindowDescription, DesignTypes.designWindowDescription, , , , , , , , , False
@@ -1620,15 +1600,15 @@ Public Sub CreateWindow_Description()
     zOrder_Con = 1
 
     ' Name
-    CreateLabel windowCount, "lblName", 8, 12, 177, , "(SB) Flame Sword", rockwellDec_15, BrightBlue, Alignment.AlignCentre
+    CreateLabel windowCount, "lblName", 8, 12, 177, , "(SB) Flame Sword", rockwellDec_15, BrightBlue, Alignment.alignCentre
     ' Sprite box
     CreatePictureBox windowCount, "picSprite", 18, 32, 68, 68, , , , , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenNormal, , , , , , GetAddress(AddressOf Description_OnDraw)
     ' Sep
     CreatePictureBox windowCount, "picSep", 96, 28, 1, 92, , , , , TextureGUI(44), TextureGUI(44), TextureGUI(44)
     ' Requirements
-    CreateLabel windowCount, "lblClass", 5, 102, 92, , "Warrior", verdana_12, LightGreen, Alignment.AlignCentre
-    CreateLabel windowCount, "lblLevel", 5, 114, 92, , "Level 20", verdana_12, BrightRed, Alignment.AlignCentre
-    CreateLabel windowCount, "lblDescription", 100, 28, 85, 112, "Level 20", verdana_12, White, Alignment.AlignCentre, False
+    CreateLabel windowCount, "lblClass", 5, 102, 92, , "Warrior", verdana_12, LightGreen, Alignment.alignCentre
+    CreateLabel windowCount, "lblLevel", 5, 114, 92, , "Level 20", verdana_12, BrightRed, Alignment.alignCentre
+    CreateLabel windowCount, "lblDescription", 100, 28, 85, 112, "Level 20", verdana_12, White, Alignment.alignCentre, False
     ' Bar
     CreatePictureBox windowCount, "picBar", 19, 114, 66, 12, False, , , , TextureGUI(45), TextureGUI(45), TextureGUI(45)
 End Sub
@@ -1642,7 +1622,7 @@ End Sub
 
 Public Sub CreateWindow_Skills()
 ' Create window
-    CreateWindow "winSkills", "Skills", zOrder_Win, 0, 0, 202, 297, TextureItem(109), False, Fonts.rockwellDec_15, , 2, 7, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, , , , , GetAddress(AddressOf Skills_MouseMove), GetAddress(AddressOf Skills_MouseDown), GetAddress(AddressOf Skills_MouseMove), GetAddress(AddressOf Skills_DblClick), , , GetAddress(AddressOf DrawSkills)
+    CreateWindow "winSkills", "Skills", zOrder_Win, 0, 0, 196, 311, TextureItem(109), False, Fonts.Default, , 2, 7, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, , , , , GetAddress(AddressOf Skills_MouseMove), GetAddress(AddressOf Skills_MouseDown), GetAddress(AddressOf Skills_MouseMove), GetAddress(AddressOf Skills_DblClick), , , GetAddress(AddressOf DrawSkills)
 
     ' Centralise it
     CentraliseWindow windowCount
@@ -1668,6 +1648,7 @@ Public Sub CreateWindow_Chat()
     CreateCheckbox windowCount, "chkParty", 160, 2, 49, 23, 1, "Party", rockwellDec_10, , , , , DesignTypes.DesignCheckChat, , , GetAddress(AddressOf chkChat_Party)
     CreateCheckbox windowCount, "chkGuild", 210, 2, 49, 23, 1, "Guild", rockwellDec_10, , , , , DesignTypes.DesignCheckChat, , , GetAddress(AddressOf chkChat_Guild)
     CreateCheckbox windowCount, "chkPrivate", 260, 2, 49, 23, 1, "Private", rockwellDec_10, , , , , DesignTypes.DesignCheckChat, , , GetAddress(AddressOf chkChat_Private)
+    CreateCheckbox windowCount, "chkQuest", 310, 2, 49, 23, 1, "Quest", rockwellDec_10, , , , , DesignTypes.DesignCheckChat, , , GetAddress(AddressOf chkChat_Quest)
 
     ' Blank picturebox - ondraw wrapper
     CreatePictureBox windowCount, "picNull", 0, 0, 0, 0, , , , , , , , , , , , , , , , GetAddress(AddressOf OnDraw_Chat)
@@ -1694,6 +1675,7 @@ Public Sub CreateWindow_Chat()
         .Controls(GetControlIndex("winChat", "chkParty")).Value = Options.channelState(ChatChannel.chParty)
         .Controls(GetControlIndex("winChat", "chkGuild")).Value = Options.channelState(ChatChannel.chGuild)
         .Controls(GetControlIndex("winChat", "chkPrivate")).Value = Options.channelState(ChatChannel.chPrivate)
+        .Controls(GetControlIndex("winChat", "chkQuest")).Value = Options.channelState(ChatChannel.chQuest)
     End With
 End Sub
 
@@ -1722,7 +1704,7 @@ Public Sub CreateWindow_Options()
     CreatePictureBox windowCount, "picParchment", 6, 6, 198, 200, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' General
     CreatePictureBox windowCount, "picBlank", 35, 25, 140, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblBlank", 35, 22, 140, , "General Options", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblBlank", 35, 22, 140, , "General Options", rockwellDec_15, White, Alignment.alignCentre
     ' Check boxes
     CreateCheckbox windowCount, "chkMusic", 35, 40, 80, , , "Music", rockwellDec_10, , , , , DesignTypes.DesignCheckbox
     CreateCheckbox windowCount, "chkSound", 115, 40, 80, , , "Sound", rockwellDec_10, , , , , DesignTypes.DesignCheckbox
@@ -1731,12 +1713,12 @@ Public Sub CreateWindow_Options()
 
     ' Resolution
     CreatePictureBox windowCount, "picBlank", 35, 85, 140, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblBlank", 35, 82, 140, , "Select Resolution", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblBlank", 35, 82, 140, , "Select Resolution", rockwellDec_15, White, Alignment.alignCentre
     ' combobox
     CreateComboBox windowCount, "cmbRes", 30, 100, 150, 18, DesignTypes.DesignCombo, verdana_12
     ' Renderer
     CreatePictureBox windowCount, "picBlank", 35, 125, 140, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblBlank", 35, 122, 140, , "DirectX Mode", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblBlank", 35, 122, 140, , "DirectX Mode", rockwellDec_15, White, Alignment.alignCentre
     ' Check boxes
     CreateComboBox windowCount, "cmbRender", 30, 140, 150, 18, DesignTypes.DesignCombo, verdana_12
     ' Button
@@ -1836,7 +1818,7 @@ Public Sub CreateWindow_NpcChat()
     ' Chat BG
     CreatePictureBox windowCount, "picChatBG", 128, 39, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Chat
-    CreateLabel windowCount, "lblChat", 136, 44, 318, 102, "[Text]", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblChat", 136, 44, 318, 102, "[Text]", rockwellDec_15, White, Alignment.alignCentre
     ' Reply buttons
     CreateButton windowCount, "btnOpt4", 69, 145, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt4), , , , , DarkGrey
     CreateButton windowCount, "btnOpt3", 69, 162, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt3), , , , , DarkGrey
@@ -1921,19 +1903,19 @@ Public Sub CreateWindow_Trade()
     CreatePictureBox windowCount, "picParchment", 10, 312, 392, 66, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Labels
     CreatePictureBox windowCount, "picShadow", 36, 30, 142, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblYourTrade", 36, 27, 142, 9, "Robin's Offer", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblYourTrade", 36, 27, 142, 9, "Robin's Offer", rockwellDec_15, White, Alignment.alignCentre
     CreatePictureBox windowCount, "picShadow", 36 + 200, 30, 142, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblTheirTrade", 36 + 200, 27, 142, 9, "Richard's Offer", rockwellDec_15, White, Alignment.AlignCentre
+    CreateLabel windowCount, "lblTheirTrade", 36 + 200, 27, 142, 9, "Richard's Offer", rockwellDec_15, White, Alignment.alignCentre
     ' Buttons
     CreateButton windowCount, "btnAccept", 134, 340, 68, 24, "Accept", rockwellDec_15, White, , , , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf btnTrade_Accept)
     CreateButton windowCount, "btnDecline", 210, 340, 68, 24, "Decline", rockwellDec_15, White, , , , , , , DesignTypes.DesignRedNormal, DesignTypes.DesignRedHover, DesignTypes.DesignRedClick, , , GetAddress(AddressOf btnTrade_Close)
     ' Labels
-    CreateLabel windowCount, "lblStatus", 114, 322, 184, , "", verdanaBold_12, Red, Alignment.AlignCentre
+    CreateLabel windowCount, "lblStatus", 114, 322, 184, , "", verdanaBold_12, Red, Alignment.alignCentre
     ' Amounts
-    CreateLabel windowCount, "lblBlank", 25, 330, 100, , "Total Value", verdanaBold_12, Black, Alignment.AlignCentre
-    CreateLabel windowCount, "lblBlank", 285, 330, 100, , "Total Value", verdanaBold_12, Black, Alignment.AlignCentre
-    CreateLabel windowCount, "lblYourValue", 25, 344, 100, , "52,812g", verdana_12, Black, Alignment.AlignCentre
-    CreateLabel windowCount, "lblTheirValue", 285, 344, 100, , "12,531g", verdana_12, Black, Alignment.AlignCentre
+    CreateLabel windowCount, "lblBlank", 25, 330, 100, , "Total Value", verdanaBold_12, Black, Alignment.alignCentre
+    CreateLabel windowCount, "lblBlank", 285, 330, 100, , "Total Value", verdanaBold_12, Black, Alignment.alignCentre
+    CreateLabel windowCount, "lblYourValue", 25, 344, 100, , "52,812g", verdana_12, Black, Alignment.alignCentre
+    CreateLabel windowCount, "lblTheirValue", 285, 344, 100, , "12,531g", verdana_12, Black, Alignment.alignCentre
     ' Item Containers
     CreatePictureBox windowCount, "picYour", 14, 46, 184, 260, , , , , , , , , , , , GetAddress(AddressOf TradeMouseMove_Your), GetAddress(AddressOf TradeMouseDown_Your), GetAddress(AddressOf TradeMouseMove_Your), , GetAddress(AddressOf DrawYourTrade)
     CreatePictureBox windowCount, "picTheir", 214, 46, 184, 260, , , , , , , , , , , , GetAddress(AddressOf TradeMouseMove_Their), GetAddress(AddressOf TradeMouseMove_Their), GetAddress(AddressOf TradeMouseMove_Their), , GetAddress(AddressOf DrawTheirTrade)
@@ -1967,7 +1949,7 @@ Public Sub CreateWindow_Guild()
     CreatePictureBox windowCount, "picParchment", 6, 26, 162, 287, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Attributes
     CreatePictureBox windowCount, "picShadow", 18, 38, 138, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblGuild", 18, 35, 138, , "Guild Name", rockwellDec_15, , Alignment.AlignCentre
+    CreateLabel windowCount, "lblGuild", 18, 35, 138, , "Guild Name", rockwellDec_15, , Alignment.alignCentre
     ' White boxes
     CreatePictureBox windowCount, "picWhiteBox", 13, 51, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 71, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
@@ -1978,6 +1960,24 @@ Public Sub CreateWindow_Guild()
     CreateLabel windowCount, "lblKills", 18, 73, 147, 16, "Enemy Kills: 0", rockwellDec_10
     CreateLabel windowCount, "lblGold", 18, 93, 147, 16, "Bank Gold: 0g", rockwellDec_10
     CreateLabel windowCount, "lblMembers", 18, 113, 147, 16, "Guild Members: 0", rockwellDec_10
+End Sub
+
+Public Sub CreateWindow_Message()
+' Create window
+    CreateWindow "winMessage", "Mensagem!", zOrder_Win, 0, 0, 358, 169, TextureItem(111), False, Fonts.rockwellDec_15, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
+    ' Centralise it
+    CentraliseWindow windowCount
+
+    zOrder_Con = 1
+
+    ' Close Button
+    CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 19, 6, 13, 13, , , , , , , TextureGUI(8), TextureGUI(9), TextureGUI(10), , , , , , GetAddress(AddressOf btnMessage_Close)
+    ' Parchment
+    CreatePictureBox windowCount, "picParchment", 6, 26, 346, 130, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
+    ' Chat BG
+    CreatePictureBox windowCount, "picChatBG", 12, 39, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
+    ' Chat
+    CreateLabel windowCount, "lblChat", 20, 44, 318, 102, "[Text]", rockwellDec_15, White, Alignment.alignCentre
 End Sub
 
 ' Rendering & Initialisation
@@ -2005,7 +2005,8 @@ Public Sub InitGUI()
     CreateWindow_Hotbar
     CreateWindow_Inventory
     CreateWindow_Character
-    CreateWindow_PlayerQuest
+    CreateWindow_Quest
+    CreateWindow_Message
     CreateWindow_Description
     CreateWindow_DragBox
     CreateWindow_Skills

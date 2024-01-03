@@ -104,7 +104,7 @@ End Type
 Private Type MapNpcRec
     Num As Long
     Target As Long
-    targetType As Byte
+    TargetType As Byte
     Vital(1 To Vitals.Vital_Count - 1) As Long
     X As Byte
     Y As Byte
@@ -126,6 +126,9 @@ Private Type MapNpcRec
     ' spell casting
     spellBuffer As SpellBufferRec
     SpellCD(1 To MAX_NPC_SPELLS) As Long
+    
+    ImpactedBy As Long
+    ImpactedTick As Long
 End Type
 
 Private Type MapNpcDataRec
@@ -154,12 +157,6 @@ Private Type TempTileRec
     DoorTimer As Long
 End Type
 
-Private Type TempProjectileRec
-    Spell As Long
-    OwnerType As Long
-
-End Type
-
 Public Type XYRec
     X As Double
     Y As Double
@@ -182,10 +179,12 @@ Public Type ProjectileRenderRec
     tX As Long
     tY As Long
     ' Servidor apenas
+    AttackTimer(1 To MAX_MAP_NPCS) As Long ' <----
     Range As Byte
     Damage As Long
     AnimOnHit As Long
     spellNum As Long
     xTargetAoE As Long
     yTargetAoE As Long
+    MapNum As Long
 End Type

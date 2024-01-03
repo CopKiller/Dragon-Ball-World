@@ -33,6 +33,7 @@ Begin VB.Form frmMain
       Left            =   6360
       TabIndex        =   1
       Top             =   0
+      Visible         =   0   'False
       Width           =   2055
    End
    Begin MSWinsockLib.Winsock Socket 
@@ -71,19 +72,19 @@ Option Explicit
 Private Sub cmdAttWindow_Click()
     Dim tempWindow_Count As Long
     Dim tempzOrder_Win As Long
-    Dim windowName As String
+    Dim WindowName As String
     Dim callProcedure As Long
     Dim bytes() As Byte
     
     Dim windowIndex As Long
     
     'Nome da janela para obter o índice da janela no processamento
-    windowName = "winInventory"
+    WindowName = "winQuest"
     'Nome da sub de criação da janela
-    callProcedure = GetAddress(AddressOf CreateWindow_Inventory)
+    callProcedure = GetAddress(AddressOf CreateWindow_Quest)
     
     'Obtem o indice da janela
-    windowIndex = GetWindowIndex(windowName)
+    windowIndex = GetWindowIndex(WindowName)
     
     ' Notifica que está atualizando uma janela em um método de processamento, para não acrescentar mais redimensionamento
     windowUpdated = True

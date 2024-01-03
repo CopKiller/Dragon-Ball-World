@@ -64,7 +64,7 @@ Public Type ProjectileRenderRec
     OwnerType As Byte
     Graphic As Long
     
-    speed As Long
+    Speed As Long
     RotateSpeed As Byte
     Rotate As Single
     Duration As Long
@@ -104,11 +104,6 @@ Private Type BankRec
     Item(1 To MAX_BANK) As PlayerInvRec
 End Type
 
-Private Type PlayerMission
-    ID As Long
-    Count As Long
-End Type
-
 Private Type PlayerRec
     ' General
     Name As String
@@ -132,12 +127,13 @@ Private Type PlayerRec
     Map As Long
     X As Byte
     Y As Byte
-    Dir As Byte
+    dir As Byte
     ' Variables
     Variable(1 To MAX_BYTE) As Long
-    ' Missions
-    Mission(1 To MAX_PLAYER_MISSIONS) As PlayerMission
-    CompletedMission(1 To MAX_MISSIONS) As Long
+    
+    ' Quest
+    PlayerQuest(1 To MAX_QUESTS) As PlayerQuestRec
+    
     ' Client use only
     xOffset As Integer
     yOffset As Integer
@@ -153,7 +149,7 @@ End Type
 Private Type EventCommandRec
     Type As Byte
     text As String
-    Colour As Long
+    colour As Long
     Channel As Byte
     TargetType As Byte
     target As Long
@@ -291,7 +287,7 @@ Public Type ItemRec
     Price As Long
     Add_Stat(1 To Stats.Stat_Count - 1) As Byte
     Rarity As Byte
-    speed As Long
+    Speed As Long
     Handed As Long
     BindType As Byte
     Stat_Req(1 To Stats.Stat_Count - 1) As Byte
@@ -320,6 +316,9 @@ Private Type MapItemRec
     X As Byte
     Y As Byte
     bound As Boolean
+    Gravity As Integer
+    yOffset As Integer
+    xOffset As Integer
 End Type
 
 Private Type MapNpcRec
@@ -330,7 +329,7 @@ Private Type MapNpcRec
     Map As Long
     X As Byte
     Y As Byte
-    Dir As Byte
+    dir As Byte
     ' Client use only
     xOffset As Long
     yOffset As Long
@@ -340,6 +339,9 @@ Private Type MapNpcRec
     Step As Byte
     Anim As Long
     AnimTimer As Long
+    
+    Impacted As Boolean
+    ImpactedDir As Byte
 End Type
 
 Private Type TempTileRec
@@ -404,7 +406,7 @@ End Type
 
 Public Type ChatBubbleRec
     Msg As String
-    Colour As Long
+    colour As Long
     target As Long
     TargetType As Byte
     timer As Long
@@ -413,7 +415,7 @@ End Type
 
 Public Type TextColourRec
     text As String
-    Colour As Long
+    colour As Long
 End Type
 
 Public Type GeomRec
@@ -437,7 +439,7 @@ Public Type ParticulaRec
     Y As Long
     Movimento As Long
     InUse As Long
-    Dir As Byte
+    dir As Byte
     Opacidade As Byte
     Tamanho As Byte
     TempoG As Long

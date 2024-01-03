@@ -13,6 +13,7 @@ Public Type ProjectileDataRec
     Despawn As Long
     AnimOnHit As Long
     ProjectileOffset(1 To 4) As XYRec
+    ImpactRange As Byte
 End Type
 
 Private Type SpellRec

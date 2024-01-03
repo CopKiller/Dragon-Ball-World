@@ -305,8 +305,8 @@ Private Sub cmdASpawn_Click()
     If Len(txtAmount.text) = 0 Then Exit Sub
     If txtAmount.text = 0 Then Exit Sub
     
-    If scrlAItem.value > 0 Then
-        SendSpawnItem scrlAItem.value, Trim$(txtAmount.text)
+    If scrlAItem.Value > 0 Then
+        SendSpawnItem scrlAItem.Value, Trim$(txtAmount.text)
     End If
 End Sub
 
@@ -404,7 +404,7 @@ End Sub
 
 Private Sub CmdQuest_Click()
     If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then Exit Sub
-    SendRequestEditMission
+    SendRequestEditQuest
 End Sub
 
 Private Sub CmdResource_Click()
@@ -423,8 +423,8 @@ Private Sub CmdSpell_Click()
 End Sub
 
 Private Sub scrlAItem_Change()
-    If scrlAItem.value > 0 Then
-        lblAItem.caption = " " & Trim$(Item(scrlAItem.value).Name)
+    If scrlAItem.Value > 0 Then
+        lblAItem.caption = " " & Trim$(Item(scrlAItem.Value).Name)
     Else
         lblAItem.caption = "Item: None"
     End If

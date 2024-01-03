@@ -127,19 +127,18 @@ Public Sub SpellEditorInit()
             .scrlDurationProjectile.Value = Int(Spell(EditorIndex).Projectile.Despawn / 100)
             .scrlProjectileAnimOnHit.Value = Spell(EditorIndex).Projectile.AnimOnHit
             
-            .lblX0.caption = "X Offset: 0"
-            .lblY0.caption = "Y Offset: 0"
             .cmbDirection.ListIndex = 0
+            .scrlProjectileRadiusX.Value = 0
+            .scrlProjectileRadiusY.Value = 0
+            .scrlProjectileRadiusX.enabled = False
+            .scrlProjectileRadiusY.enabled = False
+            
             .scrlOffsetProjectileX = 0
             .scrlOffsetProjectileY = 0
             .scrlOffsetProjectileX.enabled = False
             .scrlOffsetProjectileY.enabled = False
             
-            .lblAoEProjectile.caption = "No AoE damage settings"
-            .scrlProjectileRadiusX = 0
-            .scrlProjectileRadiusY = 0
-            .scrlProjectileRadiusX.enabled = False
-            .scrlProjectileRadiusY.enabled = False
+            .scrlImpact.Value = Spell(EditorIndex).Projectile.ImpactRange
         Else
             .fraSpellData.visible = True
             .fraProjectile.visible = False
@@ -147,7 +146,7 @@ Public Sub SpellEditorInit()
             .scrlMap.Value = Spell(EditorIndex).Map
             .scrlX.Value = Spell(EditorIndex).X
             .scrlY.Value = Spell(EditorIndex).Y
-            .scrlDir.Value = Spell(EditorIndex).Dir
+            .scrlDir.Value = Spell(EditorIndex).dir
             .scrlVital.Value = Spell(EditorIndex).Vital
             .scrlDuration.Value = Spell(EditorIndex).Duration
             .scrlInterval.Value = Spell(EditorIndex).Interval

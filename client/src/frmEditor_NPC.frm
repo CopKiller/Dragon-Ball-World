@@ -617,12 +617,6 @@ Private Sub cmbBehaviour_Click()
     Npc(EditorIndex).Behaviour = cmbBehaviour.ListIndex
 End Sub
 
-Private Sub cmbMission_Click()
-    If EditorIndex <= 0 Or EditorIndex > MAX_NPCS Then Exit Sub
-    
-    Npc(EditorIndex).Mission = cmbMission.ListIndex
-End Sub
-
 Private Sub cmdCopy_Click()
     NpcEditorCopy
 End Sub
@@ -632,7 +626,7 @@ Private Sub cmdDelete_Click()
     ClearNPC EditorIndex
     tmpIndex = lstIndex.ListIndex
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
     NpcEditorInit
 End Sub
@@ -774,7 +768,7 @@ Private Sub txtChance_Validate(Cancel As Boolean)
     End If
 
     If Right$(txtChance.text, 1) = "%" Then
-        txtChance.text = left$(txtChance.text, Len(txtChance.text) - 1) / 100
+        txtChance.text = Left$(txtChance.text, Len(txtChance.text) - 1) / 100
     ElseIf InStr(1, txtChance.text, "/") > 0 Then
         Dim i() As String
         i = Split(txtChance.text, "/")
@@ -822,9 +816,9 @@ Public Sub txtName_Validate(Cancel As Boolean)
 
     If EditorIndex = 0 Then Exit Sub
     tmpIndex = lstIndex.ListIndex
-    Npc(EditorIndex).name = Trim$(txtName.text)
+    Npc(EditorIndex).Name = Trim$(txtName.text)
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & Npc(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
 End Sub
 

@@ -454,15 +454,20 @@ End Sub
 
 Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
     Dim MovementSpeed As Long
+    Dim dir As Long
 
     ' Check if NPC is walking, and if so process moving them over
-    If MapNpc(MapNpcNum).Moving = MOVING_WALKING Then
+    If MapNpc(MapNpcNum).Impacted Then
+        MovementSpeed = RUN_SPEED * 2 ' Da pra trazer o dado da velocidade da projectile pro npc movimentar na mesma vel.
+        dir = MapNpc(MapNpcNum).ImpactedDir
+    ElseIf MapNpc(MapNpcNum).Moving = MOVING_WALKING Then
         MovementSpeed = RUN_SPEED
+        dir = MapNpc(MapNpcNum).dir
     Else
         Exit Sub
     End If
 
-    Select Case MapNpc(MapNpcNum).Dir
+    Select Case dir
 
         Case DIR_UP
             MapNpc(MapNpcNum).yOffset = MapNpc(MapNpcNum).yOffset - MovementSpeed
@@ -471,7 +476,6 @@ Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
 
         Case DIR_DOWN
             MapNpc(MapNpcNum).yOffset = MapNpc(MapNpcNum).yOffset + MovementSpeed
-
             If MapNpc(MapNpcNum).yOffset > 0 Then MapNpc(MapNpcNum).yOffset = 0
 
         Case DIR_LEFT
@@ -511,7 +515,7 @@ Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
 
     ' Check if completed walking over to the next tile
     If MapNpc(MapNpcNum).Moving > 0 Then
-        If MapNpc(MapNpcNum).Dir = DIR_RIGHT Or MapNpc(MapNpcNum).Dir = DIR_DOWN Or MapNpc(MapNpcNum).Dir = DIR_DOWN_RIGHT Then
+        If MapNpc(MapNpcNum).dir = DIR_RIGHT Or MapNpc(MapNpcNum).dir = DIR_DOWN Or MapNpc(MapNpcNum).dir = DIR_DOWN_RIGHT Then
             If (MapNpc(MapNpcNum).xOffset >= 0) And (MapNpc(MapNpcNum).yOffset >= 0) Then
                 MapNpc(MapNpcNum).Moving = 0
 
@@ -519,6 +523,10 @@ Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
                     MapNpc(MapNpcNum).Step = 2
                 Else
                     MapNpc(MapNpcNum).Step = 0
+                End If
+                
+                If MapNpc(MapNpcNum).Impacted Then
+                    MapNpc(MapNpcNum).Impacted = False
                 End If
             End If
 
@@ -532,6 +540,10 @@ Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
                 Else
                     MapNpc(MapNpcNum).Step = 0
                 End If
+                
+                If MapNpc(MapNpcNum).Impacted Then
+                    MapNpc(MapNpcNum).Impacted = False
+                End If
             End If
         End If
     End If
@@ -539,8 +551,8 @@ Public Sub ProcessNpcMovement(ByVal MapNpcNum As Long)
 End Sub
 
 Sub CheckMapGetItem()
-    Dim buffer As New clsBuffer, tmpIndex As Long, i As Long, X As Long
-    Set buffer = New clsBuffer
+    Dim Buffer As New clsBuffer, tmpIndex As Long, i As Long, X As Long
+    Set Buffer = New clsBuffer
 
     If getTime > Player(MyIndex).MapGetTimer + 250 Then
 
@@ -584,15 +596,15 @@ Sub CheckMapGetItem()
 
         ' nevermind, pick it up
         Player(MyIndex).MapGetTimer = getTime
-        buffer.WriteLong CMapGetItem
-        SendData buffer.ToArray()
+        Buffer.WriteLong CMapGetItem
+        SendData Buffer.ToArray()
     End If
 
-    buffer.Flush: Set buffer = Nothing
+    Buffer.Flush: Set Buffer = Nothing
 End Sub
 
 Public Sub CheckAttack()
-    Dim buffer As clsBuffer
+    Dim Buffer As clsBuffer
     Dim attackspeed As Long
 
     If ControlDown Then
@@ -614,10 +626,10 @@ Public Sub CheckAttack()
                     .AttackTimer = getTime
                 End With
 
-                Set buffer = New clsBuffer
-                buffer.WriteLong CAttack
-                SendData buffer.ToArray()
-                buffer.Flush: Set buffer = Nothing
+                Set Buffer = New clsBuffer
+                Buffer.WriteLong CAttack
+                SendData Buffer.ToArray()
+                Buffer.Flush: Set Buffer = Nothing
             End If
         End If
     End If
@@ -1349,7 +1361,7 @@ Public Sub UseItem()
 End Sub
 
 Public Sub ForgetSpell(ByVal spellSlot As Long)
-    Dim buffer As clsBuffer
+    Dim Buffer As clsBuffer
 
     ' Check for subscript out of range
     If spellSlot < 1 Or spellSlot > MAX_PLAYER_SPELLS Then
@@ -1369,11 +1381,11 @@ Public Sub ForgetSpell(ByVal spellSlot As Long)
     End If
 
     If PlayerSpells(spellSlot).Spell > 0 Then
-        Set buffer = New clsBuffer
-        buffer.WriteLong CForgetSpell
-        buffer.WriteLong spellSlot
-        SendData buffer.ToArray()
-        buffer.Flush: Set buffer = Nothing
+        Set Buffer = New clsBuffer
+        Buffer.WriteLong CForgetSpell
+        Buffer.WriteLong spellSlot
+        SendData Buffer.ToArray()
+        Buffer.Flush: Set Buffer = Nothing
     Else
         AddText "No spell here.", BrightRed
     End If
@@ -1381,7 +1393,7 @@ Public Sub ForgetSpell(ByVal spellSlot As Long)
 End Sub
 
 Public Sub CastSpell(ByVal spellSlot As Long)
-    Dim buffer As clsBuffer
+    Dim Buffer As clsBuffer
 
     ' Check for subscript out of range
     If spellSlot < 1 Or spellSlot > MAX_PLAYER_SPELLS Then
@@ -1412,11 +1424,11 @@ Public Sub CastSpell(ByVal spellSlot As Long)
     If PlayerSpells(spellSlot).Spell > 0 Then
         If getTime > Player(MyIndex).AttackTimer + 1000 Then
             If Player(MyIndex).Moving = 0 Then
-                Set buffer = New clsBuffer
-                buffer.WriteLong CCast
-                buffer.WriteLong spellSlot
-                SendData buffer.ToArray()
-                buffer.Flush: Set buffer = Nothing
+                Set Buffer = New clsBuffer
+                Buffer.WriteLong CCast
+                Buffer.WriteLong spellSlot
+                SendData Buffer.ToArray()
+                Buffer.Flush: Set Buffer = Nothing
                 SpellBuffer = spellSlot
                 SpellBufferTimer = getTime
             Else
@@ -1626,8 +1638,8 @@ Public Function GetBankItemNum(ByVal BankSlot As Long) As Long
     GetBankItemNum = Bank.Item(BankSlot).Num
 End Function
 
-Public Sub SetBankItemNum(ByVal BankSlot As Long, ByVal ItemNum As Long)
-    Bank.Item(BankSlot).Num = ItemNum
+Public Sub SetBankItemNum(ByVal BankSlot As Long, ByVal itemNum As Long)
+    Bank.Item(BankSlot).Num = itemNum
 End Sub
 
 Public Function GetBankItemValue(ByVal BankSlot As Long) As Long
@@ -1639,19 +1651,19 @@ Public Sub SetBankItemValue(ByVal BankSlot As Long, ByVal ItemValue As Long)
 End Sub
 
 ' BitWise Operators for directional blocking
-Public Sub setDirBlock(ByRef blockvar As Byte, ByRef Dir As Byte, ByVal block As Boolean)
+Public Sub setDirBlock(ByRef blockvar As Byte, ByRef dir As Byte, ByVal block As Boolean)
 
     If block Then
-        blockvar = blockvar Or (2 ^ Dir)
+        blockvar = blockvar Or (2 ^ dir)
     Else
-        blockvar = blockvar And Not (2 ^ Dir)
+        blockvar = blockvar And Not (2 ^ dir)
     End If
 
 End Sub
 
-Public Function isDirBlocked(ByRef blockvar As Byte, ByRef Dir As Byte) As Boolean
+Public Function isDirBlocked(ByRef blockvar As Byte, ByRef dir As Byte) As Boolean
 
-    If Not blockvar And (2 ^ Dir) Then
+    If Not blockvar And (2 ^ dir) Then
         isDirBlocked = False
     Else
         isDirBlocked = True
@@ -1763,8 +1775,8 @@ End Sub
 Public Sub dialogueHandler(ByVal Index As Long)
 Dim Value As Long, diaInput As String
 
-    Dim buffer As New clsBuffer
-    Set buffer = New clsBuffer
+    Dim Buffer As New clsBuffer
+    Set Buffer = New clsBuffer
     
     diaInput = Trim$(Windows(GetWindowIndex("winDialogue")).Controls(GetControlIndex("winDialogue", "txtInput")).text)
 
@@ -1805,8 +1817,8 @@ Dim Value As Long, diaInput As String
             Case TypeLOOTITEM
                 ' send the packet
                 Player(MyIndex).MapGetTimer = getTime
-                buffer.WriteLong CMapGetItem
-                SendData buffer.ToArray()
+                Buffer.WriteLong CMapGetItem
+                SendData Buffer.ToArray()
 
             Case TypeDELCHAR
                 ' send the deletion
@@ -1926,8 +1938,8 @@ Public Sub UpdateCamera()
     GlobalY_Map = GlobalY + (TileView.Top * PIC_Y) + Camera.Top
 End Sub
 
-Public Function CensorWord(ByVal sString As String) As String
-    CensorWord = String$(Len(sString), "*")
+Public Function CensorWord(ByVal SString As String) As String
+    CensorWord = String$(Len(SString), "*")
 End Function
 
 Public Sub placeAutotile(ByVal layernum As Long, ByVal X As Long, ByVal Y As Long, ByVal tileQuarter As Byte, ByVal autoTileLetter As String)
@@ -2850,7 +2862,7 @@ Public Sub ClearMapCache()
     AddText "Map cache destroyed.", BrightGreen
 End Sub
 
-Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal Msg As String, ByVal Colour As Long)
+Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal Msg As String, ByVal colour As Long)
     Dim i As Long, Index As Long
     ' set the global index
     chatBubbleIndex = chatBubbleIndex + 1
@@ -2883,7 +2895,7 @@ Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal M
         .target = target
         .TargetType = TargetType
         .Msg = Msg
-        .Colour = Colour
+        .colour = colour
         .timer = getTime
         .active = True
     End With
@@ -3158,39 +3170,39 @@ Dim i As Long, Amount As Long
 End Sub
 
 Public Sub ShowInvDesc(X As Long, Y As Long, invNum As Long)
-    Dim soulBound As Boolean
+    Dim SoulBound As Boolean
 
     ' rte9
     If invNum <= 0 Or invNum > MAX_INV Then Exit Sub
     
     ' show
     If GetPlayerInvItemNum(MyIndex, invNum) Then
-        If Item(GetPlayerInvItemNum(MyIndex, invNum)).BindType > 0 And PlayerInv(invNum).bound > 0 Then soulBound = True
-        ShowItemDesc X, Y, GetPlayerInvItemNum(MyIndex, invNum), soulBound
+        If Item(GetPlayerInvItemNum(MyIndex, invNum)).BindType > 0 And PlayerInv(invNum).bound > 0 Then SoulBound = True
+        ShowItemDesc X, Y, GetPlayerInvItemNum(MyIndex, invNum), SoulBound
     End If
 End Sub
 
-Public Sub ShowShopDesc(X As Long, Y As Long, ItemNum As Long)
-    If ItemNum <= 0 Or ItemNum > MAX_ITEMS Then Exit Sub
+Public Sub ShowShopDesc(X As Long, Y As Long, itemNum As Long)
+    If itemNum <= 0 Or itemNum > MAX_ITEMS Then Exit Sub
     ' show
-    ShowItemDesc X, Y, ItemNum, False
+    ShowItemDesc X, Y, itemNum, False
 End Sub
 
 Public Sub ShowEqDesc(X As Long, Y As Long, eqNum As Long)
-    Dim soulBound As Boolean
+    Dim SoulBound As Boolean
 
     ' rte9
     If eqNum <= 0 Or eqNum > Equipment.Equipment_Count - 1 Then Exit Sub
     
     ' show
     If Player(MyIndex).Equipment(eqNum) Then
-        If Item(Player(MyIndex).Equipment(eqNum)).BindType > 0 Then soulBound = True
-        ShowItemDesc X, Y, Player(MyIndex).Equipment(eqNum), soulBound
+        If Item(Player(MyIndex).Equipment(eqNum)).BindType > 0 Then SoulBound = True
+        ShowItemDesc X, Y, Player(MyIndex).Equipment(eqNum), SoulBound
     End If
 End Sub
 
 Public Sub ShowOfferDesc(X As Long, Y As Long, OfferNum As Long)
-    Dim Colour As Long, className As String, levelTxt As String, i As Long
+    Dim colour As Long, className As String, levelTxt As String, i As Long
 
     If inOffer(OfferNum) < 0 Then Exit Sub
     ' set globals
@@ -3221,32 +3233,7 @@ Public Sub ShowOfferDesc(X As Long, Y As Long, OfferNum As Long)
     
     ' set variables
     Select Case inOfferType(OfferNum)
-        Case Offers.Offer_Type_Mission
-            With Windows(GetWindowIndex("winDescription"))
-                .Controls(GetControlIndex("winDescription", "lblName")).text = Trim$(Mission(inOffer(OfferNum)).Name)
-                .Controls(GetControlIndex("winDescription", "lblName")).textColour = White
-                
-                Select Case Mission(inOffer(OfferNum)).Type
-                    Case MissionType.Mission_TypeCollect
-                        If Mission(inOffer(OfferNum)).CollectItem = 0 Then Exit Sub
-                        .Controls(GetControlIndex("winDescription", "lblClass")).text = "Collect: " + Trim$(Item(Mission(inOffer(OfferNum)).CollectItem).Name)
-                        .Controls(GetControlIndex("winDescription", "lblLevel")).text = "Amount: " + Trim$(Mission(inOffer(OfferNum)).CollectItemAmount)
-                        .Controls(GetControlIndex("winDescription", "lblLevel")).textColour = Red
-                        .Controls(GetControlIndex("winDescription", "lblDescription")).text = Trim$(Mission(inOffer(OfferNum)).Description)
-                    Case MissionType.Mission_TypeKill
-                        If Mission(inOffer(OfferNum)).KillNPC = 0 Then Exit Sub
-                        .Controls(GetControlIndex("winDescription", "lblClass")).text = "Kill: " + Trim$(Item(Mission(inOffer(OfferNum)).KillNPC).Name)
-                        .Controls(GetControlIndex("winDescription", "lblLevel")).text = "Amount: " + Trim$(Mission(inOffer(OfferNum)).KillNPCAmount)
-                        .Controls(GetControlIndex("winDescription", "lblLevel")).textColour = Red
-                        .Controls(GetControlIndex("winDescription", "lblDescription")).text = Trim$(Mission(inOffer(OfferNum)).Description)
-                    Case MissionType.Mission_TypeTalk
-                        If Mission(inOffer(OfferNum)).TalkNPC = 0 Then Exit Sub
-                        .Controls(GetControlIndex("winDescription", "lblClass")).text = "Talk: " + Trim$(Npc(Mission(inOffer(OfferNum)).TalkNPC).Name)
-                        .Controls(GetControlIndex("winDescription", "lblDescription")).text = Trim$(Mission(inOffer(OfferNum)).Description)
-                End Select
-                
-                '.Controls(GetControlIndex("winDescription", "lblLevel")).textColour = Colour
-            End With
+        
     End Select
 End Sub
 
@@ -3262,7 +3249,7 @@ Public Sub ShowPlayerSpellDesc(X As Long, Y As Long, slotNum As Long)
 End Sub
 
 Public Sub ShowSpellDesc(X As Long, Y As Long, spellnum As Long, spellSlot As Long)
-Dim Colour As Long, theName As String, sUse As String, i As Long, barWidth As Long, tmpWidth As Long
+Dim colour As Long, theName As String, sUse As String, i As Long, barWidth As Long, tmpWidth As Long
 
     ' set globals
     descType = 2 ' spell
@@ -3303,16 +3290,16 @@ Dim Colour As Long, theName As String, sUse As String, i As Long, barWidth As Lo
             .Controls(GetControlIndex("winDescription", "picBar")).Value = tmpWidth
             ' does it rank up?
             If Spell(spellnum).NextRank > 0 Then
-                Colour = White
+                colour = White
                 sUse = "Uses: " & PlayerSpells(spellSlot).Uses & "/" & Spell(spellnum).NextUses
                 If PlayerSpells(spellSlot).Uses = Spell(spellnum).NextUses Then
                     If Not GetPlayerLevel(MyIndex) >= Spell(Spell(spellnum).NextRank).LevelReq Then
-                        Colour = BrightRed
+                        colour = BrightRed
                         sUse = "Lvl " & Spell(Spell(spellnum).NextRank).LevelReq & " req."
                     End If
                 End If
             Else
-                Colour = Grey
+                colour = Grey
                 sUse = "Max Rank"
             End If
             ' show controls
@@ -3320,7 +3307,7 @@ Dim Colour As Long, theName As String, sUse As String, i As Long, barWidth As Lo
             .Controls(GetControlIndex("winDescription", "picBar")).visible = True
              'set vals
             .Controls(GetControlIndex("winDescription", "lblClass")).text = sUse
-            .Controls(GetControlIndex("winDescription", "lblClass")).textColour = Colour
+            .Controls(GetControlIndex("winDescription", "lblClass")).textColour = colour
         Else
             ' hide some controls
             .Controls(GetControlIndex("winDescription", "lblClass")).visible = False
@@ -3379,13 +3366,13 @@ Public Sub ResetControlsWinDesc()
     Windows(GetWindowIndex("winDescription")).Controls(GetControlIndex("winDescription", "lblDescription")).text = ""
 End Sub
 
-Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, soulBound As Boolean)
-    Dim Colour As Long, theName As String, className As String, levelTxt As String, i As Long
+Public Sub ShowItemDesc(X As Long, Y As Long, itemNum As Long, SoulBound As Boolean)
+    Dim colour As Long, theName As String, className As String, levelTxt As String, i As Long
     
     Call ResetControlsWinDesc
     ' set globals
     descType = 1 ' inventory
-    descItem = ItemNum
+    descItem = itemNum
     
     ' set position
     Windows(GetWindowIndex("winDescription")).Window.Left = X
@@ -3409,89 +3396,89 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, soulBound As Bool
     ' set variables
     With Windows(GetWindowIndex("winDescription"))
         ' name
-        If Not soulBound Then
-            theName = Trim$(Item(ItemNum).Name)
+        If Not SoulBound Then
+            theName = Trim$(Item(itemNum).Name)
         Else
-            theName = "(SB) " & Trim$(Item(ItemNum).Name)
+            theName = "(SB) " & Trim$(Item(itemNum).Name)
         End If
         .Controls(GetControlIndex("winDescription", "lblName")).text = theName
-        Select Case Item(ItemNum).Rarity
+        Select Case Item(itemNum).Rarity
             Case 0 ' white
-                Colour = White
+                colour = White
             Case 1 ' green
-                Colour = Green
+                colour = Green
             Case 2 ' blue
-                Colour = BrightBlue
+                colour = BrightBlue
             Case 3 ' maroon
-                Colour = Red
+                colour = Red
             Case 4 ' purple
-                Colour = Pink
+                colour = Pink
             Case 5 ' orange
-                Colour = Brown
+                colour = Brown
         End Select
-        .Controls(GetControlIndex("winDescription", "lblName")).textColour = Colour
+        .Controls(GetControlIndex("winDescription", "lblName")).textColour = colour
         ' class req
-        If Item(ItemNum).ClassReq > 0 Then
-            className = Trim$(Class(Item(ItemNum).ClassReq).Name)
+        If Item(itemNum).ClassReq > 0 Then
+            className = Trim$(Class(Item(itemNum).ClassReq).Name)
             ' do we match it?
-            If GetPlayerClass(MyIndex) = Item(ItemNum).ClassReq Then
-                Colour = Green
+            If GetPlayerClass(MyIndex) = Item(itemNum).ClassReq Then
+                colour = Green
             Else
-                Colour = BrightRed
+                colour = BrightRed
             End If
-        ElseIf Item(ItemNum).proficiency > 0 Then
-            Select Case Item(ItemNum).proficiency
+        ElseIf Item(itemNum).proficiency > 0 Then
+            Select Case Item(itemNum).proficiency
                 Case 1 ' Sword/Armour
-                    If Item(ItemNum).Type >= ITEM_TYPE_ARMOR And Item(ItemNum).Type <= ITEM_TYPE_FEET Then
+                    If Item(itemNum).Type >= ITEM_TYPE_ARMOR And Item(itemNum).Type <= ITEM_TYPE_FEET Then
                         className = "Heavy Armour"
-                    ElseIf Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
+                    ElseIf Item(itemNum).Type = ITEM_TYPE_WEAPON Then
                         className = "Heavy Weapon"
                     End If
-                    If hasProficiency(MyIndex, Item(ItemNum).proficiency) Then
-                        Colour = Green
+                    If hasProficiency(MyIndex, Item(itemNum).proficiency) Then
+                        colour = Green
                     Else
-                        Colour = BrightRed
+                        colour = BrightRed
                     End If
                 Case 2 ' Staff/Cloth
-                    If Item(ItemNum).Type >= ITEM_TYPE_ARMOR And Item(ItemNum).Type <= ITEM_TYPE_FEET Then
+                    If Item(itemNum).Type >= ITEM_TYPE_ARMOR And Item(itemNum).Type <= ITEM_TYPE_FEET Then
                         className = "Cloth Armour"
-                    ElseIf Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
+                    ElseIf Item(itemNum).Type = ITEM_TYPE_WEAPON Then
                         className = "Light Weapon"
                     End If
-                    If hasProficiency(MyIndex, Item(ItemNum).proficiency) Then
-                        Colour = Green
+                    If hasProficiency(MyIndex, Item(itemNum).proficiency) Then
+                        colour = Green
                     Else
-                        Colour = BrightRed
+                        colour = BrightRed
                     End If
             End Select
         Else
             className = "No class req."
-            Colour = Green
+            colour = Green
         End If
         .Controls(GetControlIndex("winDescription", "lblClass")).text = className
-        .Controls(GetControlIndex("winDescription", "lblClass")).textColour = Colour
+        .Controls(GetControlIndex("winDescription", "lblClass")).textColour = colour
         ' level
-        If Item(ItemNum).LevelReq > 0 Then
-            levelTxt = "Level " & Item(ItemNum).LevelReq
+        If Item(itemNum).LevelReq > 0 Then
+            levelTxt = "Level " & Item(itemNum).LevelReq
             ' do we match it?
-            If GetPlayerLevel(MyIndex) >= Item(ItemNum).LevelReq Then
-                Colour = Green
+            If GetPlayerLevel(MyIndex) >= Item(itemNum).LevelReq Then
+                colour = Green
             Else
-                Colour = BrightRed
+                colour = BrightRed
             End If
         Else
             levelTxt = "No level req."
-            Colour = Green
+            colour = Green
         End If
         .Controls(GetControlIndex("winDescription", "lblLevel")).text = levelTxt
-        .Controls(GetControlIndex("winDescription", "lblLevel")).textColour = Colour
+        .Controls(GetControlIndex("winDescription", "lblLevel")).textColour = colour
     End With
     
     ' clear
     ReDim descText(1 To 1) As TextColourRec
     
     ' go through the rest of the text
-    Select Case Item(ItemNum).Type
+    Select Case Item(itemNum).Type
         Case ITEM_TYPE_NONE
             AddDescInfo "No type"
         Case ITEM_TYPE_WEAPON
@@ -3519,88 +3506,88 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, soulBound As Bool
     End Select
     
     ' more info
-    Select Case Item(ItemNum).Type
+    Select Case Item(itemNum).Type
         Case ITEM_TYPE_NONE, ITEM_TYPE_KEY, ITEM_TYPE_CURRENCY
             ' binding
-            If Item(ItemNum).BindType = 1 Then
+            If Item(itemNum).BindType = 1 Then
                 AddDescInfo "Bind on Pickup"
-            ElseIf Item(ItemNum).BindType = 2 Then
+            ElseIf Item(itemNum).BindType = 2 Then
                 AddDescInfo "Bind on Equip"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_WEAPON, ITEM_TYPE_ARMOR, ITEM_TYPE_HELMET, ITEM_TYPE_SHIELD, ITEM_TYPE_PANTS, ITEM_TYPE_FEET
             ' damage/defence
-            If Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
-                AddDescInfo "Damage: " & Item(ItemNum).Data2
+            If Item(itemNum).Type = ITEM_TYPE_WEAPON Then
+                AddDescInfo "Damage: " & Item(itemNum).Data2
                 ' speed
-                AddDescInfo "Speed: " & (Item(ItemNum).Speed / 1000) & "s"
+                AddDescInfo "Speed: " & (Item(itemNum).Speed / 1000) & "s"
             Else
-                If Item(ItemNum).Data2 > 0 Then
-                    AddDescInfo "Defence: " & Item(ItemNum).Data2
+                If Item(itemNum).Data2 > 0 Then
+                    AddDescInfo "Defence: " & Item(itemNum).Data2
                 End If
             End If
             ' binding
-            If Item(ItemNum).BindType = 1 Then
+            If Item(itemNum).BindType = 1 Then
                 AddDescInfo "Bind on Pickup"
-            ElseIf Item(ItemNum).BindType = 2 Then
+            ElseIf Item(itemNum).BindType = 2 Then
                 AddDescInfo "Bind on Equip"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
             ' stat bonuses
-            If Item(ItemNum).Add_Stat(Stats.Strength) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Strength) & " Str"
+            If Item(itemNum).Add_Stat(Stats.Strength) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Strength) & " Str"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Endurance) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Endurance) & " End"
+            If Item(itemNum).Add_Stat(Stats.Endurance) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Endurance) & " End"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Intelligence) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Intelligence) & " Int"
+            If Item(itemNum).Add_Stat(Stats.Intelligence) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Intelligence) & " Int"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Agility) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Agility) & " Agi"
+            If Item(itemNum).Add_Stat(Stats.Agility) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Agility) & " Agi"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Willpower) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Willpower) & " Will"
+            If Item(itemNum).Add_Stat(Stats.Willpower) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Willpower) & " Will"
             End If
         Case ITEM_TYPE_CONSUME
-            If Item(ItemNum).CastSpell > 0 Then
+            If Item(itemNum).CastSpell > 0 Then
                 AddDescInfo "Casts Spell"
             End If
-            If Item(ItemNum).AddHP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddHP & " HP"
+            If Item(itemNum).AddHP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddHP & " HP"
             End If
-            If Item(ItemNum).AddMP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddMP & " SP"
+            If Item(itemNum).AddMP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddMP & " SP"
             End If
-            If Item(ItemNum).AddEXP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddEXP & " EXP"
+            If Item(itemNum).AddEXP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddEXP & " EXP"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_SPELL
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_FOOD
-            If Item(ItemNum).HPorSP = 2 Then
-                AddDescInfo "Heal: " & (Item(ItemNum).FoodPerTick * Item(ItemNum).FoodTickCount) & " SP"
+            If Item(itemNum).HPorSP = 2 Then
+                AddDescInfo "Heal: " & (Item(itemNum).FoodPerTick * Item(itemNum).FoodTickCount) & " SP"
             Else
-                AddDescInfo "Heal: " & (Item(ItemNum).FoodPerTick * Item(ItemNum).FoodTickCount) & " HP"
+                AddDescInfo "Heal: " & (Item(itemNum).FoodPerTick * Item(itemNum).FoodTickCount) & " HP"
             End If
             ' time
-            AddDescInfo "Time: " & (Item(ItemNum).FoodInterval * (Item(ItemNum).FoodTickCount / 1000)) & "s"
+            AddDescInfo "Time: " & (Item(itemNum).FoodInterval * (Item(itemNum).FoodTickCount / 1000)) & "s"
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
     End Select
 End Sub
 
-Public Sub AddDescInfo(text As String, Optional Colour As Long = White)
+Public Sub AddDescInfo(text As String, Optional colour As Long = White)
 Dim Count As Long
     Count = UBound(descText)
     ReDim Preserve descText(1 To Count + 1) As TextColourRec
     descText(Count + 1).text = text
-    descText(Count + 1).Colour = Colour
+    descText(Count + 1).colour = colour
 End Sub
 
 Public Sub SwitchHotbar(oldSlot As Long, newSlot As Long)
@@ -4021,7 +4008,7 @@ Sub Resize(ByVal Width As Long, ByVal Height As Long)
     frmMain.Top = (Screen.Height - frmMain.Height) \ 2
     
     '//Inicializar opções administrativas
-    Call HandleDeveloperOptions
+    'Call HandleDeveloperOptions
     
     DoEvents
 End Sub
@@ -4062,6 +4049,8 @@ Dim Top As Long
     CentraliseWindow GetWindowIndex("winNpcChat")
     CentraliseWindow GetWindowIndex("winTrade")
     CentraliseWindow GetWindowIndex("winGuild")
+    CentraliseWindow GetWindowIndex("winQuest")
+    CentraliseWindow GetWindowIndex("winMessage")
 End Sub
 
 Sub SetResolution()
@@ -4179,13 +4168,13 @@ Sub SetOptionsScreen()
     End With
 End Sub
 
-Function HasItem(ByVal ItemNum As Long) As Long
+Function HasItem(ByVal itemNum As Long) As Long
     Dim i As Long
 
     For i = 1 To MAX_INV
         ' Check to see if the player has the item
-        If GetPlayerInvItemNum(MyIndex, i) = ItemNum Then
-            If Item(ItemNum).Type = ITEM_TYPE_CURRENCY Then
+        If GetPlayerInvItemNum(MyIndex, i) = itemNum Then
+            If Item(itemNum).Type = ITEM_TYPE_CURRENCY Then
                 HasItem = GetPlayerInvItemValue(MyIndex, i)
             Else
                 HasItem = 1

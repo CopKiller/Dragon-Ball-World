@@ -13,6 +13,7 @@ Public Type ProjectileDataRec
     Despawn As Long
     AnimOnHit As Long
     ProjectileOffset(1 To 4) As XYRec
+    ImpactRange As Byte
 End Type
 
 Public Type SpellRec
@@ -31,7 +32,7 @@ Public Type SpellRec
     Map As Long
     X As Long
     Y As Long
-    Dir As Byte
+    dir As Byte
     Vital As Long
     Duration As Long
     Interval As Long

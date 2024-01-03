@@ -23,6 +23,7 @@ Public Enum ServerPackets
     SNpcDir
     SPlayerXY
     SPlayerXYMap
+    SMapNpcDataXY
     SAttack
     SNpcAttack ' = 20
     SCheckForMap
@@ -89,12 +90,16 @@ Public Enum ServerPackets
     SChatBubble
     SPlayerChars
     SCancelAnimation
-    SMissionEditor ' = 85
-    SUpdateMission
-    SPlayerMission
     SPlayerVariables
-    SOfferMission ' = 90
     SProjectileAttack
+    
+    SQuestEditor
+    SUpdateQuest
+    SPlayerQuest
+    SQuestMessage
+    SQuestCancel
+    
+    SMessage
     ' Make sure SMSG_COUNT is below everything else
     SMSG_COUNT
 End Enum
@@ -191,12 +196,13 @@ Public Enum ClientPackets
     CRequestEditConv
     CSaveConv
     CRequestConvs ' = 90
-    CRequestEditMission
-    CSaveMission
-    CRequestMissions
-    CAcceptMissionRequest
-    CDeclineMissionRequest
     CFinishTutorial
+    
+    CRequestEditQuest
+    CSaveQuest
+    CRequestQuests
+    CPlayerHandleQuest
+    CQuestLogUpdate
     ' Make sure CMSG_COUNT is below everything else
     CMSG_COUNT
 End Enum

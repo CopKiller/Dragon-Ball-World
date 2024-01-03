@@ -246,14 +246,14 @@ Public Function CanMove(index As Long, Dir As Long) As Byte
     ' check if we've warped
     If warped Then
         ' clear their target
-        TempPlayer(index).target = 0
+        TempPlayer(index).Target = 0
         TempPlayer(index).targetType = TARGET_TYPE_NONE
         SendTarget index
     End If
 End Function
 
 Public Function CheckDirection(index As Long, direction As Long) As Boolean
-    Dim x As Long, y As Long, i As Long
+    Dim x As Long, Y As Long, i As Long
     Dim EventCount As Long, mapnum As Long, page As Long
 
     CheckDirection = False
@@ -261,38 +261,38 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
     Select Case direction
         Case DIR_UP
             x = GetPlayerX(index)
-            y = GetPlayerY(index) - 1
+            Y = GetPlayerY(index) - 1
         Case DIR_DOWN
             x = GetPlayerX(index)
-            y = GetPlayerY(index) + 1
+            Y = GetPlayerY(index) + 1
         Case DIR_LEFT
             x = GetPlayerX(index) - 1
-            y = GetPlayerY(index)
+            Y = GetPlayerY(index)
         Case DIR_RIGHT
             x = GetPlayerX(index) + 1
-            y = GetPlayerY(index)
+            Y = GetPlayerY(index)
         Case DIR_UP_LEFT
             x = GetPlayerX(index) - 1
-            y = GetPlayerY(index) - 1
+            Y = GetPlayerY(index) - 1
         Case DIR_UP_RIGHT
             x = GetPlayerX(index) + 1
-            y = GetPlayerY(index) - 1
+            Y = GetPlayerY(index) - 1
         Case DIR_DOWN_LEFT
             x = GetPlayerX(index) - 1
-            y = GetPlayerY(index) + 1
+            Y = GetPlayerY(index) + 1
         Case DIR_DOWN_RIGHT
             x = GetPlayerX(index) + 1
-            y = GetPlayerY(index) + 1
+            Y = GetPlayerY(index) + 1
     End Select
     
     ' Check to see if the map tile is blocked or not
-    If Map(GetPlayerMap(index)).TileData.Tile(x, y).Type = TILE_TYPE_BLOCKED Then
+    If Map(GetPlayerMap(index)).TileData.Tile(x, Y).Type = TILE_TYPE_BLOCKED Then
         CheckDirection = True
         Exit Function
     End If
 
     ' Check to see if the map tile is tree or not
-    If Map(GetPlayerMap(index)).TileData.Tile(x, y).Type = TILE_TYPE_RESOURCE Then
+    If Map(GetPlayerMap(index)).TileData.Tile(x, Y).Type = TILE_TYPE_RESOURCE Then
         CheckDirection = True
         Exit Function
     End If
@@ -304,7 +304,7 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
         For i = 1 To Player_HighIndex
             If IsPlaying(i) And GetPlayerMap(i) = GetPlayerMap(index) Then
                 If GetPlayerX(i) = x Then
-                    If GetPlayerY(i) = y Then
+                    If GetPlayerY(i) = Y Then
                         CheckDirection = True
                         Exit Function
                     End If
@@ -317,7 +317,7 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
     For i = 1 To MAX_MAP_NPCS
         If MapNpc(GetPlayerMap(index)).Npc(i).Num > 0 Then
             If MapNpc(GetPlayerMap(index)).Npc(i).x = x Then
-                If MapNpc(GetPlayerMap(index)).Npc(i).y = y Then
+                If MapNpc(GetPlayerMap(index)).Npc(i).Y = Y Then
                     CheckDirection = True
                     Exit Function
                 End If
@@ -475,182 +475,3 @@ Public Function CanPlayerBlockHit(ByVal index As Long) As Boolean
     End If
 
 End Function
-
-Public Sub CheckHas_Mission(ByVal index As Long, ByVal NpcIndex As Long)
-    Dim MissionID As Long, NpcNum As Long
-    Dim AlreadyOnMission As Boolean
-    Dim HasCompletedMission As Boolean
-    Dim AlreadyCompletedMission As Boolean
-    Dim IsRepeatable As Boolean
-    Dim ActualMissionID As Long
-    Dim MissionSlot As Long
-    Dim i As Long, N As Long
-    Dim mapnum As Long
-    
-    mapnum = GetPlayerMap(index)
-    
-    If NpcIndex = 0 Then
-        Exit Sub
-    End If
-    
-    NpcNum = MapNpc(mapnum).Npc(NpcIndex).Num
-'    'Before we bother checking the main Mission variables, if we are on a Mission to talk to this NPC, let's do that first!
-'    For i = 1 To MAX_PLAYER_MISSIONS
-'        MissionID = Player(index).Mission(i).ID
-'        If MissionID > 0 Then
-'            If Mission(MissionID).Type = Mission_TYPE_TALK Then
-'                If Mission(MissionID).TalkNPC = NpcNum Then
-'                    Call MissionChat(index, MissionID)
-'                    Call CompleteMission(index, i)
-'                    Exit Sub
-'                End If
-'            End If
-'        End If
-'    Next i
-    
-    'Exit out if it's not a Mission giver
-    If Npc(NpcNum).Behaviour <> NPC_BEHAVIOUR_FRIENDLY Then
-        Exit Sub
-    End If
-    
-    If Npc(NpcNum).Mission <> 0 Then
-        MissionID = Npc(NpcNum).Mission
-        For i = 1 To MAX_PLAYER_MISSIONS
-            'Toggle flags to false, this will be modified further down as we run if statements
-            AlreadyOnMission = False
-            HasCompletedMission = False
-            AlreadyCompletedMission = False
-            IsRepeatable = False
-            'See if we're already on the Mission,
-            For N = 1 To MAX_MISSIONS
-                If Player(index).CompletedMission(N) = MissionID Then
-                    ' AlreadyOnMission = True
-                    AlreadyCompletedMission = True
-                    If Mission(MissionID).Repeatable = 1 Then
-                       IsRepeatable = True
-                    Else
-                       IsRepeatable = False
-                    End If
-                End If
-            Next N
-            
-            MissionSlot = 0
-            
-            For N = 1 To MAX_PLAYER_MISSIONS
-                If Player(index).Mission(N).ID = MissionID Then
-                    AlreadyOnMission = True
-                    MissionSlot = N
-                End If
-            Next N
-    
-            'We're going to use a bunch of If statements to run some checks and figure out what state we're at in the Mission
-            If AlreadyOnMission = True Then
-            'Flag that we're already on this NPC's Mission
-            ' AlreadyOnMission = True
-            
-                'if it's a kill Mission
-                If Mission(MissionID).Type = MissionType.Mission_TypeKill Then
-                'We have completed the objective...
-                    If Player(index).Mission(MissionSlot).Count >= Mission(MissionID).KillNPCAmount Then
-                        HasCompletedMission = True
-                    Else
-                        HasCompletedMission = False
-                    End If
-                'if it's a collect Mission
-                ElseIf Mission(MissionID).Type = MissionType.Mission_TypeCollect Then
-                    'We have completed the objective
-                    If HasItem(index, Mission(MissionID).CollectItem) >= Mission(MissionID).CollectItemAmount Then
-                        HasCompletedMission = True
-                    Else
-                        HasCompletedMission = False
-                    End If
-                'if it's a talk Mission
-                ElseIf Mission(MissionID).Type = MissionType.Mission_TypeTalk Then
-                    'We flag this as incomplete because we're not going to have a Mission to talk to the same person...or we shouldn't anyways, that'd bad dialogue..
-                    HasCompletedMission = False
-                End If
-            End If
-    
-    
-            If IsRepeatable = True And AlreadyOnMission = False And AlreadyCompletedMission = True Then
-                Call OfferMission(index, MissionID)
-                Exit Sub
-            End If
-            If IsRepeatable = True And AlreadyOnMission = True And AlreadyCompletedMission = True And HasCompletedMission = False Then
-                Call SendChatBubble(GetPlayerMap(index), NpcNum, TARGET_TYPE_NPC, Mission(MissionID).Incomplete, White)
-                Exit Sub
-            End If
-            If IsRepeatable = True And AlreadyOnMission = True And AlreadyCompletedMission = True And HasCompletedMission = True Then
-                'Call MissionChat(index, MissionID)
-                Call CompleteMission(index, MissionSlot)
-                Exit Sub
-            End If
-            If AlreadyOnMission = True And HasCompletedMission = True And AlreadyCompletedMission = False Then
-                'Call MissionChat(index, MissionID)
-                Call CompleteMission(index, MissionSlot)
-                Exit Sub
-            End If
-            If AlreadyOnMission = True And HasCompletedMission = False And AlreadyCompletedMission = False Then
-                Call PlayerMsg(index, Mission(MissionID).Incomplete, BrightRed)
-                Call SendChatBubble(GetPlayerMap(index), NpcNum, TARGET_TYPE_NPC, Mission(MissionID).Incomplete, White)
-                Exit Sub
-            End If
-            If AlreadyOnMission = False And HasCompletedMission = False And AlreadyCompletedMission = False And Player(index).Mission(i).ID = 0 Then
-                Call OfferMission(index, MissionID)
-                Exit Sub
-            End If
-        Next i
-    End If
-End Sub
-
-
-Public Sub Check_Mission(ByVal Player_Index As Long, ByVal Target_Index As Long, Optional ByVal ItemAmount As Long = 0)
-    Dim Missin_ID As Long, i As Long
-    Dim mapnum As Long
-    
-    mapnum = GetPlayerMap(Player_Index)
-    
-    For i = 1 To MAX_PLAYER_MISSIONS
-        Mission_ID = Player(Player_Index).Mission(i).ID
-        If Mission_ID > 0 Then
-            If Mission(Mission_ID).Type = MissionType.Mission_TypeKill And Mission(Mission_ID).KillNPC = Target_Index Then
-                If TempPlayer(Player_Index).inParty > 0 Then
-                    'Party_ShareNPCKill TempPlayer(Player_Index).inParty, Player_Index, GetPlayerMap(Player_Index), Player(Player_Index).Mission(i).ID
-                Else
-                    If Player(Player_Index).Mission(i).Count < Mission(Mission_ID).KillNPCAmount Then
-                        Player(Player_Index).Mission(i).Count = Player(Player_Index).Mission(i).Count + 1
-                        If Player(Player_Index).Mission(i).Count Mod 5 = 0 Then
-                            Call PlayerMsg(Player_Index, "(" & Player(Player_Index).Mission(i).Count & "/" & Mission(Mission_ID).KillNPCAmount & ") " & Npc(Target_Index).Name, Yellow)
-                        End If
-                        Call SendPlayerMission(Player_Index, Mission_ID)
-                    Else
-                        If Player(Player_Index).Mission(i).Count Mod 5 = 0 Then
-                            Call PlayerMsg(Player_Index, "(" & Player(Player_Index).Mission(i).Count & "/" & Mission(Mission_ID).KillNPCAmount & ") " & Npc(Target_Index).Name, Yellow)
-                        End If
-                    End If
-                End If
-                
-            ElseIf Mission(Mission_ID).Type = MissionType.Mission_TypeCollect And Mission(Mission_ID).CollectItem = MapItem(mapnum, Target_Index).Num Then
-                If Player(Player_Index).Mission(i).Count < Mission(Mission_ID).CollectItemAmount Then
-                    Player(Player_Index).Mission(i).Count = Player(Player_Index).Mission(i).Count + ItemAmount
-                    If Player(Player_Index).Mission(i).Count Mod 5 = 0 Then
-                        Call PlayerMsg(Player_Index, "(" & Player(Player_Index).Mission(i).Count & "/" & Mission(Mission_ID).CollectItemAmount & ") " & Item(MapItem(mapnum, Target_Index).Num).Name, Yellow)
-                    End If
-                    Call SendPlayerMission(Player_Index, Mission_ID)
-                Else
-                    If Player(Player_Index).Mission(i).Count Mod 5 = 0 Then
-                        Call PlayerMsg(Player_Index, "(" & Player(Player_Index).Mission(i).Count & "/" & Mission(Mission_ID).CollectItemAmount & ") " & Item(MapItem(mapnum, Target_Index).Num).Name, Yellow)
-                    End If
-                End If
-            ElseIf Mission(Mission_ID).Type = MissionType.Mission_TypeTalk And Mission(Mission_ID).TalkNPC = Target_Index Then
-                If Player(Player_Index).Mission(i).Count = 0 Then
-                    Player(Player_Index).Mission(i).Count = Player(Player_Index).Mission(i).Count + 1
-                    If Player(Player_Index).Mission(i).Count <> 0 Then
-                        Call PlayerMsg(Player_Index, "Mission conv " & Npc(Target_Index).Name, Yellow)
-                    End If
-                    Call SendPlayerMission(Player_Index, Mission_ID)
-                End If
-            End If
-        End If
-    Next i
-End Sub

@@ -12,13 +12,12 @@ Private Type NpcRec
     Sprite As Long
     SpawnSecs As Long
     Behaviour As Byte
-    Mission As Long
     Range As Byte
     Stat(1 To Stats.Stat_Count - 1) As Byte
     HP As Long
     exp As Long
     Animation As Long
-    damage As Long
+    Damage As Long
     Level As Long
     Conv As Long
     

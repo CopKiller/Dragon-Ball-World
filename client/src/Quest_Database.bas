@@ -1,17 +1,23 @@
 Attribute VB_Name = "Quest_Database"
-Public Sub ClearMission(ByVal Index As Long)
-    Mission(Index) = EmptyMission
-    Mission(Index).Name = vbNullString
-    Mission(Index).Incomplete = vbNullString
-    Mission(Index).Completed = vbNullString
+Option Explicit
+
+Sub ClearQuest(ByVal Index As Long)
+    Dim i As Long
+    
+    Call ZeroMemory(ByVal VarPtr(Quest(Index)), LenB(Quest(Index)))
+    Quest(Index).Name = vbNullString
+    Quest(Index).QuestLog = vbNullString
+    Quest(Index).Speech = vbNullString
+    
+    For i = 1 To MAX_TASKS
+        Quest(Index).Task(i).TaskLog = vbNullString
+    Next i
 End Sub
 
-Public Sub ClearMissions()
+Sub ClearQuests()
     Dim i As Long
 
-    For i = 1 To MAX_MISSIONS
-        Call ClearMission(i)
+    For i = 1 To MAX_QUESTS
+        Call ClearQuest(i)
     Next
-
 End Sub
-

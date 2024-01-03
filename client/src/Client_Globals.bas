@@ -11,8 +11,6 @@ Public descItem As Long
 Public descLastType As Byte
 Public descLastItem As Long
 Public descText() As TextColourRec
-' Window Missions
-Public Button_MissionActive As Byte
 ' chars
 Public CharName(1 To MAX_CHARS) As String
 Public CharSprite(1 To MAX_CHARS) As Long

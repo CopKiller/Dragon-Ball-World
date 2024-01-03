@@ -31,15 +31,15 @@ Public Sub ConvEditorInit()
 
         .scrlChatCount = Conv(EditorIndex).chatCount
         .scrlConv.max = Conv(EditorIndex).chatCount
-        .scrlConv.value = 1
-        .txtConv = Conv(EditorIndex).Conv(.scrlConv.value).Conv
+        .scrlConv.Value = 1
+        .txtConv = Conv(EditorIndex).Conv(.scrlConv.Value).Conv
 
         For i = 1 To 4
-            .txtReply(i).text = Conv(EditorIndex).Conv(.scrlConv.value).rText(i)
-            .cmbReply(i).ListIndex = Conv(EditorIndex).Conv(.scrlConv.value).rTarget(i)
+            .txtReply(i).text = Conv(EditorIndex).Conv(.scrlConv.Value).rText(i)
+            .cmbReply(i).ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).rTarget(i)
         Next
         
-        .cmbEvent.ListIndex = Conv(EditorIndex).Conv(.scrlConv.value).EventType
+        .cmbEvent.ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).EventType
         
         If .cmbEvent.ListIndex = EventType.Event_OpenShop Then
             ' build EventNum combo
@@ -50,17 +50,7 @@ Public Sub ConvEditorInit()
                 .cmbEventNum.AddItem Trim$(Shop(i).Name)
             Next
     
-            .cmbEventNum.ListIndex = Conv(EditorIndex).Conv(.scrlConv.value).EventNum
-        ElseIf .cmbEvent.ListIndex = EventType.Event_OpenQuest Then
-            ' build EventNum combo
-            .cmbEventNum.Clear
-            .cmbEventNum.AddItem "None"
-    
-            For i = 1 To MAX_MISSIONS
-                .cmbEventNum.AddItem Trim$(Mission(i).Name)
-            Next
-    
-            .cmbEventNum.ListIndex = Conv(EditorIndex).Conv(.scrlConv.value).EventNum
+            .cmbEventNum.ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).EventNum
         End If
     End With
 
