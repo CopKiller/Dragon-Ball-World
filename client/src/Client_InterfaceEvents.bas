@@ -471,15 +471,15 @@ Public Sub btnAcceptChar_3()
 End Sub
 
 Public Sub btnDelChar_1()
-    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, StyleYESNO, 1
+    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, styleyesno, 1
 End Sub
 
 Public Sub btnDelChar_2()
-    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, StyleYESNO, 2
+    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, styleyesno, 2
 End Sub
 
 Public Sub btnDelChar_3()
-    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, StyleYESNO, 3
+    Dialogue "Delete Character", "Deleting this character is permanent.", "Are you sure you want to delete this character?", TypeDELCHAR, styleyesno, 3
 End Sub
 
 Public Sub btnCreateChar_1()
@@ -510,7 +510,7 @@ End Sub
 Public Sub btnDialogue_Close()
     If diaStyle = StyleOKAY Then
         dialogueHandler 1
-    ElseIf diaStyle = StyleYESNO Then
+    ElseIf diaStyle = styleyesno Then
         dialogueHandler 3
     End If
 End Sub

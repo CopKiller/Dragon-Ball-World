@@ -64,7 +64,7 @@ Public Type ChatStruct
     text As String
     Color As Long
     visible As Boolean
-    Timer As Long
+    timer As Long
     Channel As Byte
 End Type
 Public Const ColourChar As String * 1 = "½"
@@ -94,20 +94,20 @@ Sub LoadFonts()
 End Sub
 
 Sub SetFont(ByVal fontNum As Long, ByVal texName As String, ByVal Size As Long, Optional ByVal xOffset As Long, Optional ByVal yOffset As Long)
-Dim data() As Byte, f As Long, w As Long, h As Long, Path As String
+Dim Data() As Byte, f As Long, w As Long, h As Long, Path As String
     ' set the path
     Path = App.Path & PathFont & texName & GFX_EXT
     ' load the texture
     f = FreeFile
     Open Path For Binary As #f
-        ReDim data(0 To LOF(f) - 1)
-        Get #f, , data
+        ReDim Data(0 To LOF(f) - 1)
+        Get #f, , Data
     Close #f
     ' get size
-    font(fontNum).TextureSize.X = ByteToInt(data(18), data(19))
-    font(fontNum).TextureSize.Y = ByteToInt(data(22), data(23))
+    font(fontNum).TextureSize.X = ByteToInt(Data(18), Data(19))
+    font(fontNum).TextureSize.Y = ByteToInt(Data(22), Data(23))
     ' set to struct
-    Set font(fontNum).Texture = D3DX.CreateTextureFromFileInMemoryEx(D3DDevice, data(0), AryCount(data), font(fontNum).TextureSize.X, font(fontNum).TextureSize.Y, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, D3DX_FILTER_POINT, D3DX_FILTER_POINT, 0, ByVal 0, ByVal 0)
+    Set font(fontNum).Texture = D3DX.CreateTextureFromFileInMemoryEx(D3DDevice, Data(0), AryCount(Data), font(fontNum).TextureSize.X, font(fontNum).TextureSize.Y, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, D3DX_FILTER_POINT, D3DX_FILTER_POINT, 0, ByVal 0, ByVal 0)
     font(fontNum).xOffset = xOffset
     font(fontNum).yOffset = yOffset
     LoadFontHeader font(fontNum), texName & ".dat"
@@ -479,7 +479,7 @@ Dim i As Long
     Chat(1).text = text
     Chat(1).Color = Color
     Chat(1).visible = True
-    Chat(1).Timer = getTime
+    Chat(1).timer = getTime
     Chat(1).Channel = Channel
 End Sub
 
@@ -698,16 +698,16 @@ End Sub
 Public Sub DrawNpcName(ByVal Index As Long)
     Dim textX As Long, textY As Long, text As String, textSize As Long, NpcNum As Long, colour As Long, i As Long
     NpcNum = MapNpc(Index).Num
-    text = Trim$(NPC(NpcNum).Name)
+    text = Trim$(Npc(NpcNum).Name)
     textSize = TextWidth(font(Fonts.rockwell_15), text)
 
-    If NPC(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or NPC(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
+    If Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
         ' get the colour
-        If NPC(NpcNum).Level <= GetPlayerLevel(MyIndex) - 3 Then
+        If Npc(NpcNum).Level <= GetPlayerLevel(MyIndex) - 3 Then
             colour = Grey
-        ElseIf NPC(NpcNum).Level <= GetPlayerLevel(MyIndex) - 2 Then
+        ElseIf Npc(NpcNum).Level <= GetPlayerLevel(MyIndex) - 2 Then
             colour = Green
-        ElseIf NPC(NpcNum).Level > GetPlayerLevel(MyIndex) Then
+        ElseIf Npc(NpcNum).Level > GetPlayerLevel(MyIndex) Then
             colour = Red
         Else
             colour = White
@@ -719,8 +719,8 @@ Public Sub DrawNpcName(ByVal Index As Long)
     textX = MapNpc(Index).X * PIC_X + MapNpc(Index).xOffset + (PIC_X \ 2) - (textSize \ 2)
     textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - 32
 
-    If NPC(NpcNum).sprite >= 1 And NPC(NpcNum).sprite <= CountChar Then
-        textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - (mTexture(TextureChar(NPC(NpcNum).sprite)).RealHeight / 4) + 12
+    If Npc(NpcNum).sprite >= 1 And Npc(NpcNum).sprite <= CountChar Then
+        textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - (mTexture(TextureChar(Npc(NpcNum).sprite)).RealHeight / 4) + 12
     End If
 
     Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
@@ -728,12 +728,12 @@ Public Sub DrawNpcName(ByVal Index As Long)
     For i = 1 To MAX_QUESTS
         'check if the npc is the next task to any quest: [?] symbol
         If Trim$(Quest(i).Name) <> "" Then
-            If Player(MyIndex).PlayerQuest(i).Status = QUEST_STARTED Then
-                If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).NPC = NpcNum Then
-                    If NPC(NpcNum).sprite > 0 Then
-                        textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (mTexture(TextureGUI(5)).Width / 2)
-                        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (mTexture(TextureChar(NPC(NpcNum).sprite)).Height / 4)
-                        RenderTexture_Animated TextureGUI(5), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
+            If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
+                If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Npc = NpcNum Then
+                    If Npc(NpcNum).sprite > 0 Then
+                        textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (mTexture(TextureGUI(9)).Width / 2)
+                        textY = ConvertMapY(MapNpc(Index).Y * PIC_Y) + MapNpc(Index).yOffset - (mTexture(TextureChar(Npc(NpcNum).sprite)).Height / 4)
+                        RenderTexture_Animated TextureGUI(9), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
 
                         If GlobalX >= textX And GlobalX <= textX + 13 Then
                             If GlobalY >= textY And GlobalY <= textY + 13 Then

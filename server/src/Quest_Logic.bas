@@ -2,7 +2,7 @@ Attribute VB_Name = "Quest_Logic"
 Option Explicit
 
 Public Function CanStartQuest(ByVal Index As Long, ByVal QuestNum As Long) As Boolean
-    Dim i As Long, n As Long
+    Dim I As Long, n As Long
     CanStartQuest = False
     If QuestNum < 1 Or QuestNum > MAX_QUESTS Then Exit Function
 
@@ -71,11 +71,11 @@ Public Function CanStartQuest(ByVal Index As Long, ByVal QuestNum As Long) As Bo
         If Quest(QuestNum).RequiredLevel <= Player(Index).Level Then
 
             'Check if item is needed
-            For i = 1 To MAX_QUESTS_ITEMS
-                If Quest(QuestNum).RequiredItem(i).Item > 0 Then
+            For I = 1 To MAX_QUESTS_ITEMS
+                If Quest(QuestNum).RequiredItem(I).Item > 0 Then
                     'if we don't have it at all then
-                    If HasItem(Index, Quest(QuestNum).RequiredItem(i).Item) = 0 Then
-                        PlayerMsg Index, "You need " & Trim$(Item(Quest(QuestNum).RequiredItem(i).Item).Name) & " to take this quest!", BrightRed
+                    If HasItem(Index, Quest(QuestNum).RequiredItem(I).Item) = 0 Then
+                        PlayerMsg Index, "You need " & Trim$(Item(Quest(QuestNum).RequiredItem(I).Item).Name) & " to take this quest!", BrightRed
                         Exit Function
                     End If
                 End If
@@ -126,24 +126,24 @@ End Function
 
 'Gets the quest reference num (id) from the quest name (it shall be unique)
 Public Function GetQuestNum(ByVal QuestName As String) As Long
-    Dim i As Long
+    Dim I As Long
     GetQuestNum = 0
 
-    For i = 1 To MAX_QUESTS
-        If Trim$(Quest(i).Name) = Trim$(QuestName) Then
-            GetQuestNum = i
+    For I = 1 To MAX_QUESTS
+        If Trim$(Quest(I).Name) = Trim$(QuestName) Then
+            GetQuestNum = I
             Exit For
         End If
     Next
 End Function
 
 Public Function GetItemNum(ByVal ItemName As String) As Long
-    Dim i As Long
+    Dim I As Long
     GetItemNum = 0
 
-    For i = 1 To MAX_ITEMS
-        If Trim$(Item(i).Name) = Trim$(ItemName) Then
-            GetItemNum = i
+    For I = 1 To MAX_ITEMS
+        If Trim$(Item(I).Name) = Trim$(ItemName) Then
+            GetItemNum = I
             Exit For
         End If
     Next
@@ -154,19 +154,19 @@ End Function
 ' /////////////////////
 
 Public Sub CheckTasks(ByVal Index As Long, ByVal TaskType As Long, ByVal TargetIndex As Long)
-    Dim i As Long
+    Dim I As Long
 
-    For i = 1 To MAX_QUESTS
-        If QuestInProgress(Index, i) Then
-            If TaskType = Quest(i).Task(Player(Index).PlayerQuest(i).ActualTask).Order Then
-                Call CheckTask(Index, i, TaskType, TargetIndex)
+    For I = 1 To MAX_QUESTS
+        If QuestInProgress(Index, I) Then
+            If TaskType = Quest(I).Task(Player(Index).PlayerQuest(I).ActualTask).Order Then
+                Call CheckTask(Index, I, TaskType, TargetIndex)
             End If
         End If
     Next
 End Sub
 
 Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType As Long, ByVal TargetIndex As Long)
-    Dim ActualTask As Long, i As Long
+    Dim ActualTask As Long, I As Long
     ActualTask = Player(Index).PlayerQuest(QuestNum).ActualTask
 
     Select Case TaskType
@@ -180,7 +180,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
             QuestMessage Index, QuestNum, Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(Npc(TargetIndex).Name) + " killed.", Yellow
             'did i finish the work?
             If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-                QuestMessage Index, QuestNum, "Task completed", LightGreen
+                QuestMessage Index, QuestNum, "Task completed", Green
                 'is the quest's end?
                 If CanEndQuest(Index, QuestNum) Then
                     EndQuest Index, QuestNum
@@ -203,10 +203,10 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
             Player(Index).PlayerQuest(QuestNum).CurrentCount = 0
 
             'Check inventory for the items
-            For i = 1 To MAX_INV
-                If GetPlayerInvItemNum(Index, i) = TargetIndex Then
-                    If Item(i).Stackable > 0 Then
-                        Player(Index).PlayerQuest(QuestNum).CurrentCount = GetPlayerInvItemValue(Index, i)
+            For I = 1 To MAX_INV
+                If GetPlayerInvItemNum(Index, I) = TargetIndex Then
+                    If Item(I).Type = ITEM_TYPE_CURRENCY Then
+                        Player(Index).PlayerQuest(QuestNum).CurrentCount = GetPlayerInvItemValue(Index, I)
                     Else
                         'If is the correct item add it to the count
                         Player(Index).PlayerQuest(QuestNum).CurrentCount = Player(Index).PlayerQuest(QuestNum).CurrentCount + 1
@@ -217,7 +217,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
             QuestMessage Index, QuestNum, "You have " + Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(Item(TargetIndex).Name), Yellow
 
             If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-                QuestMessage Index, QuestNum, "Task completed", LightGreen
+                QuestMessage Index, QuestNum, "Task completed", Green
                 If CanEndQuest(Index, QuestNum) Then
                     EndQuest Index, QuestNum
                 Else
@@ -233,7 +233,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
 
     Case QUEST_TYPE_GOTALK    'Interact with X npc.
         If TargetIndex = Quest(QuestNum).Task(ActualTask).Npc Then
-            QuestMessage Index, QuestNum, "Task completed", LightGreen
+            QuestMessage Index, QuestNum, "Task completed", Green
             If CanEndQuest(Index, QuestNum) Then
                 EndQuest Index, QuestNum
             Else
@@ -247,7 +247,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
 
     Case QUEST_TYPE_GOREACH    'Reach X map.
         If TargetIndex = Quest(QuestNum).Task(ActualTask).Map Then
-            QuestMessage Index, QuestNum, "Task completed", LightGreen
+            QuestMessage Index, QuestNum, "Task completed", Green
             If CanEndQuest(Index, QuestNum) Then
                 EndQuest Index, QuestNum
             Else
@@ -265,11 +265,11 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
 
             Player(Index).PlayerQuest(QuestNum).CurrentCount = 0
 
-            For i = 1 To MAX_INV
-                If GetPlayerInvItemNum(Index, i) = Quest(QuestNum).Task(ActualTask).Item Then
-                    If Item(i).Stackable > 0 Then
-                        If GetPlayerInvItemValue(Index, i) >= Quest(QuestNum).Task(ActualTask).Amount Then
-                            Player(Index).PlayerQuest(QuestNum).CurrentCount = GetPlayerInvItemValue(Index, i)
+            For I = 1 To MAX_INV
+                If GetPlayerInvItemNum(Index, I) = Quest(QuestNum).Task(ActualTask).Item Then
+                    If Item(I).Type = ITEM_TYPE_CURRENCY Then
+                        If GetPlayerInvItemValue(Index, I) >= Quest(QuestNum).Task(ActualTask).Amount Then
+                            Player(Index).PlayerQuest(QuestNum).CurrentCount = GetPlayerInvItemValue(Index, I)
                         End If
                     Else
                         'If is the correct item add it to the count
@@ -280,17 +280,17 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
 
             If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
                 'if we have enough items, then remove them and finish the task
-                If Item(Quest(QuestNum).Task(ActualTask).Item).Stackable > 0 Then
+                If Item(Quest(QuestNum).Task(ActualTask).Item).Type = ITEM_TYPE_CURRENCY Then
                     TakeInvItem Index, Quest(QuestNum).Task(ActualTask).Item, Quest(QuestNum).Task(ActualTask).Amount
                 Else
                     'If it's not a currency then remove all the items
-                    For i = 1 To Quest(QuestNum).Task(ActualTask).Amount
+                    For I = 1 To Quest(QuestNum).Task(ActualTask).Amount
                         TakeInvItem Index, Quest(QuestNum).Task(ActualTask).Item, 1
                     Next
                 End If
 
                 QuestMessage Index, QuestNum, "You gave " + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " " + Trim$(Item(TargetIndex).Name), Yellow
-                QuestMessage Index, QuestNum, "Task completed", LightGreen
+                QuestMessage Index, QuestNum, "Task completed", Green
 
                 If CanEndQuest(Index, QuestNum) Then
                     EndQuest Index, QuestNum
@@ -309,7 +309,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
         Player(Index).PlayerQuest(QuestNum).CurrentCount = Player(Index).PlayerQuest(QuestNum).CurrentCount + 1
         QuestMessage Index, QuestNum, Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " players killed.", Yellow
         If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-            QuestMessage Index, QuestNum, "Task completed", LightGreen
+            QuestMessage Index, QuestNum, "Task completed", Green
             If CanEndQuest(Index, QuestNum) Then
                 EndQuest Index, QuestNum
             Else
@@ -327,7 +327,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
             Player(Index).PlayerQuest(QuestNum).CurrentCount = Player(Index).PlayerQuest(QuestNum).CurrentCount + 1
             QuestMessage Index, QuestNum, Trim$(Player(Index).PlayerQuest(QuestNum).CurrentCount) + "/" + Trim$(Quest(QuestNum).Task(ActualTask).Amount) + " hits.", Yellow
             If Player(Index).PlayerQuest(QuestNum).CurrentCount >= Quest(QuestNum).Task(ActualTask).Amount Then
-                QuestMessage Index, QuestNum, "Task completed", LightGreen
+                QuestMessage Index, QuestNum, "Task completed", Green
                 If CanEndQuest(Index, QuestNum) Then
                     EndQuest Index, QuestNum
                 Else
@@ -364,7 +364,7 @@ Public Sub CheckTask(ByVal Index As Long, ByVal QuestNum As Long, ByVal TaskType
 End Sub
 
 Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
-    Dim i As Long, n As Long
+    Dim I As Long, n As Long
 
     ' Reseta os dados da data pra ser somente usado onde necessitar!
     Player(Index).PlayerQuest(QuestNum).Data = vbNullString
@@ -395,14 +395,14 @@ Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
     End If
 
     'remove items on the end
-    For i = 1 To MAX_QUESTS_ITEMS
-        If Quest(QuestNum).TakeItem(i).Item > 0 Then
-            If HasItem(Index, Quest(QuestNum).TakeItem(i).Item) > 0 Then
-                If Item(Quest(QuestNum).TakeItem(i).Item).Stackable > 0 Then
-                    TakeInvItem Index, Quest(QuestNum).TakeItem(i).Item, Quest(QuestNum).TakeItem(i).Value
+    For I = 1 To MAX_QUESTS_ITEMS
+        If Quest(QuestNum).TakeItem(I).Item > 0 Then
+            If HasItem(Index, Quest(QuestNum).TakeItem(I).Item) > 0 Then
+                If Item(Quest(QuestNum).TakeItem(I).Item).Type = ITEM_TYPE_CURRENCY Then
+                    TakeInvItem Index, Quest(QuestNum).TakeItem(I).Item, Quest(QuestNum).TakeItem(I).Value
                 Else
-                    For n = 1 To Quest(QuestNum).TakeItem(i).Value
-                        TakeInvItem Index, Quest(QuestNum).TakeItem(i).Item, 1
+                    For n = 1 To Quest(QuestNum).TakeItem(I).Value
+                        TakeInvItem Index, Quest(QuestNum).TakeItem(I).Item, 1
                     Next
                 End If
             End If
@@ -410,24 +410,24 @@ Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
     Next
 
     'give rewards
-    For i = 1 To MAX_QUESTS_ITEMS
-        If Quest(QuestNum).RewardItem(i).Item <> 0 Then
+    For I = 1 To MAX_QUESTS_ITEMS
+        If Quest(QuestNum).RewardItem(I).Item <> 0 Then
             'check if we have space
-            If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(i).Item) = 0 Then
+            If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(I).Item) = 0 Then
                 PlayerMsg Index, "You have no inventory space.", BrightRed
                 Exit For
             Else
                 'if so, check if it's a currency stack the item in one slot
-                If Item(Quest(QuestNum).RewardItem(i).Item).Stackable > 0 Then
-                    GiveInvItem Index, Quest(QuestNum).RewardItem(i).Item, Quest(QuestNum).RewardItem(i).Value, 0
+                If Item(Quest(QuestNum).RewardItem(I).Item).Type = ITEM_TYPE_CURRENCY Then
+                    GiveInvItem Index, Quest(QuestNum).RewardItem(I).Item, Quest(QuestNum).RewardItem(I).Value, 0
                 Else
                     'if not, create a new loop and store the item in a new slot if is possible
-                    For n = 1 To Quest(QuestNum).RewardItem(i).Value
-                        If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(i).Item) = 0 Then
+                    For n = 1 To Quest(QuestNum).RewardItem(I).Value
+                        If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(I).Item) = 0 Then
                             PlayerMsg Index, "You have no inventory space.", BrightRed
                             Exit For
                         Else
-                            GiveInvItem Index, Quest(QuestNum).RewardItem(i).Item, 1, 0
+                            GiveInvItem Index, Quest(QuestNum).RewardItem(I).Item, 1, 0
                         End If
                     Next
                 End If
@@ -446,6 +446,10 @@ Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
         SendMessageTo Index, Trim$(Quest(QuestNum).Name), "Parabens, Voce concluiu a missao, volte amanha para completar novamente!"
     ElseIf Player(Index).PlayerQuest(QuestNum).Status = QUEST_COMPLETED_TIME Then
         SendMessageTo Index, Trim$(Quest(QuestNum).Name), "Parabens, Voce concluiu a missao, volte daqui: " & SecondsToHMS(Quest(QuestNum).Time) & " e complete novamente!"
+    ElseIf Player(Index).PlayerQuest(QuestNum).Status = QUEST_COMPLETED_BUT Then
+        SendMessageTo Index, Trim$(Quest(QuestNum).Name), "Parabens, Voce concluiu a missao. Esta missão é repetitiva!"
+    Else
+        SendMessageTo Index, Trim$(Quest(QuestNum).Name), "Parabens, Voce concluiu a missao!"
     End If
 
     SavePlayer Index
@@ -454,31 +458,65 @@ Public Sub EndQuest(ByVal Index As Long, ByVal QuestNum As Long)
     SendPlayerQuest Index, QuestNum
 End Sub
 
+Public Function GivePlayerSpell(ByVal Index As Long, ByVal SpellNum As Long) As Boolean
+    Dim I As Long, FreeSlot As Long
+    
+    GivePlayerSpell = False
+
+    ' Se o usuário já estiver com a magia, atualiza o level.
+    For I = 1 To MAX_PLAYER_SPELLS
+        If Player(Index).Spell(I).Spell = SpellNum Then
+            Call PlayerMsg(Index, "Você já possui essa habilidade", BrightRed)
+            GivePlayerSpell = True
+            Exit Function
+        End If
+    Next
+
+    ' Procura por um slot vazio.
+    For I = 1 To MAX_PLAYER_SPELLS
+        If Player(Index).Spell(I).Spell = 0 Then
+            FreeSlot = I
+            Exit For
+        End If
+    Next
+
+    If FreeSlot <> 0 Then
+        Player(Index).Spell(FreeSlot).Spell = SpellNum
+
+        Call PlayerMsg(Index, "A habilidade " & Trim$(Spell(SpellNum).Name) & " foi adquirida", BrightGreen)
+        Call SendPlayerSpells(Index)
+        GivePlayerSpell = True
+    Else
+        Call PlayerMsg(Index, "Não há espaço suficiente para novas magias", BrightRed)
+    End If
+
+End Function
+
 Public Sub StartQuest(ByVal Index As Long, ByVal QuestNum As Long, ByVal Order As Byte)
-    Dim i As Long, n As Long
+    Dim I As Long, n As Long
     Dim RemoveStartItems As Boolean
 
     If Order = 1 Then    'Iniciar
         RemoveStartItems = False
-        For i = 1 To MAX_QUESTS_ITEMS
+        For I = 1 To MAX_QUESTS_ITEMS
 
-            If Quest(QuestNum).RewardItem(i).Item > 0 Then
-                If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(i).Item) = 0 Then
+            If Quest(QuestNum).RewardItem(I).Item > 0 Then
+                If FindOpenInvSlot(Index, Quest(QuestNum).RewardItem(I).Item) = 0 Then
                     QuestMessage Index, QuestNum, "Você não tem espaço na mochila, drope algo para pegar a quest.", Red
                     Exit For
                 End If
             End If
 
-            If Quest(QuestNum).GiveItem(i).Item > 0 Then
-                If FindOpenInvSlot(Index, Quest(QuestNum).GiveItem(i).Item) = 0 Then
+            If Quest(QuestNum).GiveItem(I).Item > 0 Then
+                If FindOpenInvSlot(Index, Quest(QuestNum).GiveItem(I).Item) = 0 Then
                     QuestMessage Index, QuestNum, "Você não tem espaço na mochila, drope algo para pegar a quest.", Red
                     RemoveStartItems = True
                     Exit For
                 Else
-                    If Item(Quest(QuestNum).GiveItem(i).Item).Stackable > 0 Then
-                        GiveInvItem Index, Quest(QuestNum).GiveItem(i).Item, Quest(QuestNum).GiveItem(i).Value, 0
+                    If Item(Quest(QuestNum).GiveItem(I).Item).Type = ITEM_TYPE_CURRENCY Then
+                        GiveInvItem Index, Quest(QuestNum).GiveItem(I).Item, Quest(QuestNum).GiveItem(I).Value, 0
                     Else
-                        GiveInvItem Index, Quest(QuestNum).GiveItem(i).Item, 1, 0
+                        GiveInvItem Index, Quest(QuestNum).GiveItem(I).Item, 1, 0
                     End If
                 End If
             End If
@@ -506,14 +544,14 @@ Public Sub StartQuest(ByVal Index As Long, ByVal QuestNum As Long, ByVal Order A
     End If
 
     If RemoveStartItems = True Then
-        For i = 1 To MAX_QUESTS_ITEMS
-            If Quest(QuestNum).GiveItem(i).Item > 0 Then
-                If HasItem(Index, Quest(QuestNum).GiveItem(i).Item) > 0 Then
-                    If Item(Quest(QuestNum).GiveItem(i).Item).Stackable > 0 Then
-                        TakeInvItem Index, Quest(QuestNum).GiveItem(i).Item, Quest(QuestNum).GiveItem(i).Value
+        For I = 1 To MAX_QUESTS_ITEMS
+            If Quest(QuestNum).GiveItem(I).Item > 0 Then
+                If HasItem(Index, Quest(QuestNum).GiveItem(I).Item) > 0 Then
+                    If Item(Quest(QuestNum).GiveItem(I).Item).Type = ITEM_TYPE_CURRENCY Then
+                        TakeInvItem Index, Quest(QuestNum).GiveItem(I).Item, Quest(QuestNum).GiveItem(I).Value
                     Else
-                        For n = 1 To Quest(QuestNum).GiveItem(i).Value
-                            TakeInvItem Index, Quest(QuestNum).GiveItem(i).Item, 1
+                        For n = 1 To Quest(QuestNum).GiveItem(I).Value
+                            TakeInvItem Index, Quest(QuestNum).GiveItem(I).Item, 1
                         Next
                     End If
                 End If
@@ -562,13 +600,13 @@ Public Sub SetPlayerTaskTimer(ByVal Index As Long, ByVal QuestNum As Integer)
 End Sub
 
 Public Sub CheckPlayerTaskTimer(ByVal Index As Long)
-    Dim i As Integer
+    Dim I As Integer
 
     If IsPlaying(Index) Then
-        For i = 1 To MAX_QUESTS
-            If LenB(Trim$(Quest(i).Name)) > 0 Then
-                If QuestInProgress(Index, i) Then
-                    With Player(Index).PlayerQuest(i).TaskTimer
+        For I = 1 To MAX_QUESTS
+            If LenB(Trim$(Quest(I).Name)) > 0 Then
+                If QuestInProgress(Index, I) Then
+                    With Player(Index).PlayerQuest(I).TaskTimer
 
                         If .Active = YES Then
                             If .Timer > 0 Then
@@ -586,19 +624,19 @@ Public Sub CheckPlayerTaskTimer(ByVal Index As Long)
 
                                 ' 0=Resetar Task ; 1=Resetar Quest.
                                 If .ResetType = 0 Then
-                                    Player(Index).PlayerQuest(i).CurrentCount = 0    ' Retornar a zero a contagem do objetivo da task.
-                                    .Timer = Quest(i).Task(Player(Index).PlayerQuest(i).ActualTask).TaskTimer.Timer    ' Resetar o tempo que o jogador vai refazê-lá.
+                                    Player(Index).PlayerQuest(I).CurrentCount = 0    ' Retornar a zero a contagem do objetivo da task.
+                                    .Timer = Quest(I).Task(Player(Index).PlayerQuest(I).ActualTask).TaskTimer.Timer    ' Resetar o tempo que o jogador vai refazê-lá.
                                 ElseIf .ResetType = 1 Then
-                                    Call ResetPlayerTaskTimer(Index, i)    ' Resetar todo os dados da task das variaveis do jogador!
-                                    Call StartQuest(Index, i, 2)    ' Cancelar a quest toda!
+                                    Call ResetPlayerTaskTimer(Index, I)    ' Resetar todo os dados da task das variaveis do jogador!
+                                    Call StartQuest(Index, I, 2)    ' Cancelar a quest toda!
                                 End If
 
                                 ' enviar a mensagem do editor de task
-                                If Trim$(Quest(i).Task(Player(Index).PlayerQuest(i).ActualTask).TaskTimer.Msg) <> vbNullString Then
-                                    Call SendMessageTo(Index, Trim$(Quest(i).Name), Trim$(Quest(i).Task(Player(Index).PlayerQuest(i).ActualTask).TaskTimer.Msg))
+                                If Trim$(Quest(I).Task(Player(Index).PlayerQuest(I).ActualTask).TaskTimer.Msg) <> vbNullString Then
+                                    Call SendMessageTo(Index, Trim$(Quest(I).Name), Trim$(Quest(I).Task(Player(Index).PlayerQuest(I).ActualTask).TaskTimer.Msg))
                                 End If
 
-                                Call SendPlayerQuest(Index, i)
+                                Call SendPlayerQuest(Index, I)
                             End If
                         Else
                             If .Teleport = YES Then
@@ -608,13 +646,13 @@ Public Sub CheckPlayerTaskTimer(ByVal Index As Long)
                                     Call PlayerWarp(Index, START_MAP, START_X, START_Y)
                                 End If
 
-                                Call ResetPlayerTaskTimer(Index, i)
+                                Call ResetPlayerTaskTimer(Index, I)
                             End If
                         End If
                     End With
                 End If
             End If
-        Next i
+        Next I
     End If
 
 End Sub

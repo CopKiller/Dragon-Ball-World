@@ -86,31 +86,75 @@ Public Sub sendChat(ByVal Index As Long)
     Dim curChat As Long
     Dim mainText As String
     Dim optText(1 To 4) As String
-    Dim P_GENDER As String
-    Dim P_NAME As String
-    Dim P_CLASS As String
+    'Dim P_GENDER As String
+    'Dim P_NAME As String
+    'Dim P_CLASS As String
     Dim I As Long
-    
+
     If TempPlayer(Index).inChatWith > 0 Then
         convNum = Npc(TempPlayer(Index).inChatWith).Conv
         curChat = TempPlayer(Index).curChat
 
-continue:
-        ' cache player's details
-        If Player(Index).Sex = SEX_MALE Then
-            P_GENDER = "man"
-        Else
-            P_GENDER = "woman"
+        ' check for unique events and trigger them early
+        If Conv(convNum).Conv(curChat).EventType > 0 Then
+            Select Case Conv(convNum).Conv(curChat).EventType
+            Case 1    ' Open Shop
+                If Conv(convNum).Conv(curChat).EventNum > 0 Then    ' shop exists?
+                    SendOpenShop Index, Conv(convNum).Conv(curChat).EventNum
+                    TempPlayer(Index).InShop = Conv(convNum).Conv(curChat).EventNum    ' stops movement and the like
+                End If
+                ' exit out early so we don't send chat update twice
+                ClosePlayerChat Index
+                Exit Sub
+            Case 2    ' Open Bank
+                SendBank Index
+                TempPlayer(Index).InBank = True
+                ' exit out early'
+                ClosePlayerChat Index
+                Exit Sub
+            Case 3    ' Give Quest
+                If Conv(convNum).Conv(curChat).EventNum > 0 Then
+                    If QuestInProgress(Index, Conv(convNum).Conv(curChat).EventNum) Then
+                        'if the quest is in progress show the meanwhile message (speech2)
+                        mainText = Trim$(Quest(Conv(convNum).Conv(curChat).EventNum).Task(Player(Index).PlayerQuest(Conv(convNum).Conv(curChat).EventNum).ActualTask).TaskLog)
+                        SendChatUpdate Index, TempPlayer(Index).inChatWith, mainText, optText(1), optText(2), optText(3), optText(4)
+                        Exit Sub
+                    End If
+                    If CanStartQuest(Index, Conv(convNum).Conv(curChat).EventNum) Then
+                        'if can start show the request message (speech1)
+                        StartQuest Index, Conv(convNum).Conv(curChat).EventNum, 1
+                        mainText = Trim$(Quest(Conv(convNum).Conv(curChat).EventNum).QuestLog)
+                        SendChatUpdate Index, TempPlayer(Index).inChatWith, mainText, optText(1), optText(2), optText(3), optText(4)
+                        Exit Sub
+                    End If
+                    mainText = "Voce nao cumpre algum requisito, verifique o log no chat!"
+                    SendChatUpdate Index, TempPlayer(Index).inChatWith, mainText, optText(1), optText(2), optText(3), optText(4)
+                    Exit Sub
+                End If
+            Case 4    ' unique script
+            Case 5    ' Dar Dica
+            Case 6    ' Dar Quest
+            Case 7    ' Iniciar Viagem
+            Case 8    ' Abrir mix
+            End Select
         End If
-        P_NAME = Trim$(Player(Index).Name)
-        P_CLASS = Trim$(Class(Player(Index).Class).Name)
-        
+
+Continue:
+        ' cache player's details
+        'If Player(index).Sex = SEX_MALE Then
+        '    P_GENDER = "man"
+        'Else
+        '    P_GENDER = "woman"
+        'End If
+        'P_NAME = Trim$(Player(index).Name)
+        'P_CLASS = Trim$(Class(Player(index).Class).Name)
+
         mainText = Conv(convNum).Conv(curChat).Conv
         For I = 1 To 4
             optText(I) = Conv(convNum).Conv(curChat).rText(I)
         Next
     End If
-    
+
     SendChatUpdate Index, TempPlayer(Index).inChatWith, mainText, optText(1), optText(2), optText(3), optText(4)
     Exit Sub
 End Sub
@@ -278,7 +322,7 @@ Sub PlayerWarp(ByVal Index As Long, ByVal mapnum As Long, ByVal x As Long, ByVal
     
     ' clear target
     TempPlayer(Index).Target = 0
-    TempPlayer(Index).targetType = TARGET_TYPE_NONE
+    TempPlayer(Index).TargetType = TARGET_TYPE_NONE
     SendTarget Index
 
     ' Save old map to send erase player data to
@@ -732,7 +776,7 @@ Sub PlayerMapGetItem(ByVal Index As Long)
                             ' check tasks
                             Call CheckTasks(Index, QUEST_TYPE_GOGATHER, MapItem(mapnum, I).Num)
                             
-                            If Item(GetPlayerInvItemNum(Index, n)).Type = ITEM_TYPE_CURRENCY Then
+                            If Item(GetPlayerInvItemNum(Index, n)).Type <> ITEM_TYPE_CURRENCY Then
                                 Call SetPlayerInvItemValue(Index, n, GetPlayerInvItemValue(Index, n) + MapItem(mapnum, I).Value)
                                 Msg = MapItem(mapnum, I).Value & " " & Trim$(Item(GetPlayerInvItemNum(Index, n)).Name)
                             Else
@@ -841,33 +885,48 @@ Sub PlayerMapDropItem(ByVal Index As Long, ByVal invNum As Long, ByVal Amount As
 
 End Sub
 
-Public Sub CheckPlayerLevelUp(ByVal Index As Long)
-    Dim I As Long
+Sub CheckPlayerLevelUp(ByVal Index As Long, Optional ByVal level_count As Long)
+    Dim I As Long, PontosPorLevel As Byte
     Dim expRollover As Long
-    Dim level_count As Long
-    
+
+    PontosPorLevel = 3
+
+    ' Caso queira adicionar levels diretamente!
+    If level_count > 0 Then
+        ' can level up?
+        If Not SetPlayerLevel(Index, GetPlayerLevel(Index) + level_count) Then
+            Exit Sub
+        End If
+
+        Call SetPlayerPOINTS(Index, GetPlayerPOINTS(Index) + (level_count * PontosPorLevel))
+        GoTo Continue
+    End If
+
+    ' Adiciona level pela experiência, método normal de um rpg
     level_count = 0
-    
     Do While GetPlayerExp(Index) >= GetPlayerNextLevel(Index)
         expRollover = GetPlayerExp(Index) - GetPlayerNextLevel(Index)
-        
+
         ' can level up?
         If Not SetPlayerLevel(Index, GetPlayerLevel(Index) + 1) Then
             Exit Sub
         End If
-        
-        Call SetPlayerPOINTS(Index, GetPlayerPOINTS(Index) + 3)
+
+        Call SetPlayerPOINTS(Index, GetPlayerPOINTS(Index) + PontosPorLevel)
         Call SetPlayerExp(Index, expRollover)
         level_count = level_count + 1
     Loop
-    
+
+Continue:
     If level_count > 0 Then
         If level_count = 1 Then
             'singular
             GlobalMsg GetPlayerName(Index) & " has gained " & level_count & " level!", Brown
+            'Call SendDiscordMsg(Levelup, Index, "has gained " & level_count & " level!")
         Else
             'plural
             GlobalMsg GetPlayerName(Index) & " has gained " & level_count & " levels!", Brown
+            'Call SendDiscordMsg(Levelup, Index, "has gained " & level_count & " levels!")
         End If
         SendEXP Index
         SendPlayerData Index

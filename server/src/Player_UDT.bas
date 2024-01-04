@@ -66,8 +66,8 @@ Public Type PlayerRec
     
     ' Position
     Map As Long
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     Dir As Byte
     
     ' Variables
@@ -95,8 +95,8 @@ Private Type ProjectileRec
     Owner As Long
     TravelTime As Long
     direction As Long
-    X As Double
-    Y As Double
+    x As Double
+    y As Double
     StartX As Double
     StartY As Double
     Pic As Long
@@ -153,9 +153,6 @@ Public Type TempPlayerRec
     
     ' character selection
     charNum As Long
-    
-    ImpactedBy As Long
-    ImpactedTick As Long
 End Type
 
 Private Type ClassRec

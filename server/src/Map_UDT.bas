@@ -60,8 +60,8 @@ Private Type MapDataRec
 End Type
 
 Private Type TileDataRec
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     Tileset As Long
 End Type
 
@@ -91,8 +91,8 @@ End Type
 Private Type MapItemRec
     Num As Long
     Value As Long
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     ' ownership + despawn
     playerName As String
     playerTimer As Long
@@ -106,8 +106,8 @@ Private Type MapNpcRec
     Target As Long
     TargetType As Byte
     Vital(1 To Vitals.Vital_Count - 1) As Long
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     Dir As Byte
     ' For server use only
     SpawnWait As Long
@@ -126,9 +126,6 @@ Private Type MapNpcRec
     ' spell casting
     spellBuffer As SpellBufferRec
     SpellCD(1 To MAX_NPC_SPELLS) As Long
-    
-    ImpactedBy As Long
-    ImpactedTick As Long
 End Type
 
 Private Type MapNpcDataRec
@@ -142,8 +139,8 @@ End Type
 Private Type MapResourceRec
     ResourceState As Byte
     ResourceTimer As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     cur_health As Long
 End Type
 
@@ -158,8 +155,8 @@ Private Type TempTileRec
 End Type
 
 Public Type XYRec
-    X As Double
-    Y As Double
+    x As Double
+    y As Double
 End Type
 
 Public Type ProjectileRenderRec
@@ -172,8 +169,8 @@ Public Type ProjectileRenderRec
     Duration As Long
     ProjectileOffset(1 To 4) As XYRec
     direction As Byte
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     xOffset As Long
     yOffset As Long
     tX As Long
@@ -186,5 +183,5 @@ Public Type ProjectileRenderRec
     spellNum As Long
     xTargetAoE As Long
     yTargetAoE As Long
-    MapNum As Long
+    mapnum As Long
 End Type

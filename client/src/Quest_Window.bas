@@ -13,10 +13,10 @@ Private Const DescriptionX As Integer = 182
 Private Const DescriptionY As Integer = 43
 
 ' Quantidade de quests mostradas na janela
-Private Const MAX_QUESTS_WINDOW As Byte = 14
+Public Const MAX_QUESTS_WINDOW As Byte = 13
 
-Private Const QuestMouseMoveColour = Brown
-Private Const QuestMouseDownColour = DarkBrown
+Private Const QuestMouseMoveColour = Yellow
+Private Const QuestMouseDownColour = Yellow
 Private Const QuestDefaultColour = White
 
 Public QuestSelect As Byte
@@ -71,12 +71,13 @@ Public Sub CreateWindow_Quest()
     Next i
 
     For i = 1 To MAX_QUESTS_WINDOW
-        CreatePictureBox windowCount, "picList" & i, ListX, ListY + (ListOffsetY * i), 130, 20, False, , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment, , , 0
+        CreatePictureBox windowCount, "picList" & i, ListX, ListY + (ListOffsetY * i), 130, 20, False, , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , 0
         CreateLabel windowCount, "lblList" & i, ListX, ListY + (ListOffsetY * i) + 3, 130, 20, "Vazio", , , Alignment.alignCentre, False, , , , , GetAddress(AddressOf lblList_MouseDown), GetAddress(AddressOf lblList_MouseMove)
+        CreateButton windowCount, "btnCancel" & i, ListX + 130, ListY + (ListOffsetY * i), 20, 20, "X", rockwellDec_15, White, , False, , , , , DesignTypes.DesignRedNormal, DesignTypes.DesignRedHover, DesignTypes.DesignRedClick, , , GetAddress(AddressOf PlayerCancelQuest)
     Next i
 
     ' Btns
-    CreateButton windowCount, "btnCancel", 238, 385, 134, 20, "Cancel Quest", rockwellDec_15, White, , , , , , , DesignTypes.DesignRedNormal, DesignTypes.DesignRedHover, DesignTypes.DesignRedClick, , , GetAddress(AddressOf PlayerCancelQuest)
+    'CreateButton windowCount, "btnCancel", 238, 385, 134, 20, "Cancel Quest", rockwellDec_15, White, , , , , , , DesignTypes.DesignRedNormal, DesignTypes.DesignRedHover, DesignTypes.DesignRedClick, , , GetAddress(AddressOf PlayerCancelQuest)
 End Sub
 
 Public Sub lblList_MouseMove()
@@ -161,6 +162,7 @@ Public Sub RefreshQuestWindow()
             .Controls(GetControlIndex("winQuest", "lblList" & n)).textColour = QuestDefaultColour
             .Controls(GetControlIndex("winQuest", "lblList" & n)).visible = False
             .Controls(GetControlIndex("winQuest", "picList" & n)).visible = False
+            .Controls(GetControlIndex("winQuest", "btnCancel" & n)).visible = False
             ClearQuestLogBox
 
             For i = 1 To MAX_QUESTS
@@ -169,6 +171,8 @@ Public Sub RefreshQuestWindow()
                         .Controls(GetControlIndex("winQuest", "lblList" & n)).text = Trim$(Quest(i).Name)
                         .Controls(GetControlIndex("winQuest", "lblList" & n)).visible = True
                         .Controls(GetControlIndex("winQuest", "picList" & n)).visible = True
+                        
+                        .Controls(GetControlIndex("winQuest", "btnCancel" & n)).visible = True
                         LastQuest = i
                         QuestSelect = n
                         Exit For
@@ -178,6 +182,10 @@ Public Sub RefreshQuestWindow()
 
             If .Controls(GetControlIndex("winQuest", "lblList" & n)).visible = False Then Exit For
         Next n
+        
+        If QuestSelect > 0 Then
+            LoadQuestLogBox QuestSelect
+        End If
 
     End With
 End Sub
@@ -199,7 +207,7 @@ Public Sub ClearQuestLogBox()
 End Sub
 
 Public Sub LoadQuestLogBox(ByVal QuestSelected As Byte)
-    Dim QuestNum As Long, i As Long
+    Dim questNum As Long, i As Long
     Dim QuestString As String
 
     ' Clear window first
@@ -207,26 +215,26 @@ Public Sub LoadQuestLogBox(ByVal QuestSelected As Byte)
 
     With Windows(GetWindowIndex("winQuest"))
 
-        QuestNum = FindQuestIndex(.Controls(GetControlIndex("winQuest", "lblList" & QuestSelected)).text)
+        questNum = FindQuestIndex(.Controls(GetControlIndex("winQuest", "lblList" & QuestSelected)).text)
 
-        If QuestNum = 0 Then Exit Sub
+        If questNum = 0 Then Exit Sub
 
         'Descrição da quest
-        QuestString = Trim$(Quest(QuestNum).Speech)
+        QuestString = Trim$(Quest(questNum).Speech)
         .Controls(GetControlIndex("winQuest", "lblQuestDescription1")).text = QuestString
 
         'Objetivo da Task
-        If Player(MyIndex).PlayerQuest(QuestNum).ActualTask > 0 Then
-            QuestString = GetQuestObjetiveCurrent(QuestNum) & GetQuestObjetives(QuestNum)
+        If Player(MyIndex).PlayerQuest(questNum).ActualTask > 0 Then
+            QuestString = GetQuestObjetiveCurrent(questNum) & GetQuestObjetives(questNum)
         End If
 
         .Controls(GetControlIndex("winQuest", "lblQuestDescription2")).text = QuestString
 
         'Recompensa da quest
-        QuestString = "Exp: " & Quest(QuestNum).RewardExp & vbNewLine & "Level(s): " & Quest(QuestNum).RewardLevel
+        QuestString = "Exp: " & Quest(questNum).RewardExp & vbNewLine & "Level(s): " & Quest(questNum).RewardLevel
         For i = 1 To MAX_QUESTS_ITEMS
-            If Quest(QuestNum).RewardItem(i).Item > 0 Then
-                .Controls(GetControlIndex("winQuest", "picReward" & i)).Value = Quest(QuestNum).RewardItem(i).Item
+            If Quest(questNum).RewardItem(i).Item > 0 Then
+                .Controls(GetControlIndex("winQuest", "picReward" & i)).Value = Quest(questNum).RewardItem(i).Item
                 .Controls(GetControlIndex("winQuest", "picReward" & i)).visible = True
             End If
         Next i

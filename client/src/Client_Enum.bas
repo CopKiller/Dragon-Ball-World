@@ -251,7 +251,7 @@ End Enum
 Public Enum EventType
     Event_OpenShop = 1
     Event_OpenBank
-    Event_OpenQuest
+    Event_GiveQuest
     
     Event_Count
 End Enum
@@ -338,10 +338,11 @@ Public Enum DialogueType
     TypeWITHDRAWITEM
     TypeTRADEAMOUNT
     TypeUNTRADEAMOUNT
+    TypeQUESTCANCEL
 End Enum
 
 Public Enum DialogueStyle
     StyleOKAY = 1
-    StyleYESNO
+    styleyesno
     StyleINPUT
 End Enum

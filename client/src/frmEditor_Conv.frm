@@ -254,6 +254,7 @@ Begin VB.Form frmEditor_Conv
    End
    Begin VB.CommandButton cmdArray 
       Caption         =   "Change Array Size"
+      Enabled         =   0   'False
       Height          =   375
       Left            =   240
       TabIndex        =   0
@@ -267,7 +268,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Dim curConv As Long
+Dim CurConv As Long
 Private Sub cmdDelete_Click()
     Dim tmpIndex As Long
 
@@ -297,25 +298,25 @@ Private Sub lstIndex_Click()
 End Sub
 
 Private Sub scrlChatCountChange()
-    Dim N As Long, i As Long
+    Dim n As Long, i As Long
     
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    If curConv <= 0 Then Exit Sub
+    If CurConv <= 0 Then Exit Sub
     
     lblChatCount.caption = "Chat Count: " & scrlChatCount.Value
     Conv(EditorIndex).chatCount = scrlChatCount.Value
     scrlConv.max = scrlChatCount.Value
     ReDim Preserve Conv(EditorIndex).Conv(1 To scrlChatCount.Value) As ConvRec
     
-    For N = 1 To 4
-        cmbReply(N).Clear
-        cmbReply(N).AddItem "None"
+    For n = 1 To 4
+        cmbReply(n).Clear
+        cmbReply(n).AddItem "None"
 
         For i = 1 To Conv(EditorIndex).chatCount
-            cmbReply(N).AddItem i
+            cmbReply(n).AddItem i
         Next
         
-        With Conv(EditorIndex).Conv(curConv)
+        With Conv(EditorIndex).Conv(CurConv)
             txtConv.text = .Conv
     
             For i = 1 To 4
@@ -327,27 +328,46 @@ Private Sub scrlChatCountChange()
     Next
 End Sub
 
+Private Sub scrlChatCount_Change()
+    Dim n As Long, i As Long
+
+    lblChatCount.caption = "Chat Count: " & scrlChatCount.Value
+    Conv(EditorIndex).chatCount = scrlChatCount.Value
+    scrlConv.max = scrlChatCount.Value
+
+    ReDim Preserve Conv(EditorIndex).Conv(1 To scrlChatCount.Value) As ConvRec
+
+    If scrlConv.Value > scrlConv.max Then
+        scrlConv.Value = scrlConv.max
+    End If
+
+    For n = 1 To 4
+        cmbReply(n).Clear
+        cmbReply(n).AddItem "None"
+
+        For i = 1 To Conv(EditorIndex).chatCount
+            cmbReply(n).AddItem i
+        Next
+
+    Next
+
+    If scrlConv.Value > 0 Then scrlConv_Change
+End Sub
+
 Private Sub scrlConv_Change()
     Dim X As Long
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    
-    curConv = scrlConv.Value
-    fraConv.caption = "Conversation - " & curConv
 
-    With Conv(EditorIndex).Conv(curConv)
-        txtConv.text = .Conv
+    CurConv = scrlConv.Value
+    fraConv.caption = "Conversation - " & CurConv
 
-        For X = 1 To 4
-            txtReply(X).text = .rText(X)
-            cmbReply(X).ListIndex = .rTarget(X)
-        Next
-    End With
+    Call ConvReloadEventOptions(EditorIndex, CurConv)
 
 End Sub
 
 Private Sub txtConv_Change()
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(curConv).Conv = txtConv.text
+    Conv(EditorIndex).Conv(CurConv).Conv = txtConv.text
 End Sub
 
 Private Sub txtName_Validate(Cancel As Boolean)
@@ -363,37 +383,26 @@ End Sub
 
 Private Sub txtReply_Change(Index As Integer)
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(curConv).rText(Index) = txtReply(Index).text
+    Conv(EditorIndex).Conv(CurConv).rText(Index) = txtReply(Index).text
 End Sub
 
 Private Sub cmbReply_Click(Index As Integer)
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(curConv).rTarget(Index) = cmbReply(Index).ListIndex
+    Conv(EditorIndex).Conv(CurConv).rTarget(Index) = cmbReply(Index).ListIndex
 End Sub
 
 Private Sub cmbEvent_Click()
-    Dim i As Long
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    If curConv = 0 Then Exit Sub
-    If (cmbEvent.ListIndex = EventType.Event_OpenShop) Then
-        cmbEventNum.visible = True
-        ' build EventNum combo
-        cmbEventNum.Clear
-        cmbEventNum.AddItem "None"
-
-        For i = 1 To MAX_SHOPS
-            cmbEventNum.AddItem Trim$(Shop(i).Name)
-        Next
-
-        cmbEventNum.ListIndex = 0
-    Else
-        cmbEventNum.visible = False
-    End If
+    If CurConv = 0 Then Exit Sub
     
-    Conv(EditorIndex).Conv(curConv).EventType = cmbEvent.ListIndex
+    Conv(EditorIndex).Conv(CurConv).EventType = cmbEvent.ListIndex
+    
+    Call ConvReloadEventOptions(EditorIndex, CurConv)
 End Sub
 
 Private Sub cmbEventNum_Click()
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(curConv).EventNum = cmbEventNum.ListIndex
+    If CurConv = 0 Then Exit Sub
+    
+    Conv(EditorIndex).Conv(CurConv).EventNum = cmbEventNum.ListIndex
 End Sub

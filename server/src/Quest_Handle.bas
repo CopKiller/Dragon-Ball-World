@@ -40,6 +40,8 @@ Sub HandleSaveQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal StartAddr A
     QuestData = Buffer.ReadBytes(QuestSize)
     CopyMemory ByVal VarPtr(Quest(n)), ByVal VarPtr(QuestData(0)), QuestSize
     Set Buffer = Nothing
+    
+    Debug.Print Quest(n).Name
 
     ' Save it
     Call QuestCache_Create(n)
@@ -69,7 +71,7 @@ Sub HandlePlayerCancelQuest(ByVal Index As Long, ByRef Data() As Byte, ByVal Sta
     For I = 1 To MAX_QUESTS_ITEMS
         If Quest(QuestNum).GiveItem(I).Item > 0 Then
             If HasItem(Index, Quest(QuestNum).GiveItem(I).Item) > 0 Then
-                If Item(Quest(QuestNum).GiveItem(I).Item).Stackable > 0 Then
+                If Item(Quest(QuestNum).GiveItem(I).Item).Type = ITEM_TYPE_CURRENCY Then
                     TakeInvItem Index, Quest(QuestNum).GiveItem(I).Item, Quest(QuestNum).GiveItem(I).Value
                 Else
                     For n = 1 To Quest(QuestNum).GiveItem(I).Value

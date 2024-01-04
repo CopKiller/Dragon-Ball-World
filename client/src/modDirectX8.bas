@@ -276,7 +276,7 @@ Dim i As Long
 
     Counter = 1
     
-    Do While Dir$(Path & Counter + 1 & GFX_EXT) <> vbNullString
+    Do While dir$(Path & Counter + 1 & GFX_EXT) <> vbNullString
         Counter = Counter + 1
     Loop
     
@@ -297,12 +297,12 @@ Public Function LoadTextureFile(ByVal Path As String, Optional ByVal Unload As B
 
     Path = Path & GFX_EXT
     
-    If Dir$(Path) = vbNullString And Not Ignore Then
+    If dir$(Path) = vbNullString And Not Ignore Then
         Call MsgBox("" & Path & """ could not be found.")
         End
     End If
     
-    If Dir$(Path) = vbNullString Then
+    If dir$(Path) = vbNullString Then
         Exit Function
     End If
     
@@ -2075,7 +2075,7 @@ Public Sub DrawNpc(ByVal MapNpcNum As Long)
         Else
 
             ' If not attacking, walk normally
-            Select Case MapNpc(MapNpcNum).Dir
+            Select Case MapNpc(MapNpcNum).dir
 
                 Case DIR_UP
                     If (MapNpc(MapNpcNum).yOffset > 8) Then Anim = MapNpc(MapNpcNum).Step
@@ -2128,7 +2128,7 @@ Public Sub DrawNpc(ByVal MapNpcNum As Long)
     End With
 
     ' Set the left
-    Select Case MapNpc(MapNpcNum).Dir
+    Select Case MapNpc(MapNpcNum).dir
 
         Case DIR_UP
             SpriteTop = 3
@@ -2278,9 +2278,9 @@ Public Sub DrawResource(ByVal Resource_num As Long)
         If Trim$(Quest(i).Name) <> "" Then
             If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
                 If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Resource = Resource_master Then
-                    X = ConvertMapX(MapResource(Resource_num).X * PIC_X) + (mTexture(TextureGUI(4)).Width / 2)
+                    X = ConvertMapX(MapResource(Resource_num).X * PIC_X) + (mTexture(TextureGUI(6)).Width / 2)
                     Y = ConvertMapY(MapResource(Resource_num).Y * PIC_Y) + 32
-                    RenderTexture_Animated TextureGUI(4), X, Y, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
+                    RenderTexture_Animated TextureGUI(6), X, Y, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
 
                     If GlobalX >= X And GlobalX <= X + 13 Then
                         If GlobalY >= Y And GlobalY <= Y + 13 Then
@@ -2382,9 +2382,9 @@ Public Sub DrawItem(ByVal itemNum As Long)
         If Trim$(Quest(i).Name) <> "" Then
             If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
                 If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Item = MapItem(itemNum).Num Then
-                    textX = 16 + ConvertMapX(MapItem(itemNum).X * PIC_X) - (mTexture(TextureGUI(5)).Width / 2)
+                    textX = 16 + ConvertMapX(MapItem(itemNum).X * PIC_X) - (mTexture(TextureGUI(9)).Width / 2)
                     textY = ConvertMapY(MapItem(itemNum).Y * PIC_Y) - 20
-                    RenderTexture_Animated TextureGUI(5), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
+                    RenderTexture_Animated TextureGUI(9), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
 
                     If GlobalX >= textX And GlobalX <= textX + 13 Then
                         If GlobalY >= textY And GlobalY <= textY + 13 Then

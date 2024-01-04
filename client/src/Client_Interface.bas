@@ -1801,7 +1801,7 @@ End Sub
 Public Sub CreateWindow_NpcChat()
 ' Create window
 
-    CreateWindow "winNpcChat", "Conversation with [Name]", zOrder_Win, 0, 0, 480, 228, TextureItem(111), False, Fonts.rockwellDec_15, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
+    CreateWindow "winNpcChat", "Conversation with [Name]", zOrder_Win, 0, 0, 480, 228, TextureItem(111), False, Fonts.Default, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
 
     ' Centralise it
     CentraliseWindow windowCount
@@ -1818,7 +1818,7 @@ Public Sub CreateWindow_NpcChat()
     ' Chat BG
     CreatePictureBox windowCount, "picChatBG", 128, 39, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Chat
-    CreateLabel windowCount, "lblChat", 136, 44, 318, 102, "[Text]", rockwellDec_15, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblChat", 136, 44, 318, 102, "[Text]", Fonts.Default, White, Alignment.alignCentre
     ' Reply buttons
     CreateButton windowCount, "btnOpt4", 69, 145, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt4), , , , , DarkGrey
     CreateButton windowCount, "btnOpt3", 69, 162, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt3), , , , , DarkGrey
@@ -1964,20 +1964,20 @@ End Sub
 
 Public Sub CreateWindow_Message()
 ' Create window
-    CreateWindow "winMessage", "Mensagem!", zOrder_Win, 0, 0, 358, 169, TextureItem(111), False, Fonts.rockwellDec_15, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
+    CreateWindow "winMessage", "Mensagem!", zOrder_Win, 0, 0, 358, 189, TextureItem(111), False, Fonts.Default, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
     ' Centralise it
     CentraliseWindow windowCount
 
     zOrder_Con = 1
 
     ' Close Button
-    CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 19, 6, 13, 13, , , , , , , TextureGUI(8), TextureGUI(9), TextureGUI(10), , , , , , GetAddress(AddressOf btnMessage_Close)
+    CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 39, 2, 36, 36, , , , , , , TextureGUI(3), TextureGUI(4), TextureGUI(5), , , , , , GetAddress(AddressOf btnMessage_Close)
     ' Parchment
-    CreatePictureBox windowCount, "picParchment", 6, 26, 346, 130, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
+    CreatePictureBox windowCount, "picParchment", 6, 46, 346, 130, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Chat BG
-    CreatePictureBox windowCount, "picChatBG", 12, 39, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
+    CreatePictureBox windowCount, "picChatBG", 12, 59, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Chat
-    CreateLabel windowCount, "lblChat", 20, 44, 318, 102, "[Text]", rockwellDec_15, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblChat", 20, 64, 318, 102, "[Text]", Default, White, Alignment.alignCentre
 End Sub
 
 ' Rendering & Initialisation

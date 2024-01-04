@@ -121,34 +121,31 @@ End Sub
 
 Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
     If Not InGame Then Exit Sub
-    
+
     Select Case KeyCode
-        Case vbKeyF1
-            If MyIndex <= 0 Then Exit Sub
-    
-            If GetPlayerAccess(MyIndex) >= ADMIN_DEVELOPER Then
-                frmAdmin.Show
-            End If
-            Exit Sub
-            
         ' handles screenshot mode
-        Case vbKeyF11
-            If MyIndex <= 0 Then Exit Sub
-    
-            If GetPlayerAccess(MyIndex) > 0 Then
-                screenshotMode = Not screenshotMode
-            End If
-            Exit Sub
-            
+    Case vbKeyF11
+        If MyIndex <= 0 Then Exit Sub
+
+        If GetPlayerAccess(MyIndex) > 0 Then
+            screenshotMode = Not screenshotMode
+        End If
+        Exit Sub
+
         ' handles form
-        Case vbKeyInsert
+    Case vbKeyInsert
+        If GetPlayerAccess(MyIndex) >= ADMIN_DEVELOPER Then
+            frmAdmin.Show
+        Else
             If frmMain.BorderStyle = 0 Then
                 frmMain.BorderStyle = 1
             Else
                 frmMain.BorderStyle = 0
             End If
             frmMain.caption = frmMain.caption
-            Exit Sub
+        End If
+
+        Exit Sub
     End Select
 End Sub
 

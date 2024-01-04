@@ -4,115 +4,122 @@ Attribute VB_Name = "Quest_Database"
 ' //////////////
 
 Sub SaveQuests()
-    Dim I As Long
-    For I = 1 To MAX_QUESTS
-        Call SaveQuest(I)
+    Dim i As Long
+    For i = 1 To MAX_QUESTS
+        Call SaveQuest(i)
     Next
 End Sub
 
 Sub SaveQuest(ByVal QuestNum As Long)
-    Dim FileName As String
-    Dim F As Long, I As Long
-    FileName = App.Path & "\data\quests\quest" & QuestNum & ".dat"
-    F = FreeFile
-    Open FileName For Binary As #F
+    Dim filename As String
+    Dim f As Long, i As Long
+    filename = App.Path & "\data\quests\quest" & QuestNum & ".dat"
+    f = FreeFile
+    Open filename For Binary As #f
     'Alatar v1.2
-    Put #F, , Quest(QuestNum).Name
-    Put #F, , Quest(QuestNum).Repeat
-    Put #F, , Quest(QuestNum).QuestLog
-    Put #F, , Quest(QuestNum).Speech
-    For I = 1 To MAX_QUESTS_ITEMS
-        Put #F, , Quest(QuestNum).GiveItem(I)
+    Put #f, , Quest(QuestNum).Name
+    Put #f, , Quest(QuestNum).Repeat
+    Put #f, , Quest(QuestNum).QuestLog
+    Put #f, , Quest(QuestNum).Speech
+    For i = 1 To MAX_QUESTS_ITEMS
+        Put #f, , Quest(QuestNum).GiveItem(i)
     Next
-    For I = 1 To MAX_QUESTS_ITEMS
-        Put #F, , Quest(QuestNum).TakeItem(I)
+    For i = 1 To MAX_QUESTS_ITEMS
+        Put #f, , Quest(QuestNum).TakeItem(i)
     Next
-    Put #F, , Quest(QuestNum).RequiredLevel
-    Put #F, , Quest(QuestNum).RequiredQuest
-    For I = 1 To 5
-        Put #F, , Quest(QuestNum).RequiredClass(I)
+    Put #f, , Quest(QuestNum).RequiredLevel
+    Put #f, , Quest(QuestNum).RequiredQuest
+    For i = 1 To 5
+        Put #f, , Quest(QuestNum).RequiredClass(i)
     Next
-    For I = 1 To MAX_QUESTS_ITEMS
-        Put #F, , Quest(QuestNum).RequiredItem(I)
+    For i = 1 To MAX_QUESTS_ITEMS
+        Put #f, , Quest(QuestNum).RequiredItem(i)
     Next
-    Put #F, , Quest(QuestNum).RewardExp
-    For I = 1 To MAX_QUESTS_ITEMS
-        Put #F, , Quest(QuestNum).RewardItem(I)
+    Put #f, , Quest(QuestNum).RewardExp
+    For i = 1 To MAX_QUESTS_ITEMS
+        Put #f, , Quest(QuestNum).RewardItem(i)
     Next
-    For I = 1 To MAX_TASKS
-        Put #F, , Quest(QuestNum).Task(I)
+    For i = 1 To MAX_TASKS
+        Put #f, , Quest(QuestNum).Task(i)
     Next
     '/Alatar v1.2
-    Close #F
+    Close #f
 End Sub
 
 Sub LoadQuests()
-    Dim FileName As String
-    Dim I As Integer
-    Dim F As Long, n As Long
+    Dim filename As String
+    Dim i As Integer
+    Dim f As Long, n As Long
     Dim sLen As Long
 
     Call CheckQuests
 
-    For I = 1 To MAX_QUESTS
+    For i = 1 To MAX_QUESTS
         ' Clear
-        Call ClearQuest(I)
+        Call ClearQuest(i)
         'Load
-        FileName = App.Path & "\data\quests\quest" & I & ".dat"
-        F = FreeFile
-        Open FileName For Binary As #F
+        filename = App.Path & "\data\quests\quest" & i & ".dat"
+        f = FreeFile
+        Open filename For Binary As #f
 
         'Alatar v1.2
-        Get #F, , Quest(I).Name
-        Get #F, , Quest(I).Repeat
-        Get #F, , Quest(I).QuestLog
-        Get #F, , Quest(I).Speech
+        Get #f, , Quest(i).Name
+        Get #f, , Quest(i).Repeat
+        Get #f, , Quest(i).QuestLog
+        Get #f, , Quest(i).Speech
         For n = 1 To MAX_QUESTS_ITEMS
-            Get #F, , Quest(I).GiveItem(n)
+            Get #f, , Quest(i).GiveItem(n)
         Next
         For n = 1 To MAX_QUESTS_ITEMS
-            Get #F, , Quest(I).TakeItem(n)
+            Get #f, , Quest(i).TakeItem(n)
         Next
-        Get #F, , Quest(I).RequiredLevel
-        Get #F, , Quest(I).RequiredQuest
+        Get #f, , Quest(i).RequiredLevel
+        Get #f, , Quest(i).RequiredQuest
         For n = 1 To 5
-            Get #F, , Quest(I).RequiredClass(n)
+            Get #f, , Quest(i).RequiredClass(n)
         Next
         For n = 1 To MAX_QUESTS_ITEMS
-            Get #F, , Quest(I).RequiredItem(n)
+            Get #f, , Quest(i).RequiredItem(n)
         Next
-        Get #F, , Quest(I).RewardExp
+        Get #f, , Quest(i).RewardExp
         For n = 1 To MAX_QUESTS_ITEMS
-            Get #F, , Quest(I).RewardItem(n)
+            Get #f, , Quest(i).RewardItem(n)
         Next
         For n = 1 To MAX_TASKS
-            Get #F, , Quest(I).Task(n)
+            Get #f, , Quest(i).Task(n)
         Next
         '/Alatar v1.2
-        Close #F
+        Close #f
     Next
 End Sub
 
 Sub CheckQuests()
-    Dim I As Long
-    For I = 1 To MAX_QUESTS
-        If Not FileExist("\Data\quests\quest" & I & ".dat") Then
-            Call SaveQuest(I)
+    Dim i As Long
+    For i = 1 To MAX_QUESTS
+        If Not FileExist(App.Path & "\data\quests\quest" & i & ".dat") Then
+            Call SaveQuest(i)
         End If
     Next
 End Sub
 
-Sub ClearQuest(ByVal Index As Long)
-    Call ZeroMemory(ByVal VarPtr(Quest(Index)), LenB(Quest(Index)))
-    Quest(Index).Name = vbNullString
-    Quest(Index).QuestLog = vbNullString
+Sub ClearQuest(ByVal index As Long)
+    Dim i As Long
+    
+    Call ZeroMemory(ByVal VarPtr(Quest(index)), LenB(Quest(index)))
+    Quest(index).Name = vbNullString
+    Quest(index).QuestLog = vbNullString
+    
+    For i = 1 To MAX_TASKS
+        Quest(index).Task(i).TaskLog = vbNullString
+        Quest(index).Task(i).TaskTimer.Msg = vbNullString
+    Next i
 End Sub
 
 Sub ClearQuests()
-    Dim I As Long
+    Dim i As Long
 
-    For I = 1 To MAX_QUESTS
-        Call ClearQuest(I)
+    For i = 1 To MAX_QUESTS
+        Call ClearQuest(i)
     Next
 End Sub
 
@@ -140,11 +147,11 @@ Sub SendQuestAll(ByVal QuestNum As Long)
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Sub SendUpdateQuestTo(ByVal Index As Long, ByVal QuestNum As Long)
+Sub SendUpdateQuestTo(ByVal index As Long, ByVal QuestNum As Long)
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteLong SUpdateQuest
     Buffer.WriteBytes QuestCache(QuestNum).Data    'Sends the entire cache as 1 packet.
-    SendDataTo Index, Buffer.ToArray()
+    SendDataTo index, Buffer.ToArray()
     Buffer.Flush: Set Buffer = Nothing
 End Sub

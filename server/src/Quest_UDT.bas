@@ -108,7 +108,7 @@ Public Type QuestRec
 
 End Type
 
-Private Enum TaskType
+Public Enum TaskType
     Day = 0
     Hour
     Minutes

@@ -4,9 +4,12 @@ Option Explicit
 Public Conv(1 To MAX_CONVS) As ConvWrapperRec
 Public EmptyConv As ConvWrapperRec
 
+Private Const CONV_LENGTH As Integer = 500
+Private Const REPONSE_LENGTH As Integer = 100
+
 Private Type ConvRec
-    Conv As String
-    rText(1 To 4) As String
+    Conv As String * CONV_LENGTH
+    rText(1 To 4) As String * REPONSE_LENGTH
     rTarget(1 To 4) As Long
     EventType As Long
     EventNum As Long

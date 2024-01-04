@@ -7,7 +7,7 @@ Public Conv_Changed(1 To MAX_CONVS) As Boolean
 ' // Conv Editor //
 ' /////////////////
 Public Sub ConvEditorInit()
-    Dim i As Long, N As Long
+    Dim i As Long, n As Long
 
     If frmEditor_Conv.visible = False Then Exit Sub
     EditorIndex = frmEditor_Conv.lstIndex.ListIndex + 1
@@ -20,12 +20,12 @@ Public Sub ConvEditorInit()
             ReDim Conv(EditorIndex).Conv(1 To Conv(EditorIndex).chatCount)
         End If
 
-        For N = 1 To 4
-            .cmbReply(N).Clear
-            .cmbReply(N).AddItem "None"
+        For n = 1 To 4
+            .cmbReply(n).Clear
+            .cmbReply(n).AddItem "None"
 
             For i = 1 To Conv(EditorIndex).chatCount
-                .cmbReply(N).AddItem i
+                .cmbReply(n).AddItem i
             Next
         Next
 
@@ -38,23 +38,46 @@ Public Sub ConvEditorInit()
             .txtReply(i).text = Conv(EditorIndex).Conv(.scrlConv.Value).rText(i)
             .cmbReply(i).ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).rTarget(i)
         Next
-        
-        .cmbEvent.ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).EventType
-        
-        If .cmbEvent.ListIndex = EventType.Event_OpenShop Then
-            ' build EventNum combo
-            .cmbEventNum.Clear
-            .cmbEventNum.AddItem "None"
-    
-            For i = 1 To MAX_SHOPS
-                .cmbEventNum.AddItem Trim$(Shop(i).Name)
-            Next
-    
-            .cmbEventNum.ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).EventNum
-        End If
+
+        Call ConvReloadEventOptions(EditorIndex, .scrlConv.Value)
     End With
 
     Conv_Changed(EditorIndex) = True
+End Sub
+
+Public Sub ConvReloadEventOptions(ByVal EditorIndex As Long, ByVal CurConv As Long)
+    Dim i As Long
+    
+    With Conv(EditorIndex).Conv(CurConv)
+        frmEditor_Conv.cmbEvent.ListIndex = .EventType
+
+        If frmEditor_Conv.cmbEvent.ListIndex = EventType.Event_OpenShop Then
+            ' build EventNum combo
+            frmEditor_Conv.cmbEventNum.Clear
+            frmEditor_Conv.cmbEventNum.AddItem "None"
+            frmEditor_Conv.cmbEventNum.visible = True
+
+            For i = 1 To MAX_SHOPS
+                frmEditor_Conv.cmbEventNum.AddItem i & ": " & Trim$(Shop(i).Name)
+            Next
+
+            frmEditor_Conv.cmbEventNum.ListIndex = .EventNum
+        ElseIf frmEditor_Conv.cmbEvent.ListIndex = EventType.Event_GiveQuest Then
+            ' build EventNum combo
+            frmEditor_Conv.cmbEventNum.Clear
+            frmEditor_Conv.cmbEventNum.AddItem "None"
+            frmEditor_Conv.cmbEventNum.visible = True
+
+            For i = 1 To MAX_QUESTS
+                frmEditor_Conv.cmbEventNum.AddItem i & ": " & Trim$(Quest(i).Name)
+            Next
+
+            frmEditor_Conv.cmbEventNum.ListIndex = .EventNum
+        Else
+            frmEditor_Conv.cmbEventNum.Clear
+            frmEditor_Conv.cmbEventNum.visible = False
+        End If
+    End With
 End Sub
 
 Public Sub ConvEditorOk()
