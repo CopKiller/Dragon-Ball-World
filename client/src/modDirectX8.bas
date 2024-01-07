@@ -420,10 +420,10 @@ End Sub
 
 Public Sub ResetGFX()
 Dim Temp() As TextureDataStruct
-Dim i As Long, n As Long
+Dim i As Long, N As Long
 
-    n = mTextures
-    ReDim Temp(1 To n)
+    N = mTextures
+    ReDim Temp(1 To N)
     
     Erase mTexture
     mTextures = 0
@@ -1121,7 +1121,7 @@ Dim X As Long, Y As Long, tileSet As Long, sX As Long, sY As Long, layernum As L
 End Sub
 
 Public Sub DrawCharacter()
-    Dim Xo As Long, Yo As Long, Width As Long, Height As Long, i As Long, sprite As Long, itemNum As Long, ItemPic As Long
+    Dim Xo As Long, Yo As Long, Width As Long, Height As Long, i As Long, sprite As Long, ItemNum As Long, ItemPic As Long
     Dim xEquipBar As Long, yEquipBar As Long, yOffSetEquip As Long
     
     Xo = Windows(GetWindowIndex("winCharacter")).Window.Left
@@ -1132,27 +1132,27 @@ Public Sub DrawCharacter()
     yOffSetEquip = EqTop
     
     For i = 1 To Equipment.Equipment_Count - 1
-        RenderTexture TextureGUI(37), xEquipBar + 170, yEquipBar + yOffSetEquip, 0, 0, 40, 38, 40, 38
+        RenderTexture TextureGUI(37), xEquipBar + 168, yEquipBar + yOffSetEquip, 0, 0, 40, 38, 40, 38
         yOffSetEquip = yOffSetEquip + 38
     Next
     
     ' render top wood
-    RenderTexture TextureGUI(1), Xo + 4, Yo + 23, 100, 100, 166, 291, 166, 291
-    RenderTexture TextureGUI(1), Xo + 170, Yo + 23, 100, 100, 40, 63, 40, 63
+    RenderTexture TextureGUI(1), Xo + 2, Yo + 40, 100, 100, 166, 291, 166, 291
+    RenderTexture TextureGUI(1), Xo + 168, Yo + 40, 100, 100, 40, 63, 40, 63
     
     ' loop through equipment
     For i = 1 To Equipment.Equipment_Count - 1
-        itemNum = GetPlayerEquipment(MyIndex, i)
+        ItemNum = GetPlayerEquipment(MyIndex, i)
 
         ' get the item sprite
-        If itemNum > 0 Then
-            ItemPic = TextureItem(Item(itemNum).pic)
+        If ItemNum > 0 Then
+            ItemPic = TextureItem(Item(ItemNum).pic)
         Else
             ' no item equiped - use blank image
             ItemPic = TextureGUI(45 + i)
         End If
         
-        Yo = Windows(GetWindowIndex("winCharacter")).Window.Top + EqTop + ((EqOffsetX + 32) * (((i - 1) Mod EqColumns)))
+        Yo = Windows(GetWindowIndex("winCharacter")).Window.Top + EqTop + ((EqOffsetY + 32) * (((i - 1) Mod EqColumns)))
         Xo = Windows(GetWindowIndex("winCharacter")).Window.Left + EqLeft
 
         RenderTexture ItemPic, Xo, Yo, 0, 0, 32, 32, 32, 32
@@ -1271,7 +1271,7 @@ Public Sub DrawShopBackground()
 End Sub
 
 Public Sub DrawShop()
-Dim Xo As Long, Yo As Long, ItemPic As Long, itemNum As Long, Amount As Long, i As Long, Top As Long, Left As Long, Y As Long, X As Long, colour As Long
+Dim Xo As Long, Yo As Long, ItemPic As Long, ItemNum As Long, Amount As Long, i As Long, Top As Long, Left As Long, Y As Long, X As Long, colour As Long
 
     If InShop = 0 Then Exit Sub
     
@@ -1281,7 +1281,7 @@ Dim Xo As Long, Yo As Long, ItemPic As Long, itemNum As Long, Amount As Long, i 
     If Not shopIsSelling Then
         ' render the shop items
         For i = 1 To MAX_TRADES
-            itemNum = Shop(InShop).TradeItem(i).Item
+            ItemNum = Shop(InShop).TradeItem(i).Item
             
             ' draw early
             Top = Yo + ShopTop + ((ShopOffsetY + 32) * ((i - 1) \ ShopColumns))
@@ -1290,8 +1290,8 @@ Dim Xo As Long, Yo As Long, ItemPic As Long, itemNum As Long, Amount As Long, i 
             If shopSelectedSlot = i Then RenderTexture TextureGUI(35), Left, Top, 0, 0, 32, 32, 32, 32
 
             
-            If itemNum > 0 And itemNum <= MAX_ITEMS Then
-                ItemPic = Item(itemNum).pic
+            If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
+                ItemPic = Item(ItemNum).pic
                 If ItemPic > 0 And ItemPic <= CountItem Then
                     ' draw item
                     RenderTexture TextureItem(ItemPic), Left, Top, 0, 0, 32, 32, 32, 32
@@ -1301,7 +1301,7 @@ Dim Xo As Long, Yo As Long, ItemPic As Long, itemNum As Long, Amount As Long, i 
     Else
         ' render the shop items
         For i = 1 To MAX_TRADES
-            itemNum = GetPlayerInvItemNum(MyIndex, i)
+            ItemNum = GetPlayerInvItemNum(MyIndex, i)
             
             ' draw early
             Top = Yo + ShopTop + ((ShopOffsetY + 32) * ((i - 1) \ ShopColumns))
@@ -1309,8 +1309,8 @@ Dim Xo As Long, Yo As Long, ItemPic As Long, itemNum As Long, Amount As Long, i 
             ' draw selected square
             If shopSelectedSlot = i Then RenderTexture TextureGUI(35), Left, Top, 0, 0, 32, 32, 32, 32
             
-            If itemNum > 0 And itemNum <= MAX_ITEMS Then
-                ItemPic = Item(itemNum).pic
+            If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
+                ItemPic = Item(ItemNum).pic
                 If ItemPic > 0 And ItemPic <= CountItem Then
 
                     ' draw item
@@ -1388,7 +1388,7 @@ Sub DrawTrade()
 End Sub
 
 Sub DrawYourTrade()
-Dim i As Long, itemNum As Long, ItemPic As Long, Top As Long, Left As Long, colour As Long, Amount As String, X As Long, Y As Long
+Dim i As Long, ItemNum As Long, ItemPic As Long, Top As Long, Left As Long, colour As Long, Amount As String, X As Long, Y As Long
 Dim Xo As Long, Yo As Long
 
     Xo = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picYour")).Left
@@ -1396,9 +1396,9 @@ Dim Xo As Long, Yo As Long
     
     ' your items
     For i = 1 To MAX_INV
-        itemNum = GetPlayerInvItemNum(MyIndex, TradeYourOffer(i).Num)
-        If itemNum > 0 And itemNum <= MAX_ITEMS Then
-            ItemPic = Item(itemNum).pic
+        ItemNum = GetPlayerInvItemNum(MyIndex, TradeYourOffer(i).Num)
+        If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
+            ItemPic = Item(ItemNum).pic
             If ItemPic > 0 And ItemPic <= CountItem Then
                 Top = Yo + TradeTop + ((TradeOffsetY + 32) * ((i - 1) \ TradeColumns))
                 Left = Xo + TradeLeft + ((TradeOffsetX + 32) * (((i - 1) Mod TradeColumns)))
@@ -1429,7 +1429,7 @@ Dim Xo As Long, Yo As Long
 End Sub
 
 Sub DrawTheirTrade()
-Dim i As Long, itemNum As Long, ItemPic As Long, Top As Long, Left As Long, colour As Long, Amount As String, X As Long, Y As Long
+Dim i As Long, ItemNum As Long, ItemPic As Long, Top As Long, Left As Long, colour As Long, Amount As String, X As Long, Y As Long
 Dim Xo As Long, Yo As Long
 
     Xo = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picTheir")).Left
@@ -1437,9 +1437,9 @@ Dim Xo As Long, Yo As Long
 
     ' their items
     For i = 1 To MAX_INV
-        itemNum = TradeTheirOffer(i).Num
-        If itemNum > 0 And itemNum <= MAX_ITEMS Then
-            ItemPic = Item(itemNum).pic
+        ItemNum = TradeTheirOffer(i).Num
+        If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
+            ItemPic = Item(ItemNum).pic
             If ItemPic > 0 And ItemPic <= CountItem Then
                 Top = Yo + TradeTop + ((TradeOffsetY + 32) * ((i - 1) \ TradeColumns))
                 Left = Xo + TradeLeft + ((TradeOffsetX + 32) * (((i - 1) Mod TradeColumns)))
@@ -1471,7 +1471,7 @@ End Sub
 
 Public Sub DrawBank()
     Dim X As Long, Y As Long, Xo As Long, Yo As Long, Width As Long, Height As Long
-    Dim i As Long, itemNum As Long, ItemPic As Long
+    Dim i As Long, ItemNum As Long, ItemPic As Long
 
     Dim Left As Long, Top As Long
     Dim colour As Long, skipItem As Boolean, Amount As Long, tmpItem As Long
@@ -1501,12 +1501,12 @@ Public Sub DrawBank()
 
     ' actually draw the icons
     For i = 1 To MAX_BANK
-        itemNum = Bank.Item(i).Num
+        ItemNum = Bank.Item(i).Num
 
-        If itemNum > 0 And itemNum <= MAX_ITEMS Then
+        If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
             ' not dragging?
             If Not (DragBox.Origin = OriginBank And DragBox.Slot = i) Then
-                ItemPic = Item(itemNum).pic
+                ItemPic = Item(ItemNum).pic
 
 
                 If ItemPic > 0 And ItemPic <= CountItem Then
@@ -1541,7 +1541,7 @@ Public Sub DrawBank()
 End Sub
 
 Public Sub DrawInventory()
-    Dim Xo As Long, Yo As Long, Width As Long, Height As Long, i As Long, Y As Long, itemNum As Long, ItemPic As Long, X As Long, Top As Long, Left As Long, Amount As String
+    Dim Xo As Long, Yo As Long, Width As Long, Height As Long, i As Long, Y As Long, ItemNum As Long, ItemPic As Long, X As Long, Top As Long, Left As Long, Amount As String
     Dim colour As Long, skipItem As Boolean, amountModifier  As Long, tmpItem As Long
     
     Xo = Windows(GetWindowIndex("winInventory")).Window.Left
@@ -1569,11 +1569,11 @@ Public Sub DrawInventory()
     
     ' actually draw the icons
     For i = 1 To MAX_INV
-        itemNum = GetPlayerInvItemNum(MyIndex, i)
-        If itemNum > 0 And itemNum <= MAX_ITEMS Then
+        ItemNum = GetPlayerInvItemNum(MyIndex, i)
+        If ItemNum > 0 And ItemNum <= MAX_ITEMS Then
             ' not dragging?
             If Not (DragBox.Origin = OriginInventory And DragBox.Slot = i) Then
-                ItemPic = Item(itemNum).pic
+                ItemPic = Item(ItemNum).pic
                 
                 ' exit out if we're offering item in a trade.
                 amountModifier = 0
@@ -1736,11 +1736,12 @@ Public Sub DrawPlayer(ByVal Index As Long)
     Dim Anim As Byte, i As Long
     Dim X As Long
     Dim Y As Long
+    Dim framesCountInSpriteSheet As Long
 
     Dim sprite As Long, SpriteTop As Long
     Dim rec As GeomRec
     Dim attackspeed As Long
-    
+
     ' pre-load sprite for calculations
     sprite = GetPlayerSprite(Index)
 
@@ -1756,41 +1757,70 @@ Public Sub DrawPlayer(ByVal Index As Long)
 
     If Not isConstAnimated(GetPlayerSprite(Index)) Then
         ' Reset frame
-        Anim = 1
+        Anim = 0
 
-        ' Check for attacking animation
-        If Player(Index).AttackTimer + (attackspeed / 2) > getTime Then
-            If Player(Index).Attacking = 1 Then
-                Anim = 2
+        With Player(Index)
+
+            ' Animação do player parado e piscando
+            If getTime > .StepTimer + 250 Then
+                If getTime > .StopTmr + 2000 Then
+                    .StepEyes = 1
+                    .StopTmr = getTime
+                    .EyesTmr = getTime
+                Else
+                    If getTime > .EyesTmr + 350 Then
+                        .StepEyes = 0
+                    End If
+                End If
+                Anim = .StepEyes
             End If
 
-        Else
+            ' Animação da frame de Atack
+            If .AttackMode = 8 Then
+                If getTime > .AttackModeTimer + 100 Then
+                    .AttackMode = 9
+                    .AttackModeTimer = getTime
+                End If
+            ElseIf .AttackMode = 9 Then
+                If getTime > .AttackModeTimer + 200 Then
+                    .AttackMode = 0
+                    .AttackModeTimer = 0
+                End If
+            End If
 
-            ' If not attacking, walk normally
-            Select Case GetPlayerDir(Index)
+            ' Check for attacking animation
+            If .AttackTimer + (attackspeed / 2) > getTime Then
+                If .Attacking = 1 Then
+                    Anim = Player(Index).AttackMode
+                End If
+            Else
+                ' If not attacking, walk normally
+                Select Case GetPlayerDir(Index)
                 Case DIR_UP
-                    If (Player(Index).yOffset > 8) Then Anim = Player(Index).Step
+                    If (.yOffset > 8) Then Anim = .Step
                 Case DIR_DOWN
-                    If (Player(Index).yOffset < -8) Then Anim = Player(Index).Step
+                    If (.yOffset < -8) Then Anim = .Step
                 Case DIR_LEFT
-                    If (Player(Index).xOffset > 8) Then Anim = Player(Index).Step
+                    If (.xOffset > 8) Then Anim = .Step
                 Case DIR_RIGHT
-                    If (Player(Index).xOffset < -8) Then Anim = Player(Index).Step
+                    If (.xOffset < -8) Then Anim = .Step
                 Case DIR_UP_LEFT
-                    If (Player(Index).yOffset > 16) Then Anim = Player(Index).Step
-                    If (Player(Index).xOffset > 16) Then Anim = Player(Index).Step
+                    If (.yOffset > 16) Then Anim = .Step
+                    If (.xOffset > 16) Then Anim = .Step
                 Case DIR_UP_RIGHT
-                    If (Player(Index).yOffset > 16) Then Anim = Player(Index).Step
-                    If (Player(Index).xOffset < -16) Then Anim = Player(Index).Step
+                    If (.yOffset > 16) Then Anim = .Step
+                    If (.xOffset < -16) Then Anim = .Step
                 Case DIR_DOWN_LEFT
-                    If (Player(Index).yOffset < -16) Then Anim = Player(Index).Step
-                    If (Player(Index).xOffset > 16) Then Anim = Player(Index).Step
+                    If (.yOffset < -16) Then Anim = .Step
+                    If (.xOffset > 16) Then Anim = .Step
                 Case DIR_DOWN_RIGHT
-                    If (Player(Index).yOffset < -16) Then Anim = Player(Index).Step
-                    If (Player(Index).xOffset < -16) Then Anim = Player(Index).Step
-            End Select
+                    If (.yOffset < -16) Then Anim = .Step
+                    If (.xOffset < -16) Then Anim = .Step
+                End Select
 
-        End If
+            End If
+
+        End With
 
     Else
 
@@ -1817,28 +1847,32 @@ Public Sub DrawPlayer(ByVal Index As Long)
     ' Set the left
     Select Case GetPlayerDir(Index)
 
-        Case DIR_UP
-            SpriteTop = 3
+    Case DIR_UP
+        SpriteTop = 3
 
-        Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
-            SpriteTop = 2
+    Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
+        SpriteTop = 2
 
-        Case DIR_DOWN
-            SpriteTop = 0
+    Case DIR_DOWN
+        SpriteTop = 0
 
-        Case DIR_LEFT, DIR_UP_LEFT, DIR_DOWN_LEFT
-            SpriteTop = 1
+    Case DIR_LEFT, DIR_UP_LEFT, DIR_DOWN_LEFT
+        SpriteTop = 1
     End Select
+
+
+    '--> Preecha com a quantidade de frames que a sprite possui
+    framesCountInSpriteSheet = 19
 
     With rec
         .Top = SpriteTop * (mTexture(TextureChar(sprite)).RealHeight / 4)
         .Height = (mTexture(TextureChar(sprite)).RealHeight / 4)
-        .Left = Anim * (mTexture(TextureChar(sprite)).RealWidth / 4)
-        .Width = (mTexture(TextureChar(sprite)).RealWidth / 4)
+        .Left = Anim * (mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet)
+        .Width = (mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet)
     End With
 
     ' Calculate the X
-    X = GetPlayerX(Index) * PIC_X + Player(Index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / 4 - 32) / 2)
+    X = GetPlayerX(Index) * PIC_X + Player(Index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet - 32) / 2)
 
     ' Is the player's height more than 32..?
     If (mTexture(TextureChar(sprite)).RealHeight) > 32 Then
@@ -1873,7 +1907,7 @@ Public Sub DrawPaperdoll(ByVal Index As Long, ByVal sprite As Long, ByVal X2 As 
 End Sub
 
 Public Sub DrawProjectile(ByVal i As Long)
-    Dim Angle As Long, X As Long, Y As Long, n As Long, SpriteTop As Byte
+    Dim Angle As Long, X As Long, Y As Long, N As Long, SpriteTop As Byte
     Dim Xo As Long, Yo As Long
     Dim sRECT As RECT, Anim As Long
 
@@ -1989,13 +2023,13 @@ Public Sub DrawProjectile(ByVal i As Long)
         Next X
         
         ' VERIFICA PLAYER NO CAMINHO
-        For n = 1 To Player_HighIndex
+        For N = 1 To Player_HighIndex
             If MyIndex <> MapProjectile(i).Owner Then
-                If IsPlaying(n) Then
-                    If Abs(MapProjectile(i).X - (GetPlayerX(n) * PIC_X)) < 20 Then
-                        If Abs(MapProjectile(i).Y - (GetPlayerY(n) * PIC_Y)) < 20 Then
+                If IsPlaying(N) Then
+                    If Abs(MapProjectile(i).X - (GetPlayerX(N) * PIC_X)) < 20 Then
+                        If Abs(MapProjectile(i).Y - (GetPlayerY(N) * PIC_Y)) < 20 Then
                             If MapProjectile(i).Speed <> 6000 Then
-                                Call SendTarget(n, TARGET_TYPE_PLAYER)
+                                Call SendTarget(N, TARGET_TYPE_PLAYER)
                                 If Not MapProjectile(i).IsAoE Then
                                     Call ClearProjectile(i)
                                     Exit Sub
@@ -2008,12 +2042,12 @@ Public Sub DrawProjectile(ByVal i As Long)
         Next
     
         ' VERIFICA NPC NO CAMINHO
-        For n = 1 To Npc_HighIndex
-            If MapNpc(n).Num <> 0 Then
-                If Abs(MapProjectile(i).X - (MapNpc(n).X * PIC_X)) < 20 Then
-                    If Abs(MapProjectile(i).Y - (MapNpc(n).Y * PIC_Y)) < 20 Then
+        For N = 1 To Npc_HighIndex
+            If MapNpc(N).Num <> 0 Then
+                If Abs(MapProjectile(i).X - (MapNpc(N).X * PIC_X)) < 20 Then
+                    If Abs(MapProjectile(i).Y - (MapNpc(N).Y * PIC_Y)) < 20 Then
                         If MapProjectile(i).Speed <> 6000 Then
-                            Call SendTarget(n, TARGET_TYPE_NPC)
+                            Call SendTarget(N, TARGET_TYPE_NPC)
                             If Not MapProjectile(i).IsAoE Then
                                 Call ClearProjectile(i)
                                 Exit Sub
@@ -2235,7 +2269,7 @@ Public Sub DrawResource(ByVal Resource_num As Long)
     Dim rec As RECT
     Dim X As Long, Y As Long
     Dim Width As Long, Height As Long
-    Dim SString As String, i As Long
+    Dim sString As String, i As Long
     X = MapResource(Resource_num).X
     Y = MapResource(Resource_num).Y
 
@@ -2285,9 +2319,9 @@ Public Sub DrawResource(ByVal Resource_num As Long)
                     If GlobalX >= X And GlobalX <= X + 13 Then
                         If GlobalY >= Y And GlobalY <= Y + 13 Then
                             If VerifyWindowsIsInCur Then Exit Sub
-                            SString = "Objective!"
-                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), SString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), SString) + 10, 20, 5, 200)
-                            Call RenderText(font(Fonts.georgiaBold_16), SString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), SString) / 2)), GlobalY - 32, Yellow)
+                            sString = "Objective!"
+                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
+                            Call RenderText(font(Fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
                         End If
                     End If
                 End If
@@ -2296,12 +2330,12 @@ Public Sub DrawResource(ByVal Resource_num As Long)
     Next
 End Sub
 
-Public Sub DrawItem(ByVal itemNum As Long)
+Public Sub DrawItem(ByVal ItemNum As Long)
     Dim Picnum As Integer, dontRender As Boolean, i As Long, tmpIndex As Long
-    Dim SString As String, ItemSizeMouse As Long, rec As RECT, colour As Long
+    Dim sString As String, ItemSizeMouse As Long, rec As RECT, colour As Long
     Dim textX As Long, textY As Long
 
-    Picnum = Item(MapItem(itemNum).Num).pic
+    Picnum = Item(MapItem(ItemNum).Num).pic
 
     ' Default item size
     ItemSizeMouse = 32
@@ -2309,21 +2343,21 @@ Public Sub DrawItem(ByVal itemNum As Long)
     If Picnum < 1 Or Picnum > CountItem Then Exit Sub
 
     ' Animação ao dropar
-    If MapItem(itemNum).Gravity < 0 Then
-        MapItem(itemNum).Gravity = MapItem(itemNum).Gravity + 1
-        MapItem(itemNum).yOffset = MapItem(itemNum).yOffset - 3
-    ElseIf MapItem(itemNum).Gravity < 11 Then
-        MapItem(itemNum).Gravity = MapItem(itemNum).Gravity + 1
-        MapItem(itemNum).yOffset = MapItem(itemNum).yOffset + 3
+    If MapItem(ItemNum).Gravity < 0 Then
+        MapItem(ItemNum).Gravity = MapItem(ItemNum).Gravity + 1
+        MapItem(ItemNum).yOffset = MapItem(ItemNum).yOffset - 3
+    ElseIf MapItem(ItemNum).Gravity < 11 Then
+        MapItem(ItemNum).Gravity = MapItem(ItemNum).Gravity + 1
+        MapItem(ItemNum).yOffset = MapItem(ItemNum).yOffset + 3
 
-        If MapItem(itemNum).Gravity = 11 Then
-            MapItem(itemNum).yOffset = 0
+        If MapItem(ItemNum).Gravity = 11 Then
+            MapItem(ItemNum).yOffset = 0
         End If
     End If
 
     ' if it's not us then don't render
-    If MapItem(itemNum).playerName <> vbNullString Then
-        If Trim$(MapItem(itemNum).playerName) <> Trim$(GetPlayerName(MyIndex)) Then
+    If MapItem(ItemNum).playerName <> vbNullString Then
+        If Trim$(MapItem(ItemNum).playerName) <> Trim$(GetPlayerName(MyIndex)) Then
 
             dontRender = True
         End If
@@ -2335,8 +2369,8 @@ Public Sub DrawItem(ByVal itemNum As Long)
                 tmpIndex = Party.Member(i)
 
                 If tmpIndex > 0 Then
-                    If Trim$(GetPlayerName(tmpIndex)) = Trim$(MapItem(itemNum).playerName) Then
-                        If MapItem(itemNum).bound = 0 Then
+                    If Trim$(GetPlayerName(tmpIndex)) = Trim$(MapItem(ItemNum).playerName) Then
+                        If MapItem(ItemNum).bound = 0 Then
 
                             dontRender = False
                         End If
@@ -2352,28 +2386,28 @@ Public Sub DrawItem(ByVal itemNum As Long)
     If Not dontRender Then
         With rec
             rec.Top = 0
-            rec.Left = MapItem(itemNum).Frame * PIC_X
+            rec.Left = MapItem(ItemNum).Frame * PIC_X
         End With
 
 
         ' Recicles variables to use in Centralize Item on mousepoint
-        textX = MapItem(itemNum).X * PIC_X
-        textY = (MapItem(itemNum).Y * PIC_Y) + MapItem(itemNum).yOffset
+        textX = MapItem(ItemNum).X * PIC_X
+        textY = (MapItem(ItemNum).Y * PIC_Y) + MapItem(ItemNum).yOffset
 
-        If GlobalX >= ConvertMapX(MapItem(itemNum).X * PIC_X) And GlobalX <= ConvertMapX(MapItem(itemNum).X * PIC_X) + PIC_X Then
-            If GlobalY >= ConvertMapY(MapItem(itemNum).Y * PIC_Y) And GlobalY <= ConvertMapY(MapItem(itemNum).Y * PIC_Y) + PIC_Y Then
+        If GlobalX >= ConvertMapX(MapItem(ItemNum).X * PIC_X) And GlobalX <= ConvertMapX(MapItem(ItemNum).X * PIC_X) + PIC_X Then
+            If GlobalY >= ConvertMapY(MapItem(ItemNum).Y * PIC_Y) And GlobalY <= ConvertMapY(MapItem(ItemNum).Y * PIC_Y) + PIC_Y Then
                 ItemSizeMouse = (PIC_X + (PIC_X / 2))
                 textX = textX - ((ItemSizeMouse - PIC_X) / 2)
                 textY = textY - ((ItemSizeMouse - PIC_Y) / 2)
-                Call GroundItem_MouseMove(GlobalX, GlobalY, MapItem(itemNum).Num, MapItem(itemNum).bound)
+                Call GroundItem_MouseMove(GlobalX, GlobalY, MapItem(ItemNum).Num, MapItem(ItemNum).bound)
             End If
         End If
         
         RenderTexture_Animated TextureItem(Picnum), ConvertMapX(textX), ConvertMapY(textY), rec.Left, rec.Top, ItemSizeMouse, ItemSizeMouse, PIC_X, PIC_Y, AnimTextureItem
 
-        colour = GetItemNameColour(Item(MapItem(itemNum).Num).Rarity)
-        If CurX = MapItem(itemNum).X And CurY = MapItem(itemNum).Y Then
-            RenderText font(Fonts.rockwell_15), Trim$(Item(MapItem(itemNum).Num).Name), 16 + ConvertMapX(MapItem(itemNum).X * PIC_X) - (TextWidth(font(Fonts.rockwell_15), Trim$(Item(MapItem(itemNum).Num).Name)) / 2), ConvertMapY(MapItem(itemNum).Y * PIC_Y) - 10, colour
+        colour = GetItemNameColour(Item(MapItem(ItemNum).Num).Rarity)
+        If CurX = MapItem(ItemNum).X And CurY = MapItem(ItemNum).Y Then
+            RenderText font(Fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name), 16 + ConvertMapX(MapItem(ItemNum).X * PIC_X) - (TextWidth(font(Fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name)) / 2), ConvertMapY(MapItem(ItemNum).Y * PIC_Y) - 10, colour
         End If
     End If
 
@@ -2381,17 +2415,17 @@ Public Sub DrawItem(ByVal itemNum As Long)
         'check if the npc is the next task to any quest: [?] symbol
         If Trim$(Quest(i).Name) <> "" Then
             If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
-                If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Item = MapItem(itemNum).Num Then
-                    textX = 16 + ConvertMapX(MapItem(itemNum).X * PIC_X) - (mTexture(TextureGUI(9)).Width / 2)
-                    textY = ConvertMapY(MapItem(itemNum).Y * PIC_Y) - 20
+                If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Item = MapItem(ItemNum).Num Then
+                    textX = 16 + ConvertMapX(MapItem(ItemNum).X * PIC_X) - (mTexture(TextureGUI(9)).Width / 2)
+                    textY = ConvertMapY(MapItem(ItemNum).Y * PIC_Y) - 20
                     RenderTexture_Animated TextureGUI(9), textX, textY, 0, 0, 13, 13, 13, 13, AnimTextureQuestObj, D3DColorARGB(255, 255, 255, 0)
 
                     If GlobalX >= textX And GlobalX <= textX + 13 Then
                         If GlobalY >= textY And GlobalY <= textY + 13 Then
                             If VerifyWindowsIsInCur Then Exit Sub
-                            SString = "Objective!"
-                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), SString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), SString) + 10, 20, 5, 200)
-                            Call RenderText(font(Fonts.georgiaBold_16), SString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), SString) / 2)), GlobalY - 32, Yellow)
+                            sString = "Objective!"
+                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
+                            Call RenderText(font(Fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
                         End If
                     End If
 
@@ -2402,7 +2436,7 @@ Public Sub DrawItem(ByVal itemNum As Long)
 
 End Sub
 
-Private Sub GroundItem_MouseMove(ByVal X As Long, ByVal Y As Long, ByVal itemNum As Long, ByVal SoulBound As Byte)
+Private Sub GroundItem_MouseMove(ByVal X As Long, ByVal Y As Long, ByVal ItemNum As Long, ByVal SoulBound As Byte)
     Dim i As Long
     Dim IsBound As Boolean
 
@@ -2411,7 +2445,7 @@ Private Sub GroundItem_MouseMove(ByVal X As Long, ByVal Y As Long, ByVal itemNum
 
     ' exit out if we're offering that item
     ' make sure we're not dragging the item
-    If DragBox.Type = PartItem And DragBox.Value = itemNum Then Exit Sub
+    If DragBox.Type = PartItem And DragBox.Value = ItemNum Then Exit Sub
 
     Dim z As Long
 
@@ -2434,7 +2468,7 @@ Private Sub GroundItem_MouseMove(ByVal X As Long, ByVal Y As Long, ByVal itemNum
 
     If SoulBound > 0 Then IsBound = True
 
-    ShowItemDesc X, Y, itemNum, IsBound
+    ShowItemDesc X, Y, ItemNum, IsBound
 End Sub
 
 Public Function GetItemNameColour(ByVal Rarity As Byte, Optional ByVal IsDxColour As Boolean = False) As Long

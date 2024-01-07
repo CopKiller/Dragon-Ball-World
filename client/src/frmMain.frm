@@ -79,9 +79,9 @@ Private Sub cmdAttWindow_Click()
     Dim windowIndex As Long
     
     'Nome da janela para obter o índice da janela no processamento
-    WindowName = "winQuest"
+    WindowName = "winNpcChat"
     'Nome da sub de criação da janela
-    callProcedure = GetAddress(AddressOf CreateWindow_Quest)
+    callProcedure = GetAddress(AddressOf CreateWindow_NpcChat)
     
     'Obtem o indice da janela
     windowIndex = GetWindowIndex(WindowName)

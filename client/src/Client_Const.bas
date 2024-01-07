@@ -45,9 +45,9 @@ Public Const InvOffsetY As Long = 6
 Public Const InvOffsetX As Long = 6
 Public Const InvColumns As Long = 5
 ' Character consts
-Public Const EqTop As Long = 86
-Public Const EqLeft As Long = 178
-Public Const EqOffsetX As Long = 6
+Public Const EqTop As Long = 103
+Public Const EqLeft As Long = 175
+Public Const EqOffsetY As Long = 6
 Public Const EqColumns As Long = 6
 ' Inventory constants
 Public Const SkillTop As Long = 45
@@ -111,8 +111,8 @@ Public Const MENU_STATE_DELCHAR As Byte = 6
 Public Const MENU_STATE_USECHAR As Byte = 7
 Public Const MENU_STATE_INIT As Byte = 8
 ' Speed moving vars
-Public Const WALK_SPEED As Byte = 2
-Public Const RUN_SPEED As Byte = 4
+Public Const WALK_SPEED As Byte = 4
+Public Const RUN_SPEED As Byte = 6
 ' Tile size constants
 Public Const PIC_X As Long = 32
 Public Const PIC_Y As Long = 32

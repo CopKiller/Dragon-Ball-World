@@ -1196,9 +1196,9 @@ Public Sub CreateWindow_Login()
 
     ' Set the active control
     If Not Len(Windows(GetWindowIndex("winLogin")).Controls(GetControlIndex("winLogin", "txtUser")).text) > 0 Then
-        '    SetActiveControl GetWindowIndex("winLogin"), GetControlIndex("winLogin", "txtUser")
+            SetActiveControl GetWindowIndex("winLogin"), GetControlIndex("winLogin", "txtUser")
     Else
-        '    SetActiveControl GetWindowIndex("winLogin"), GetControlIndex("winLogin", "txtPass")
+            SetActiveControl GetWindowIndex("winLogin"), GetControlIndex("winLogin", "txtPass")
     End If
 End Sub
 
@@ -1525,7 +1525,7 @@ End Sub
 
 Public Sub CreateWindow_Character()
 ' Create window
-    CreateWindow "winCharacter", "Character Status", zOrder_Win, 0, 0, 214, 318, TextureItem(62), False, Fonts.rockwellDec_15, , 2, 6, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, DesignTypes.DesignWindowClear, , , , , GetAddress(AddressOf Character_MouseMove), GetAddress(AddressOf Character_MouseDown), GetAddress(AddressOf Character_MouseMove), GetAddress(AddressOf Character_MouseMove), , , GetAddress(AddressOf DrawCharacter)
+    CreateWindow "winCharacter", "Character Status", zOrder_Win, 0, 0, 210, 333, TextureItem(62), False, Fonts.rockwellDec_15, , 2, 6, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, DesignTypes.DesignWindowClearIcon, , , , , GetAddress(AddressOf Character_MouseMove), GetAddress(AddressOf Character_MouseDown), GetAddress(AddressOf Character_MouseMove), GetAddress(AddressOf Character_MouseMove), , , GetAddress(AddressOf DrawCharacter)
 
     ' Centralise it
     CentraliseWindow windowCount
@@ -1537,59 +1537,59 @@ Public Sub CreateWindow_Character()
     CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 39, 2, 36, 36, , , , , , , TextureGUI(3), TextureGUI(4), TextureGUI(5), , , , , , GetAddress(AddressOf btnMenu_Char)
 
     ' Parchment
-    CreatePictureBox windowCount, "picParchment", 6, 26, 162, 287, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
+    CreatePictureBox windowCount, "picParchment", 6, 43, 162, 287, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' White boxes
-    CreatePictureBox windowCount, "picWhiteBox", 13, 34, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 54, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 74, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 94, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 114, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 134, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     CreatePictureBox windowCount, "picWhiteBox", 13, 154, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
+    CreatePictureBox windowCount, "picWhiteBox", 13, 174, 148, 19, , , , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput
     ' Labels
-    CreateLabel windowCount, "lblName", 18, 36, 147, 16, "Name", rockwellDec_10
-    CreateLabel windowCount, "lblClass", 18, 56, 147, 16, "Class", rockwellDec_10
-    CreateLabel windowCount, "lblLevel", 18, 76, 147, 16, "Level", rockwellDec_10
-    CreateLabel windowCount, "lblGuild", 18, 96, 147, 16, "Guild", rockwellDec_10
-    CreateLabel windowCount, "lblHealth", 18, 116, 147, 16, "Health", rockwellDec_10
-    CreateLabel windowCount, "lblSpirit", 18, 136, 147, 16, "Spirit", rockwellDec_10
-    CreateLabel windowCount, "lblExperience", 18, 156, 147, 16, "Experience", rockwellDec_10
+    CreateLabel windowCount, "lblName", 18, 56, 147, 16, "Name", rockwellDec_10
+    CreateLabel windowCount, "lblClass", 18, 76, 147, 16, "Class", rockwellDec_10
+    CreateLabel windowCount, "lblLevel", 18, 96, 147, 16, "Level", rockwellDec_10
+    CreateLabel windowCount, "lblGuild", 18, 116, 147, 16, "Guild", rockwellDec_10
+    CreateLabel windowCount, "lblHealth", 18, 136, 147, 16, "Health", rockwellDec_10
+    CreateLabel windowCount, "lblSpirit", 18, 156, 147, 16, "Spirit", rockwellDec_10
+    CreateLabel windowCount, "lblExperience", 18, 176, 147, 16, "Experience", rockwellDec_10
     ' Attributes
-    CreatePictureBox windowCount, "picShadow", 18, 176, 138, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
-    CreateLabel windowCount, "lblLabel", 18, 173, 138, , "Character Attributes", rockwellDec_15, , Alignment.alignCentre
+    CreatePictureBox windowCount, "picShadow", 18, 196, 138, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
+    CreateLabel windowCount, "lblLabel", 18, 193, 138, , "Character Attributes", rockwellDec_15, , Alignment.alignCentre
     ' Black boxes
-    CreatePictureBox windowCount, "picBlackBox", 13, 186, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 206, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 226, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 246, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 266, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreatePictureBox windowCount, "picBlackBox", 13, 286, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
+    CreatePictureBox windowCount, "picBlackBox", 13, 306, 148, 19, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Labels
-    CreateLabel windowCount, "lblLabel", 18, 188, 138, , "Strength", rockwellDec_10, Gold, Alignment.AlignRight
-    CreateLabel windowCount, "lblLabel", 18, 208, 138, , "Endurance", rockwellDec_10, Gold, Alignment.AlignRight
-    CreateLabel windowCount, "lblLabel", 18, 228, 138, , "Intelligence", rockwellDec_10, Gold, Alignment.AlignRight
-    CreateLabel windowCount, "lblLabel", 18, 248, 138, , "Agility", rockwellDec_10, Gold, Alignment.AlignRight
-    CreateLabel windowCount, "lblLabel", 18, 268, 138, , "Willpower", rockwellDec_10, Gold, Alignment.AlignRight
-    CreateLabel windowCount, "lblLabel", 18, 288, 138, , "Unused Stat Points", rockwellDec_10, LightGreen, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 208, 138, , "Strength", rockwellDec_10, Gold, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 228, 138, , "Endurance", rockwellDec_10, Gold, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 248, 138, , "Intelligence", rockwellDec_10, Gold, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 268, 138, , "Agility", rockwellDec_10, Gold, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 288, 138, , "Willpower", rockwellDec_10, Gold, Alignment.AlignRight
+    CreateLabel windowCount, "lblLabel", 18, 308, 138, , "Unused Stat Points", rockwellDec_10, LightGreen, Alignment.AlignRight
     ' Buttons
-    CreateButton windowCount, "btnStat_1", 15, 188, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint1)
-    CreateButton windowCount, "btnStat_2", 15, 208, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint2)
-    CreateButton windowCount, "btnStat_3", 15, 228, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint3)
-    CreateButton windowCount, "btnStat_4", 15, 248, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint4)
-    CreateButton windowCount, "btnStat_5", 15, 268, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint5)
+    CreateButton windowCount, "btnStat_1", 15, 208, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint1)
+    CreateButton windowCount, "btnStat_2", 15, 228, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint2)
+    CreateButton windowCount, "btnStat_3", 15, 248, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint3)
+    CreateButton windowCount, "btnStat_4", 15, 268, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint4)
+    CreateButton windowCount, "btnStat_5", 15, 288, 15, 15, , , , , , , TextureGUI(18), TextureGUI(19), TextureGUI(20), , , , , , GetAddress(AddressOf Character_SpendPoint5)
     ' fake buttons
-    CreatePictureBox windowCount, "btnGreyStat_1", 15, 188, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
-    CreatePictureBox windowCount, "btnGreyStat_2", 15, 208, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
-    CreatePictureBox windowCount, "btnGreyStat_3", 15, 228, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
-    CreatePictureBox windowCount, "btnGreyStat_4", 15, 248, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
-    CreatePictureBox windowCount, "btnGreyStat_5", 15, 268, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
+    CreatePictureBox windowCount, "btnGreyStat_1", 15, 208, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
+    CreatePictureBox windowCount, "btnGreyStat_2", 15, 228, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
+    CreatePictureBox windowCount, "btnGreyStat_3", 15, 248, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
+    CreatePictureBox windowCount, "btnGreyStat_4", 15, 268, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
+    CreatePictureBox windowCount, "btnGreyStat_5", 15, 288, 15, 15, , , , , TextureGUI(21), TextureGUI(21), TextureGUI(21)
     ' Labels
-    CreateLabel windowCount, "lblStat_1", 32, 188, 100, , "255", rockwellDec_10
-    CreateLabel windowCount, "lblStat_2", 32, 208, 100, , "255", rockwellDec_10
-    CreateLabel windowCount, "lblStat_3", 32, 228, 100, , "255", rockwellDec_10
-    CreateLabel windowCount, "lblStat_4", 32, 248, 100, , "255", rockwellDec_10
-    CreateLabel windowCount, "lblStat_5", 32, 268, 100, , "255", rockwellDec_10
-    CreateLabel windowCount, "lblPoints", 18, 288, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblStat_1", 32, 208, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblStat_2", 32, 228, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblStat_3", 32, 248, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblStat_4", 32, 268, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblStat_5", 32, 288, 100, , "255", rockwellDec_10
+    CreateLabel windowCount, "lblPoints", 18, 308, 100, , "255", rockwellDec_10
 End Sub
 
 Public Sub CreateWindow_Description()
@@ -1801,7 +1801,7 @@ End Sub
 Public Sub CreateWindow_NpcChat()
 ' Create window
 
-    CreateWindow "winNpcChat", "Conversation with [Name]", zOrder_Win, 0, 0, 480, 228, TextureItem(111), False, Fonts.Default, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
+    CreateWindow "winNpcChat", "Conversation with [Name]", zOrder_Win, 0, 0, 480, 248, TextureItem(111), False, Fonts.Default, , 2, 11, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal, DesignTypes.DesignWindowNormal
 
     ' Centralise it
     CentraliseWindow windowCount
@@ -1810,27 +1810,27 @@ Public Sub CreateWindow_NpcChat()
     CreateButton windowCount, "btnClose", Windows(windowCount).Window.Width - 39, 2, 36, 36, , , , , , , TextureGUI(3), TextureGUI(4), TextureGUI(5), , , , , , GetAddress(AddressOf btnNpcChat_Close)
 
     ' Parchment
-    CreatePictureBox windowCount, "picParchment", 6, 26, 468, 198, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
+    CreatePictureBox windowCount, "picParchment", 6, 46, 468, 178, , , , , , , , DesignTypes.DesignParchment, DesignTypes.DesignParchment, DesignTypes.DesignParchment
     ' Face background
-    CreatePictureBox windowCount, "picFaceBG", 20, 40, 102, 102, , , , , TextureGUI(36), TextureGUI(36), TextureGUI(36)
+    CreatePictureBox windowCount, "picFaceBG", 20, 60, 102, 102, , , , , TextureGUI(36), TextureGUI(36), TextureGUI(36)
     ' Actual Face
-    CreatePictureBox windowCount, "picFace", 23, 43, 96, 96, , , , , TextureFace(1), TextureFace(1), TextureFace(1)
+    CreatePictureBox windowCount, "picFace", 23, 63, 96, 96, , , , , TextureFace(1), TextureFace(1), TextureFace(1)
     ' Chat BG
-    CreatePictureBox windowCount, "picChatBG", 128, 39, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
+    CreatePictureBox windowCount, "picChatBG", 128, 59, 334, 104, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     ' Chat
-    CreateLabel windowCount, "lblChat", 136, 44, 318, 102, "[Text]", Fonts.Default, White, Alignment.alignCentre
+    CreateLabel windowCount, "lblChat", 136, 64, 318, 102, "[Text]", Fonts.Default, White, Alignment.alignCentre
     ' Reply buttons
-    CreateButton windowCount, "btnOpt4", 69, 145, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt4), , , , , DarkGrey
-    CreateButton windowCount, "btnOpt3", 69, 162, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt3), , , , , DarkGrey
-    CreateButton windowCount, "btnOpt2", 69, 179, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt2), , , , , DarkGrey
-    CreateButton windowCount, "btnOpt1", 69, 196, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt1), , , , , DarkGrey
+    CreateButton windowCount, "btnOpt4", 69, 165, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt4), , , , , DarkGrey
+    CreateButton windowCount, "btnOpt3", 69, 182, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt3), , , , , DarkGrey
+    CreateButton windowCount, "btnOpt2", 69, 199, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt2), , , , , DarkGrey
+    CreateButton windowCount, "btnOpt1", 69, 216, 343, 15, "[Text]", verdana_12, Black, , , , , , , , , , , , GetAddress(AddressOf btnOpt1), , , , , DarkGrey
 
     ' Cache positions
-    optPos(1) = 196
-    optPos(2) = 179
-    optPos(3) = 162
-    optPos(4) = 145
-    optHeight = 228
+    optPos(1) = 216
+    optPos(2) = 199
+    optPos(3) = 182
+    optPos(4) = 165
+    optHeight = 248
 End Sub
 
 Public Sub CreateWindow_RightClick()

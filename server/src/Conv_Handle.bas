@@ -25,7 +25,7 @@ End Sub
 ' :: Save Conv packet ::
 ' :::::::::::::::::::::::
 Public Sub HandleSaveConv(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim N As Long
+    Dim n As Long
     Dim Buffer As clsBuffer
     Dim i As Long
     Dim x As Long
@@ -37,30 +37,30 @@ Public Sub HandleSaveConv(ByVal index As Long, ByRef Data() As Byte, ByVal Start
 
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    N = Buffer.ReadLong
+    n = Buffer.ReadLong
 
     ' Prevent hacking
-    If N < 0 Or N > MAX_CONVS Then
+    If n < 0 Or n > MAX_CONVS Then
         Exit Sub
     End If
 
-    With Conv(N)
+    With Conversation(n)
         .Name = Buffer.ReadString
         .chatCount = Buffer.ReadLong
         ReDim .Conv(1 To .chatCount)
         For i = 1 To .chatCount
-            .Conv(i).Conv = Buffer.ReadString
+            .Conv(i).Talk = Buffer.ReadString
             For x = 1 To 4
                 .Conv(i).rText(x) = Buffer.ReadString
                 .Conv(i).rTarget(x) = Buffer.ReadLong
             Next
             .Conv(i).EventType = Buffer.ReadLong
-            .Conv(i).eventNum = Buffer.ReadLong
+            .Conv(i).EventNum = Buffer.ReadLong
         Next
     End With
     
     ' Save it
-    Call SendUpdateConvToAll(N)
-    Call SaveConv(N)
-    Call AddLog(GetPlayerName(index) & " saved Conv #" & N & ".", ADMIN_LOG)
+    Call SendUpdateConvToAll(n)
+    Call SaveConv(n)
+    Call AddLog(GetPlayerName(index) & " saved Conv #" & n & ".", ADMIN_LOG)
 End Sub

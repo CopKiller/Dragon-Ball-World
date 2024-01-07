@@ -23,12 +23,12 @@ Public Sub SendSaveConv(ByVal Convnum As Long)
     buffer.WriteLong CSaveConv
     buffer.WriteLong Convnum
 
-    With Conv(Convnum)
+    With Conversation(Convnum)
         buffer.WriteString .Name
         buffer.WriteLong .chatCount
 
         For i = 1 To .chatCount
-            buffer.WriteString .Conv(i).Conv
+            buffer.WriteString .Conv(i).Talk
 
             For X = 1 To 4
                 buffer.WriteString .Conv(i).rText(X)

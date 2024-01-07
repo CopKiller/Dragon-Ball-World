@@ -273,10 +273,10 @@ Private Sub cmdDelete_Click()
     Dim tmpIndex As Long
 
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    ClearConv EditorIndex
+    InitConversationMode EditorIndex, ClearAndRedimensionEmpty
     tmpIndex = lstIndex.ListIndex
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Conv(EditorIndex).Name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & Conversation(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
     ConvEditorInit
 End Sub
@@ -297,45 +297,14 @@ Private Sub lstIndex_Click()
     Call ConvEditorInit
 End Sub
 
-Private Sub scrlChatCountChange()
-    Dim n As Long, i As Long
-    
-    If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    If CurConv <= 0 Then Exit Sub
-    
-    lblChatCount.caption = "Chat Count: " & scrlChatCount.Value
-    Conv(EditorIndex).chatCount = scrlChatCount.Value
-    scrlConv.max = scrlChatCount.Value
-    ReDim Preserve Conv(EditorIndex).Conv(1 To scrlChatCount.Value) As ConvRec
-    
-    For n = 1 To 4
-        cmbReply(n).Clear
-        cmbReply(n).AddItem "None"
-
-        For i = 1 To Conv(EditorIndex).chatCount
-            cmbReply(n).AddItem i
-        Next
-        
-        With Conv(EditorIndex).Conv(CurConv)
-            txtConv.text = .Conv
-    
-            For i = 1 To 4
-                txtReply(i).text = .rText(i)
-                cmbReply(i).ListIndex = .rTarget(i)
-            Next
-        End With
-
-    Next
-End Sub
-
 Private Sub scrlChatCount_Change()
     Dim n As Long, i As Long
 
     lblChatCount.caption = "Chat Count: " & scrlChatCount.Value
-    Conv(EditorIndex).chatCount = scrlChatCount.Value
+    Conversation(EditorIndex).chatCount = scrlChatCount.Value
     scrlConv.max = scrlChatCount.Value
-
-    ReDim Preserve Conv(EditorIndex).Conv(1 To scrlChatCount.Value) As ConvRec
+    
+    Call InitConversationMode(EditorIndex, AddRedimensionToChat, scrlChatCount.Value)
 
     If scrlConv.Value > scrlConv.max Then
         scrlConv.Value = scrlConv.max
@@ -345,7 +314,7 @@ Private Sub scrlChatCount_Change()
         cmbReply(n).Clear
         cmbReply(n).AddItem "None"
 
-        For i = 1 To Conv(EditorIndex).chatCount
+        For i = 1 To Conversation(EditorIndex).chatCount
             cmbReply(n).AddItem i
         Next
 
@@ -361,13 +330,14 @@ Private Sub scrlConv_Change()
     CurConv = scrlConv.Value
     fraConv.caption = "Conversation - " & CurConv
 
+    Call ConvRealoadData(EditorIndex, CurConv)
     Call ConvReloadEventOptions(EditorIndex, CurConv)
 
 End Sub
 
 Private Sub txtConv_Change()
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(CurConv).Conv = txtConv.text
+    Conversation(EditorIndex).Conv(CurConv).Talk = txtConv.text
 End Sub
 
 Private Sub txtName_Validate(Cancel As Boolean)
@@ -375,27 +345,27 @@ Private Sub txtName_Validate(Cancel As Boolean)
 
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
     tmpIndex = lstIndex.ListIndex
-    Conv(EditorIndex).Name = Trim$(txtName.text)
+    Conversation(EditorIndex).Name = Trim$(txtName.text)
     lstIndex.RemoveItem EditorIndex - 1
-    lstIndex.AddItem EditorIndex & ": " & Conv(EditorIndex).Name, EditorIndex - 1
+    lstIndex.AddItem EditorIndex & ": " & Conversation(EditorIndex).Name, EditorIndex - 1
     lstIndex.ListIndex = tmpIndex
 End Sub
 
 Private Sub txtReply_Change(Index As Integer)
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(CurConv).rText(Index) = txtReply(Index).text
+    Conversation(EditorIndex).Conv(CurConv).rText(Index) = txtReply(Index).text
 End Sub
 
 Private Sub cmbReply_Click(Index As Integer)
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
-    Conv(EditorIndex).Conv(CurConv).rTarget(Index) = cmbReply(Index).ListIndex
+    Conversation(EditorIndex).Conv(CurConv).rTarget(Index) = cmbReply(Index).ListIndex
 End Sub
 
 Private Sub cmbEvent_Click()
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
     If CurConv = 0 Then Exit Sub
     
-    Conv(EditorIndex).Conv(CurConv).EventType = cmbEvent.ListIndex
+    Conversation(EditorIndex).Conv(CurConv).EventType = cmbEvent.ListIndex
     
     Call ConvReloadEventOptions(EditorIndex, CurConv)
 End Sub
@@ -404,5 +374,5 @@ Private Sub cmbEventNum_Click()
     If EditorIndex = 0 Or EditorIndex > MAX_CONVS Then Exit Sub
     If CurConv = 0 Then Exit Sub
     
-    Conv(EditorIndex).Conv(CurConv).EventNum = cmbEventNum.ListIndex
+    Conversation(EditorIndex).Conv(CurConv).EventNum = cmbEventNum.ListIndex
 End Sub

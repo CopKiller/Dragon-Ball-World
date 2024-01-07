@@ -141,9 +141,20 @@ Private Type PlayerRec
     Attacking As Byte
     AttackTimer As Long
     MapGetTimer As Long
-    Step As Byte
+    
+    '--> Frames
     Anim As Long
     AnimTimer As Long
+    
+    Step As Byte
+    StepTimer As Long
+    
+    StopTmr As Long
+    EyesTmr As Long
+    StepEyes As Byte
+    
+    AttackMode As Byte
+    AttackModeTimer As Long
 End Type
 
 Private Type EventCommandRec

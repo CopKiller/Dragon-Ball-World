@@ -10,19 +10,19 @@ Public Sub SaveConv(ByVal convNum As Long)
     f = FreeFile
 
     Open filename For Binary As #f
-    With Conv(convNum)
+    With Conversation(convNum)
         Put #f, , .Name
         Put #f, , .chatCount
         For i = 1 To .chatCount
-            Put #f, , CLng(Len(.Conv(i).Conv))
-            Put #f, , .Conv(i).Conv
+            Put #f, , CLng(Len(.Conv(i).Talk))
+            Put #f, , .Conv(i).Talk
             For x = 1 To 4
                 Put #f, , CLng(Len(.Conv(i).rText(x)))
                 Put #f, , .Conv(i).rText(x)
                 Put #f, , .Conv(i).rTarget(x)
             Next
             Put #f, , .Conv(i).EventType
-            Put #f, , .Conv(i).eventNum
+            Put #f, , .Conv(i).EventNum
         Next
     End With
     Close #f
@@ -48,7 +48,7 @@ End Sub
 
 Public Sub LoadConvs()
     Dim filename As String
-    Dim i As Long, N As Long, x As Long, f As Long
+    Dim i As Long, n As Long, x As Long, f As Long
     Dim sLen As Long
 
     Call CheckConvs
@@ -57,22 +57,22 @@ Public Sub LoadConvs()
         filename = App.Path & "\data\convs\conv" & i & ".dat"
         f = FreeFile
         Open filename For Binary As #f
-        With Conv(i)
+        With Conversation(i)
             Get #f, , .Name
             Get #f, , .chatCount
             If .chatCount > 0 Then ReDim .Conv(1 To .chatCount)
-            For N = 1 To .chatCount
+            For n = 1 To .chatCount
                 Get #f, , sLen
-                .Conv(N).Conv = Space$(sLen)
-                Get #f, , .Conv(N).Conv
+                .Conv(n).Talk = Space$(sLen)
+                Get #f, , .Conv(n).Talk
                 For x = 1 To 4
                     Get #f, , sLen
-                    .Conv(N).rText(x) = Space$(sLen)
-                    Get #f, , .Conv(N).rText(x)
-                    Get #f, , .Conv(N).rTarget(x)
+                    .Conv(n).rText(x) = Space$(sLen)
+                    Get #f, , .Conv(n).rText(x)
+                    Get #f, , .Conv(n).rTarget(x)
                 Next
-                Get #f, , .Conv(N).EventType
-                Get #f, , .Conv(N).eventNum
+                Get #f, , .Conv(n).EventType
+                Get #f, , .Conv(n).EventNum
             Next
         End With
         Close #f
@@ -80,9 +80,16 @@ Public Sub LoadConvs()
 End Sub
 
 Public Sub ClearConv(ByVal index As Long)
-    Conv(index) = EmptyConv
-    Conv(index).Name = vbNullString
-    ReDim Conv(index).Conv(1)
+    Dim i As Long
+    
+    Conversation(index) = EmptyConv
+    Conversation(index).Name = vbNullString
+    ReDim Conversation(index).Conv(1)
+    
+    Conversation(index).Conv(1).Talk = vbNullString
+    For i = 1 To 4
+        Conversation(index).Conv(1).rText(i) = vbNullString
+    Next i
 End Sub
 
 Public Sub ClearConvs()

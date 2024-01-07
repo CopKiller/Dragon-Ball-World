@@ -9,17 +9,17 @@ Public Sub SendUpdateConvTo(ByVal index As Long, ByVal convNum As Long)
     
     Buffer.WriteLong SUpdateConv
     Buffer.WriteLong convNum
-    With Conv(convNum)
+    With Conversation(convNum)
         Buffer.WriteString .Name
         Buffer.WriteLong .chatCount
         For i = 1 To .chatCount
-            Buffer.WriteString .Conv(i).Conv
+            Buffer.WriteString .Conv(i).Talk
             For x = 1 To 4
                 Buffer.WriteString .Conv(i).rText(x)
                 Buffer.WriteLong .Conv(i).rTarget(x)
             Next
             Buffer.WriteLong .Conv(i).EventType
-            Buffer.WriteLong .Conv(i).eventNum
+            Buffer.WriteLong .Conv(i).EventNum
         Next
     End With
     
@@ -31,7 +31,7 @@ Public Sub SendConvs(ByVal index As Long)
     Dim i As Long
 
     For i = 1 To MAX_CONVS
-        If LenB(Trim$(Conv(i).Name)) > 0 Then
+        If LenB(Trim$(Conversation(i).Name)) > 0 Then
             Call SendUpdateConvTo(index, i)
         End If
     Next
@@ -47,17 +47,17 @@ Public Sub SendUpdateConvToAll(ByVal convNum As Long)
     
     Buffer.WriteLong SUpdateConv
     Buffer.WriteLong convNum
-    With Conv(convNum)
+    With Conversation(convNum)
         Buffer.WriteString .Name
         Buffer.WriteLong .chatCount
         For i = 1 To .chatCount
-            Buffer.WriteString .Conv(i).Conv
+            Buffer.WriteString .Conv(i).Talk
             For x = 1 To 4
                 Buffer.WriteString .Conv(i).rText(x)
                 Buffer.WriteLong .Conv(i).rTarget(x)
             Next
             Buffer.WriteLong .Conv(i).EventType
-            Buffer.WriteLong .Conv(i).eventNum
+            Buffer.WriteLong .Conv(i).EventNum
         Next
     End With
     

@@ -126,6 +126,8 @@ Private Type MapNpcRec
     ' spell casting
     spellBuffer As SpellBufferRec
     SpellCD(1 To MAX_NPC_SPELLS) As Long
+    
+    ImpactedTick As Long
 End Type
 
 Private Type MapNpcDataRec

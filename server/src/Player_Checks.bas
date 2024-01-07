@@ -247,13 +247,13 @@ Public Function CanMove(index As Long, Dir As Long) As Byte
     If warped Then
         ' clear their target
         TempPlayer(index).Target = 0
-        TempPlayer(index).targetType = TARGET_TYPE_NONE
+        TempPlayer(index).TargetType = TARGET_TYPE_NONE
         SendTarget index
     End If
 End Function
 
 Public Function CheckDirection(index As Long, direction As Long) As Boolean
-    Dim x As Long, Y As Long, i As Long
+    Dim x As Long, y As Long, i As Long
     Dim EventCount As Long, mapnum As Long, page As Long
 
     CheckDirection = False
@@ -261,38 +261,38 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
     Select Case direction
         Case DIR_UP
             x = GetPlayerX(index)
-            Y = GetPlayerY(index) - 1
+            y = GetPlayerY(index) - 1
         Case DIR_DOWN
             x = GetPlayerX(index)
-            Y = GetPlayerY(index) + 1
+            y = GetPlayerY(index) + 1
         Case DIR_LEFT
             x = GetPlayerX(index) - 1
-            Y = GetPlayerY(index)
+            y = GetPlayerY(index)
         Case DIR_RIGHT
             x = GetPlayerX(index) + 1
-            Y = GetPlayerY(index)
+            y = GetPlayerY(index)
         Case DIR_UP_LEFT
             x = GetPlayerX(index) - 1
-            Y = GetPlayerY(index) - 1
+            y = GetPlayerY(index) - 1
         Case DIR_UP_RIGHT
             x = GetPlayerX(index) + 1
-            Y = GetPlayerY(index) - 1
+            y = GetPlayerY(index) - 1
         Case DIR_DOWN_LEFT
             x = GetPlayerX(index) - 1
-            Y = GetPlayerY(index) + 1
+            y = GetPlayerY(index) + 1
         Case DIR_DOWN_RIGHT
             x = GetPlayerX(index) + 1
-            Y = GetPlayerY(index) + 1
+            y = GetPlayerY(index) + 1
     End Select
     
     ' Check to see if the map tile is blocked or not
-    If Map(GetPlayerMap(index)).TileData.Tile(x, Y).Type = TILE_TYPE_BLOCKED Then
+    If Map(GetPlayerMap(index)).TileData.Tile(x, y).Type = TILE_TYPE_BLOCKED Then
         CheckDirection = True
         Exit Function
     End If
 
     ' Check to see if the map tile is tree or not
-    If Map(GetPlayerMap(index)).TileData.Tile(x, Y).Type = TILE_TYPE_RESOURCE Then
+    If Map(GetPlayerMap(index)).TileData.Tile(x, y).Type = TILE_TYPE_RESOURCE Then
         CheckDirection = True
         Exit Function
     End If
@@ -304,7 +304,7 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
         For i = 1 To Player_HighIndex
             If IsPlaying(i) And GetPlayerMap(i) = GetPlayerMap(index) Then
                 If GetPlayerX(i) = x Then
-                    If GetPlayerY(i) = Y Then
+                    If GetPlayerY(i) = y Then
                         CheckDirection = True
                         Exit Function
                     End If
@@ -317,7 +317,7 @@ Public Function CheckDirection(index As Long, direction As Long) As Boolean
     For i = 1 To MAX_MAP_NPCS
         If MapNpc(GetPlayerMap(index)).Npc(i).Num > 0 Then
             If MapNpc(GetPlayerMap(index)).Npc(i).x = x Then
-                If MapNpc(GetPlayerMap(index)).Npc(i).Y = Y Then
+                If MapNpc(GetPlayerMap(index)).Npc(i).y = y Then
                     CheckDirection = True
                     Exit Function
                 End If
@@ -438,16 +438,16 @@ End Function
 Public Function CanPlayerCriticalHit(ByVal index As Long) As Boolean
     On Error Resume Next
     Dim i As Long
-    Dim N As Long
+    Dim n As Long
 
     If GetPlayerEquipment(index, Weapon) > 0 Then
-        N = (Rnd) * 2
+        n = (Rnd) * 2
 
-        If N = 1 Then
+        If n = 1 Then
             i = (GetPlayerStat(index, Stats.Strength) \ 2) + (GetPlayerLevel(index) \ 2)
-            N = Int(Rnd * 100) + 1
+            n = Int(Rnd * 100) + 1
 
-            If N <= i Then
+            If n <= i Then
                 CanPlayerCriticalHit = True
             End If
         End If
@@ -455,22 +455,35 @@ Public Function CanPlayerCriticalHit(ByVal index As Long) As Boolean
 
 End Function
 
-Public Function CanPlayerBlockHit(ByVal index As Long) As Boolean
-    Dim i As Long
-    Dim N As Long
-    Dim ShieldSlot As Long
-    ShieldSlot = GetPlayerEquipment(index, Shield)
+Public Function CanPlayerBlockHit(ByVal Victim As Long, Optional ByVal AttackerType As Byte, Optional ByVal AttackerID As Long) As Boolean
+    Dim rndNum As Long
+    Dim Value As Long
+    Dim Rate As Single
+    Dim NpcNum As Long
 
-    If ShieldSlot > 0 Then
-        N = Int(Rnd * 2)
+    If TempPlayer(Victim).PlayerBlock Then
 
-        If N = 1 Then
-            i = (GetPlayerStat(index, Stats.Endurance) \ 2) + (GetPlayerLevel(index) \ 2)
-            N = Int(Rnd * 100) + 1
+        ' Obtém a chance de acerto do atacante.
+        If AttackerType = TARGET_TYPE_PLAYER Then
+            Value = GetPlayerRawStat(AttackerID, Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
+            Rate = CSng(Value / GetPlayerRawStat(AttackerID, Stats.Agility))
 
-            If N <= i Then
-                CanPlayerBlockHit = True
-            End If
+        ElseIf AttackerType = TARGET_TYPE_NPC Then
+            NpcNum = MapNpc(GetPlayerMap(Victim)).Npc(AttackerID).Num
+            Value = Npc(NpcNum).Stat(Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
+            Rate = CSng(Value / Npc(NpcNum).Stat(Stats.Agility))
+        End If
+
+        ' Inverte os valores para obter a chance de esquiva.
+        Rate = 100 - (Rate * 100)
+
+        ' Limita a chance em 90%
+        If Rate > 90 Then Rate = 90
+        If Rate < 0 Then Rate = 1
+
+        rndNum = RAND(1, 100)
+        If rndNum <= Rate Then
+            CanPlayerBlock = True
         End If
     End If
 

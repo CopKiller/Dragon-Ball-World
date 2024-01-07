@@ -13,31 +13,14 @@ Public Sub ConvEditorInit()
     EditorIndex = frmEditor_Conv.lstIndex.ListIndex + 1
 
     With frmEditor_Conv
-        .txtName.text = Trim$(Conv(EditorIndex).Name)
+        .txtName.text = Trim$(Conversation(EditorIndex).Name)
 
-        If Conv(EditorIndex).chatCount = 0 Then
-            Conv(EditorIndex).chatCount = 1
-            ReDim Conv(EditorIndex).Conv(1 To Conv(EditorIndex).chatCount)
+        If Conversation(EditorIndex).chatCount = 0 Then
+            Conversation(EditorIndex).chatCount = 1
+            Call InitConversationMode(EditorIndex, ClearAndRedimensionEmpty)
         End If
 
-        For n = 1 To 4
-            .cmbReply(n).Clear
-            .cmbReply(n).AddItem "None"
-
-            For i = 1 To Conv(EditorIndex).chatCount
-                .cmbReply(n).AddItem i
-            Next
-        Next
-
-        .scrlChatCount = Conv(EditorIndex).chatCount
-        .scrlConv.max = Conv(EditorIndex).chatCount
-        .scrlConv.Value = 1
-        .txtConv = Conv(EditorIndex).Conv(.scrlConv.Value).Conv
-
-        For i = 1 To 4
-            .txtReply(i).text = Conv(EditorIndex).Conv(.scrlConv.Value).rText(i)
-            .cmbReply(i).ListIndex = Conv(EditorIndex).Conv(.scrlConv.Value).rTarget(i)
-        Next
+        Call ConvRealoadData(EditorIndex, .scrlConv.Value)
 
         Call ConvReloadEventOptions(EditorIndex, .scrlConv.Value)
     End With
@@ -45,10 +28,38 @@ Public Sub ConvEditorInit()
     Conv_Changed(EditorIndex) = True
 End Sub
 
+Public Sub ConvRealoadData(ByVal EditorIndex As Long, ByVal CurConv As Long)
+    Dim i As Long, n As Long
+
+    With frmEditor_Conv
+        For n = 1 To 4
+            .cmbReply(n).Clear
+            .cmbReply(n).AddItem "None"
+
+            For i = 1 To Conversation(EditorIndex).chatCount
+                .cmbReply(n).AddItem i
+            Next
+        Next
+
+        If Conversation(EditorIndex).chatCount = 0 Then Conversation(EditorIndex).chatCount = 1
+        .scrlChatCount = Conversation(EditorIndex).chatCount
+        .scrlConv.max = Conversation(EditorIndex).chatCount
+        
+        If CurConv > .scrlConv.max Then CurConv = .scrlConv.max
+        .scrlConv.Value = CurConv
+        .txtConv = Trim$(Conversation(EditorIndex).Conv(CurConv).Talk)
+
+        For i = 1 To 4
+            .txtReply(i).text = Trim$(Conversation(EditorIndex).Conv(CurConv).rText(i))
+            .cmbReply(i).ListIndex = Conversation(EditorIndex).Conv(CurConv).rTarget(i)
+        Next
+    End With
+End Sub
+
 Public Sub ConvReloadEventOptions(ByVal EditorIndex As Long, ByVal CurConv As Long)
     Dim i As Long
     
-    With Conv(EditorIndex).Conv(CurConv)
+    With Conversation(EditorIndex).Conv(CurConv)
         frmEditor_Conv.cmbEvent.ListIndex = .EventType
 
         If frmEditor_Conv.cmbEvent.ListIndex = EventType.Event_OpenShop Then

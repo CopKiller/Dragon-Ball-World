@@ -644,7 +644,7 @@ End Sub
 Private Sub scrlConv_Change()
 
     If scrlConv.Value > 0 Then
-        lblConv.caption = "Conv: " & Trim$(Conv(scrlConv.Value).Name)
+        lblConv.caption = "Conv: " & Trim$(Conversation(scrlConv.Value).Name)
 
     Else
         lblConv.caption = "Conv: None"
@@ -795,8 +795,8 @@ End Sub
 
 Private Sub txtEXP_Change()
 
-    If Not Len(txtEXP.text) > 0 Then Exit Sub
-    If IsNumeric(txtEXP.text) Then Npc(EditorIndex).EXP = Val(txtEXP.text)
+    If Not Len(txtExp.text) > 0 Then Exit Sub
+    If IsNumeric(txtExp.text) Then Npc(EditorIndex).EXP = Val(txtExp.text)
 End Sub
 
 Private Sub txtHP_Change()

@@ -14,7 +14,7 @@ Public Sub HandleConvEditor(ByVal Index As Long, ByRef Data() As Byte, ByVal Sta
 
         ' Add the names
         For i = 1 To MAX_CONVS
-            .lstIndex.AddItem i & ": " & Trim$(Conv(i).Name)
+            .lstIndex.AddItem i & ": " & Trim$(Conversation(i).Name)
         Next
 
         .Show
@@ -28,22 +28,22 @@ Public Sub HandleUpdateConv(ByVal Index As Long, ByRef Data() As Byte, ByVal Sta
     Dim Convnum As Long
     Dim buffer As clsBuffer
     Dim i As Long
-    Dim x As Long
+    Dim X As Long
     Set buffer = New clsBuffer
     buffer.WriteBytes Data()
     Convnum = buffer.ReadLong
 
-    With Conv(Convnum)
+    With Conversation(Convnum)
         .Name = buffer.ReadString
         .chatCount = buffer.ReadLong
-        If .chatCount > 0 Then ReDim Conv(Convnum).Conv(1 To .chatCount)
+        If .chatCount > 0 Then ReDim Conversation(Convnum).Conv(1 To .chatCount)
 
         For i = 1 To .chatCount
-            .Conv(i).Conv = buffer.ReadString
+            .Conv(i).Talk = buffer.ReadString
 
-            For x = 1 To 4
-                .Conv(i).rText(x) = buffer.ReadString
-                .Conv(i).rTarget(x) = buffer.ReadLong
+            For X = 1 To 4
+                .Conv(i).rText(X) = buffer.ReadString
+                .Conv(i).rTarget(X) = buffer.ReadLong
             Next
 
             .Conv(i).EventType = buffer.ReadLong
