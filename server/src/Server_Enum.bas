@@ -100,6 +100,10 @@ Public Enum ServerPackets
     SQuestCancel
     
     SMessage
+    
+    SPlayerBlock
+    SPlayerFrame
+    SPlayerConjureProjectileCustom
     ' Make sure SMSG_COUNT is below everything else
     SMSG_COUNT
 End Enum
@@ -203,6 +207,8 @@ Public Enum ClientPackets
     CRequestQuests
     CPlayerHandleQuest
     CQuestLogUpdate
+    
+    CPlayerBlock
     ' Make sure CMSG_COUNT is below everything else
     CMSG_COUNT
 End Enum
@@ -269,4 +275,32 @@ Public Enum SoundEntity
     seSpell
     ' Make sure SoundEntity_Count is below everything else
     SoundEntity_Count
+End Enum
+
+' Fonts
+Enum fonts
+    ' Georgia
+    georgia_16 = 1
+    georgiaBold_16
+    georgiaDec_16
+    ' Rockwell
+    rockwellDec_15
+    rockwell_15
+    rockwellDec_10
+    ' Verdana
+    verdana_12
+    verdanaBold_12
+    verdana_13
+    
+    Default
+    
+    Damage
+    energy
+    exp
+    health
+    alert
+    Mapname
+    Riven
+    ' count value
+    Fonts_Count
 End Enum

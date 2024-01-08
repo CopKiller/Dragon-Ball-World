@@ -99,6 +99,10 @@ Public Enum ServerPackets
     SQuestCancel
     
     SMessage
+    
+    SPlayerBlock
+    SPlayerFrame
+    SPlayerConjureProjectileCustom
     ' Make sure SMsgCOUNT is below everything else
     SMsgCOUNT
 End Enum
@@ -202,6 +206,8 @@ Public Enum ClientPackets
     CRequestQuests
     CPlayerHandleQuest
     CQuestLogUpdate
+    
+    CPlayerBlock
     ' Make sure CMSG_COUNT is below everything else
     CMSG_COUNT
 End Enum

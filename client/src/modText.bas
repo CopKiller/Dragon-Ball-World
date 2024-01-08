@@ -4,6 +4,9 @@ Option Explicit
 'The size of a FVF vertex
 Public Const FVF_Size As Long = 28
 
+Public ActionMsg(1 To MAX_BYTE) As ActionMsgRec
+Public EmptyActionMsg As ActionMsgRec
+
 'Point API
 Public Type POINTAPI
     X As Long
@@ -36,8 +39,22 @@ Private Type CustomFont
     yOffset As Long
 End Type
 
+Public Type ActionMsgRec
+    message As String
+    Created As Long
+
+    Type As Long
+    Color As Long
+    Scroll As Long
+    X As Long
+    Y As Long
+    timer As Long
+    alpha As Long
+    fonte As fonts
+End Type
+
 ' Fonts
-Public Enum Fonts
+Enum fonts
     ' Georgia
     georgia_16 = 1
     georgiaBold_16
@@ -52,6 +69,14 @@ Public Enum Fonts
     verdana_13
     
     Default
+    
+    Damage
+    energy
+    EXP
+    health
+    alert
+    Mapname
+    Riven
     ' count value
     Fonts_Count
 End Enum
@@ -80,17 +105,25 @@ Sub LoadFonts()
     'Check if we have the device
     If D3DDevice.TestCooperativeLevel <> D3D_OK Then Exit Sub
     ' re-dim the fonts
-    ReDim font(1 To Fonts.Fonts_Count - 1)
+    ReDim font(1 To fonts.Fonts_Count - 1)
     ' load the fonts
-    SetFont Fonts.georgia_16, "georgia_16", 256
-    SetFont Fonts.georgiaBold_16, "georgiaBold_16", 256
-    SetFont Fonts.georgiaDec_16, "georgiaDec_16", 256
-    SetFont Fonts.rockwellDec_15, "rockwellDec_15", 256, 2, 2
-    SetFont Fonts.rockwell_15, "rockwell_15", 256, 2, 2
-    SetFont Fonts.verdana_12, "verdana_12", 256
-    SetFont Fonts.verdanaBold_12, "verdanaBold_12", 256
-    SetFont Fonts.rockwellDec_10, "rockwellDec_10", 256, 2, 2
-    SetFont Fonts.Default, "default", 256
+    SetFont fonts.georgia_16, "georgia_16", 256
+    SetFont fonts.georgiaBold_16, "georgiaBold_16", 256
+    SetFont fonts.georgiaDec_16, "georgiaDec_16", 256
+    SetFont fonts.rockwellDec_15, "rockwellDec_15", 256, 2, 2
+    SetFont fonts.rockwell_15, "rockwell_15", 256, 2, 2
+    SetFont fonts.verdana_12, "verdana_12", 256
+    SetFont fonts.verdanaBold_12, "verdanaBold_12", 256
+    SetFont fonts.rockwellDec_10, "rockwellDec_10", 256, 2, 2
+    SetFont fonts.Default, "default", 256
+    
+    SetFont fonts.Damage, "damage", 256
+    SetFont fonts.energy, "energy", 256
+    SetFont fonts.EXP, "exp", 256
+    SetFont fonts.health, "health", 256
+    SetFont fonts.alert, "alert", 256
+    SetFont fonts.Mapname, "mapname", 512
+    SetFont fonts.Riven, "riven", 256
 End Sub
 
 Sub SetFont(ByVal fontNum As Long, ByVal texName As String, ByVal Size As Long, Optional ByVal xOffset As Long, Optional ByVal yOffset As Long)
@@ -355,74 +388,89 @@ Public Function TextHeight(ByRef UseFont As CustomFont) As Long
 End Function
 
 Sub DrawActionMsg(ByVal Index As Integer)
-        Dim X As Long, Y As Long, i As Long, Time As Long
-    Dim LenMsg As Long
+    Dim X As Long, Y As Long, i As Long, Time As Long
+    Dim LenMsg As Long, colour As Long
 
     If ActionMsg(Index).message = vbNullString Then Exit Sub
 
     ' how long we want each message to appear
     Select Case ActionMsg(Index).Type
 
-        Case ACTIONMsgSTATIC
-            Time = 1500
-            LenMsg = TextWidth(font(Fonts.rockwell_15), Trim$(ActionMsg(Index).message))
+    Case ACTIONMsgSTATIC
+        Time = 1500
+        LenMsg = TextWidth(font(fonts.rockwell_15), Trim$(ActionMsg(Index).message))
 
-            If ActionMsg(Index).Y > 0 Then
-                X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
-                Y = ActionMsg(Index).Y + PIC_Y
-            Else
-                X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
-                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18
-            End If
+        If ActionMsg(Index).Y > 0 Then
+            X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
+            Y = ActionMsg(Index).Y + PIC_Y
+        Else
+            X = ActionMsg(Index).X + Int(PIC_X \ 2) - (LenMsg / 2)
+            Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18
+        End If
 
-        Case ACTIONMsgSCROLL
-            Time = 1500
+    Case ACTIONMsgSCROLL
+        Time = 1500
 
-            If ActionMsg(Index).Y > 0 Then
-                X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).message)) \ 2) * 8)
-                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) - 2 - (ActionMsg(Index).Scroll * 0.6)
-                ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
-            Else
-                X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).message)) \ 2) * 8)
-                Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18 + (ActionMsg(Index).Scroll * 0.001)
-                ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
-            End If
+        If ActionMsg(Index).Y > 0 Then
+            X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).message)) \ 2) * 8)
+            Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) - 2 - (ActionMsg(Index).Scroll * 0.3)
+            ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
+        Else
+            X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).message)) \ 2) * 8)
+            Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) + 18 + (ActionMsg(Index).Scroll * 0.001)
+            ActionMsg(Index).Scroll = ActionMsg(Index).Scroll + 1
+        End If
 
-            ActionMsg(Index).alpha = ActionMsg(Index).alpha - 5
+        ActionMsg(Index).alpha = ActionMsg(Index).alpha - 1
 
-            If ActionMsg(Index).alpha <= 0 Then ClearActionMsg Index: Exit Sub
+        If ActionMsg(Index).alpha <= 0 Then ClearActionMsg Index: Exit Sub
 
-        Case ACTIONMsgSCREEN
-            Time = 3000
+    Case ACTIONMsgSCREEN
+        Time = 3000
 
-            ' This will kill any action screen messages that there in the system
-            For i = MAX_BYTE To 1 Step -1
+        ' This will kill any action screen messages that there in the system
+        For i = MAX_BYTE To 1 Step -1
 
-                If ActionMsg(i).Type = ACTIONMsgSCREEN Then
-                    If i <> Index Then
-                        ClearActionMsg Index
-                        Index = i
-                    End If
+            If ActionMsg(i).Type = ACTIONMsgSCREEN Then
+                If i <> Index Then
+                    ClearActionMsg Index
+                    Index = i
                 End If
+            End If
 
-            Next
+        Next
 
-            X = (400) - ((TextWidth(font(Fonts.rockwell_15), Trim$(ActionMsg(Index).message)) \ 2))
-            Y = 24
+
+        ActionMsg(Index).alpha = ActionMsg(Index).alpha - 1
+        If ActionMsg(Index).alpha <= 0 Then ClearActionMsg Index: Exit Sub
+
+        X = (ScreenWidth / 2) - ((TextWidth(font(fonts.rockwell_15), Trim$(ActionMsg(Index).message)) \ 2))
+        Y = 64
+
+        Call RenderEntity_Square(TextureDesign(6), (ScreenWidth / 2) - ((TextWidth(font(fonts.rockwell_15), Trim$(ActionMsg(Index).message)) \ 2)) - 5, (Y) - 2, TextWidth(font(rockwell_15), Trim$(ActionMsg(Index).message)) + 10, 20, 5, ActionMsg(Index).alpha)
     End Select
 
-    X = ConvertMapX(X)
-    Y = ConvertMapY(Y)
+    If ActionMsg(Index).Type <> ACTIONMsgSCREEN Then
+        X = ConvertMapX(X)
+        Y = ConvertMapY(Y)
+    End If
+    
+    Select Case ActionMsg(Index).fonte
+    Case health, Damage, energy, EXP, alert
+        colour = White
+    Case Else
+        colour = ActionMsg(Index).Color
+    End Select
 
     If ActionMsg(Index).Created > 0 Then
-        RenderText font(Fonts.rockwell_15), ActionMsg(Index).message, X, Y, ActionMsg(Index).Color, ActionMsg(Index).alpha
+        RenderText font(ActionMsg(Index).fonte), ActionMsg(Index).message, X, Y, colour, ActionMsg(Index).alpha
     End If
 End Sub
 
 Public Function DrawMapAttributes()
 Dim X As Long, Y As Long, tx As Long, ty As Long, theFont As Long
 
-    theFont = Fonts.rockwellDec_10
+    theFont = fonts.rockwellDec_10
 
     If frmEditor_Map.optAttribs.Value Then
         For X = TileView.Left To TileView.Right
@@ -456,6 +504,8 @@ Dim X As Long, Y As Long, tx As Long, ty As Long, theFont As Long
                                 RenderText font(theFont), "S", tx, ty, Pink
                             Case TILE_TYPE_CHAT
                                 RenderText font(theFont), "C", tx, ty, Blue
+                            Case TILE_TYPE_HEAL
+                                RenderText font(theFont), "H", tx, ty, Green
                         End Select
                     End With
                 End If
@@ -510,27 +560,27 @@ Dim tmpText As String, i As Long, isVisible As Boolean, topWidth As Long, tmpArr
             ' render line
             colour = Chat(i).Color
             ' check if we need to word wrap
-            If TextWidth(font(Fonts.verdana_12), Chat(i).text) > ChatWidth Then
+            If TextWidth(font(fonts.verdana_12), Chat(i).text) > ChatWidth Then
                 ' word wrap
-                tmpText = WordWrap(font(Fonts.verdana_12), Chat(i).text, ChatWidth, lineCount)
+                tmpText = WordWrap(font(fonts.verdana_12), Chat(i).text, ChatWidth, lineCount)
                 ' can't have it going offscreen.
                 If rLines + lineCount > 9 Then Exit Do
                 ' continue on
                 yOffset = yOffset - (14 * lineCount)
-                RenderText font(Fonts.verdana_12), tmpText, Xo, Yo + yOffset, colour
+                RenderText font(fonts.verdana_12), tmpText, Xo, Yo + yOffset, colour
                 rLines = rLines + lineCount
                 ' set the top width
                 tmpArray = Split(tmpText, vbNewLine)
                 For X = 0 To UBound(tmpArray)
-                    If TextWidth(font(Fonts.verdana_12), tmpArray(X)) > topWidth Then topWidth = TextWidth(font(Fonts.verdana_12), tmpArray(X))
+                    If TextWidth(font(fonts.verdana_12), tmpArray(X)) > topWidth Then topWidth = TextWidth(font(fonts.verdana_12), tmpArray(X))
                 Next
             Else
                 ' normal
                 yOffset = yOffset - 14
-                RenderText font(Fonts.verdana_12), Chat(i).text, Xo, Yo + yOffset, colour
+                RenderText font(fonts.verdana_12), Chat(i).text, Xo, Yo + yOffset, colour
                 rLines = rLines + 1
                 ' set the top width
-                If TextWidth(font(Fonts.verdana_12), Chat(i).text) > topWidth Then topWidth = TextWidth(font(Fonts.verdana_12), Chat(i).text)
+                If TextWidth(font(fonts.verdana_12), Chat(i).text) > topWidth Then topWidth = TextWidth(font(fonts.verdana_12), Chat(i).text)
             End If
         End If
         ' increment chat pointer
@@ -566,7 +616,7 @@ Public Sub WordWrap_Array(ByVal text As String, ByVal MaxLineLen As Long, ByRef 
         End Select
 
         'Add up the size
-        Size = Size + font(Fonts.georgiaDec_16).HeaderInfo.CharWidth(Asc(Mid$(text, i, 1)))
+        Size = Size + font(fonts.georgiaDec_16).HeaderInfo.CharWidth(Asc(Mid$(text, i, 1)))
 
         'Check for too large of a size
         If Size > MaxLineLen Then
@@ -585,7 +635,7 @@ Public Sub WordWrap_Array(ByVal text As String, ByVal MaxLineLen As Long, ByRef 
                 theArray(lineCount) = Trim$(Mid$(text, B, lastSpace - B))
                 B = lastSpace + 1
                 'Count all the words we ignored (the ones that weren't printed, but are before "i")
-                Size = TextWidth(font(Fonts.georgiaDec_16), Mid$(text, lastSpace, i - lastSpace))
+                Size = TextWidth(font(fonts.georgiaDec_16), Mid$(text, lastSpace, i - lastSpace))
             End If
         End If
 
@@ -679,7 +729,7 @@ Public Sub DrawPlayerName(ByVal Index As Long)
     Dim textX As Long, textY As Long, text As String, textSize As Long, colour As Long
     
     text = Trim$(GetPlayerName(Index))
-    textSize = TextWidth(font(Fonts.rockwell_15), text)
+    textSize = TextWidth(font(fonts.rockwell_15), text)
     ' get the colour
     colour = White
 
@@ -692,14 +742,14 @@ Public Sub DrawPlayerName(ByVal Index As Long)
         textY = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - (mTexture(TextureChar(GetPlayerSprite(Index))).RealHeight / 4) + 12
     End If
 
-    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
+    Call RenderText(font(fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
 End Sub
 
 Public Sub DrawNpcName(ByVal Index As Long)
     Dim textX As Long, textY As Long, text As String, textSize As Long, NpcNum As Long, colour As Long, i As Long
     NpcNum = MapNpc(Index).Num
     text = Trim$(Npc(NpcNum).Name)
-    textSize = TextWidth(font(Fonts.rockwell_15), text)
+    textSize = TextWidth(font(fonts.rockwell_15), text)
 
     If Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKONSIGHT Or Npc(NpcNum).Behaviour = NPC_BEHAVIOUR_ATTACKWHENATTACKED Then
         ' get the colour
@@ -723,7 +773,7 @@ Public Sub DrawNpcName(ByVal Index As Long)
         textY = MapNpc(Index).Y * PIC_Y + MapNpc(Index).yOffset - (mTexture(TextureChar(Npc(NpcNum).sprite)).RealHeight / 4) + 12
     End If
 
-    Call RenderText(font(Fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
+    Call RenderText(font(fonts.rockwell_15), text, ConvertMapX(textX), ConvertMapY(textY), colour)
     
     For i = 1 To MAX_QUESTS
         'check if the npc is the next task to any quest: [?] symbol
@@ -739,8 +789,8 @@ Public Sub DrawNpcName(ByVal Index As Long)
                             If GlobalY >= textY And GlobalY <= textY + 13 Then
                                 If VerifyWindowsIsInCur Then Exit Sub
                                 text = "Objective!"
-                                Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), text) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), text) + 10, 20, 5, 200)
-                                Call RenderText(font(Fonts.georgiaBold_16), text, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), text) / 2)), GlobalY - 32, Yellow)
+                                Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(fonts.georgiaBold_16), text) / 2)) - 5, GlobalY - 35, TextWidth(font(fonts.georgiaBold_16), text) + 10, 20, 5, 200)
+                                Call RenderText(font(fonts.georgiaBold_16), text, GlobalX - ((TextWidth(font(fonts.georgiaBold_16), text) / 2)), GlobalY - 32, Yellow)
                             End If
                         End If
                     End If

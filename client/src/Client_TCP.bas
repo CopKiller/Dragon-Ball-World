@@ -813,3 +813,12 @@ Public Sub SendTarget(ByVal target As Long, ByVal TargetType As Long)
     SendData buffer.ToArray()
     buffer.Flush: Set buffer = Nothing
 End Sub
+
+Sub SendPlayerBlock()
+    Dim buffer As clsBuffer
+    Set buffer = New clsBuffer
+    buffer.WriteLong CPlayerBlock
+    buffer.WriteByte Player(MyIndex).PlayerBlock
+    SendData buffer.ToArray()
+    buffer.Flush: Set buffer = Nothing
+End Sub

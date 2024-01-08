@@ -36,7 +36,7 @@ Public Sub HandleUpdateConv(ByVal Index As Long, ByRef Data() As Byte, ByVal Sta
     With Conversation(Convnum)
         .Name = buffer.ReadString
         .chatCount = buffer.ReadLong
-        If .chatCount > 0 Then ReDim Conversation(Convnum).Conv(1 To .chatCount)
+        If .chatCount > 0 Then InitConversationMode Convnum, AddRedimensionToChat, .chatCount
 
         For i = 1 To .chatCount
             .Conv(i).Talk = buffer.ReadString

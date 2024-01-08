@@ -14,7 +14,7 @@ End Sub
 Sub HandlePlayerInfoRequest(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Name As String
     Dim i As Long
-    Dim N As Long
+    Dim n As Long
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
@@ -133,7 +133,7 @@ End Sub
 ' :: Player attack packet ::
 ' ::::::::::::::::::::::::::
 Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim i As Long, N As Long, Damage As Long, TempIndex As Long, x As Long, Y As Long, mapnum As Long, dirReq As Long
+    Dim i As Long, n As Long, Damage As Long, TempIndex As Long, x As Long, y As Long, mapnum As Long, dirReq As Long
     
     ' can't attack whilst casting
     If TempPlayer(index).spellBuffer.Spell > 0 Then Exit Sub
@@ -162,11 +162,11 @@ Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAd
     ' check if we've got a remote chat tile
     mapnum = GetPlayerMap(index)
     x = GetPlayerX(index)
-    Y = GetPlayerY(index)
-    If Map(mapnum).TileData.Tile(x, Y).Type = TILE_TYPE_CHAT Then
-        dirReq = Map(mapnum).TileData.Tile(x, Y).Data2
+    y = GetPlayerY(index)
+    If Map(mapnum).TileData.Tile(x, y).Type = TILE_TYPE_CHAT Then
+        dirReq = Map(mapnum).TileData.Tile(x, y).Data2
         If Player(index).Dir = dirReq Then
-            InitChat index, mapnum, Map(mapnum).TileData.Tile(x, Y).Data1, True
+            InitChat index, mapnum, Map(mapnum).TileData.Tile(x, y).Data1, True
             Exit Sub
         End If
     End If
@@ -177,40 +177,40 @@ Public Sub HandleAttack(ByVal index As Long, ByRef Data() As Byte, ByVal StartAd
 
             If GetPlayerY(index) = 0 Then Exit Sub
             x = GetPlayerX(index)
-            Y = GetPlayerY(index) - 1
+            y = GetPlayerY(index) - 1
         Case DIR_DOWN
 
             If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.MaxY Then Exit Sub
             x = GetPlayerX(index)
-            Y = GetPlayerY(index) + 1
+            y = GetPlayerY(index) + 1
         Case DIR_LEFT
 
             If GetPlayerX(index) = 0 Then Exit Sub
             x = GetPlayerX(index) - 1
-            Y = GetPlayerY(index)
+            y = GetPlayerY(index)
         Case DIR_RIGHT
 
             If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.MaxX Then Exit Sub
             x = GetPlayerX(index) + 1
-            Y = GetPlayerY(index)
+            y = GetPlayerY(index)
     End Select
     
-    CheckResource index, x, Y
+    CheckResource index, x, y
 End Sub
 
 ' :::::::::::::::::
 ' :: Cast packet ::
 ' :::::::::::::::::
 Public Sub HandleCast(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim N As Long
+    Dim n As Long
     Dim Buffer As clsBuffer
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     ' Spell slot
-    N = Buffer.ReadLong 'CLng(Parse(1))
+    n = Buffer.ReadLong 'CLng(Parse(1))
     Buffer.Flush: Set Buffer = Nothing
     ' set the spell buffer before castin
-    Call BufferSpell(index, N)
+    Call BufferSpell(index, n)
 End Sub
 
 ' :::::::::::::::::::::
@@ -259,20 +259,20 @@ End Sub
 ' :: Search packet ::
 ' :::::::::::::::::::
 Public Sub HandleTarget(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim Buffer As clsBuffer, Target As Long, targetType As Long
+    Dim Buffer As clsBuffer, Target As Long, TargetType As Long
 
     Set Buffer = New clsBuffer
     
     Buffer.WriteBytes Data()
     
     Target = Buffer.ReadLong
-    targetType = Buffer.ReadLong
+    TargetType = Buffer.ReadLong
     
     Buffer.Flush: Set Buffer = Nothing
     
     ' set player's target - no need to send, it's client side
     TempPlayer(index).Target = Target
-    TempPlayer(index).targetType = targetType
+    TempPlayer(index).TargetType = TargetType
 End Sub
 
 ' :::::::::::::::::::
@@ -369,7 +369,7 @@ Public Sub HandleUseStatPoint(ByVal index As Long, ByRef Data() As Byte, ByVal S
                 sMes = "Willpower"
         End Select
         
-        SendActionMsg GetPlayerMap(index), "+1 " & sMes, White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32)
+        SendActionMsg GetPlayerMap(index), "+1 " & sMes, White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), alert
     Else
         Exit Sub
     End If
@@ -382,7 +382,7 @@ End Sub
 ' :: Swap Inventory Slots ::
 ' ::::::::::::::::::::::::::
 Public Sub HandleSwapInvSlots(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim N As Long
+    Dim n As Long
     Dim Buffer As clsBuffer
     Dim oldSlot As Long, newSlot As Long
     
@@ -399,7 +399,7 @@ End Sub
 
 Public Sub HandleSwapSpellSlots(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
-    Dim oldSlot As Long, newSlot As Long, N As Long
+    Dim oldSlot As Long, newSlot As Long, n As Long
     
     If TempPlayer(index).InTrade > 0 Or TempPlayer(index).InBank Or TempPlayer(index).InShop Then Exit Sub
     
@@ -408,8 +408,8 @@ Public Sub HandleSwapSpellSlots(ByVal index As Long, ByRef Data() As Byte, ByVal
         Exit Sub
     End If
     
-    For N = 1 To MAX_PLAYER_SPELLS
-        If TempPlayer(index).SpellCD(N) > GetTickCount Then
+    For n = 1 To MAX_PLAYER_SPELLS
+        If TempPlayer(index).SpellCD(n) > GetTickCount Then
             PlayerMsg index, "You cannot swap spells whilst they're cooling down.", BrightRed
             Exit Sub
         End If
@@ -436,25 +436,25 @@ End Sub
 ' :::::::::::::::::::::::
 
 Public Sub HandlePartyRequest(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
-    Dim Buffer As clsBuffer, targetIndex As Long
+    Dim Buffer As clsBuffer, TargetIndex As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
-    targetIndex = Buffer.ReadLong
+    TargetIndex = Buffer.ReadLong
     Buffer.Flush: Set Buffer = Nothing
     
     ' make sure it's a valid target
-    If targetIndex = index Then
+    If TargetIndex = index Then
         PlayerMsg index, "You can't invite yourself. That would be weird.", BrightRed
         Exit Sub
     End If
     
     ' make sure they're connected and on the same map
-    If Not IsConnected(targetIndex) Or Not IsPlaying(targetIndex) Then Exit Sub
-    If GetPlayerMap(targetIndex) <> GetPlayerMap(index) Then Exit Sub
+    If Not IsConnected(TargetIndex) Or Not IsPlaying(TargetIndex) Then Exit Sub
+    If GetPlayerMap(TargetIndex) <> GetPlayerMap(index) Then Exit Sub
     
     ' init the request
-    Party_Invite index, targetIndex
+    Party_Invite index, TargetIndex
 End Sub
 
 Public Sub HandleAcceptParty(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
@@ -590,9 +590,9 @@ Public Sub HandleTradeRequest(ByVal index As Long, ByRef Data() As Byte, ByVal S
     
     ' make sure they're stood next to each other
     tX = Player(tradeTarget).x
-    tY = Player(tradeTarget).Y
+    tY = Player(tradeTarget).y
     sX = Player(index).x
-    sY = Player(index).Y
+    sY = Player(index).y
     
     ' within range?
     If tX < sX - 1 Or tX > sX + 1 Then
@@ -884,7 +884,7 @@ End Sub
 Public Sub HandleTradeItem(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim invSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     Dim EmptySlot As Long
     Dim ItemNum As Long
     Dim i As Long
@@ -893,7 +893,7 @@ Public Sub HandleTradeItem(ByVal index As Long, ByRef Data() As Byte, ByVal Star
     Buffer.WriteBytes Data()
     
     invSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
     Buffer.Flush: Set Buffer = Nothing
     
@@ -905,7 +905,7 @@ Public Sub HandleTradeItem(ByVal index As Long, ByRef Data() As Byte, ByVal Star
     If TempPlayer(index).InTrade <= 0 Or TempPlayer(index).InTrade > MAX_PLAYERS Then Exit Sub
     
     ' make sure they have the amount they offer
-    If amount < 0 Or amount > GetPlayerInvItemValue(index, invSlot) Then
+    If Amount < 0 Or Amount > GetPlayerInvItemValue(index, invSlot) Then
         PlayerMsg index, "You do not have that many.", BrightRed
         Exit Sub
     End If
@@ -923,7 +923,7 @@ Public Sub HandleTradeItem(ByVal index As Long, ByRef Data() As Byte, ByVal Star
         For i = 1 To MAX_INV
             If TempPlayer(index).TradeOffer(i).Num = invSlot Then
                 ' add amount
-                TempPlayer(index).TradeOffer(i).Value = TempPlayer(index).TradeOffer(i).Value + amount
+                TempPlayer(index).TradeOffer(i).Value = TempPlayer(index).TradeOffer(i).Value + Amount
                 ' clamp to limits
                 If TempPlayer(index).TradeOffer(i).Value > GetPlayerInvItemValue(index, invSlot) Then
                     TempPlayer(index).TradeOffer(i).Value = GetPlayerInvItemValue(index, invSlot)
@@ -959,7 +959,7 @@ Public Sub HandleTradeItem(ByVal index As Long, ByRef Data() As Byte, ByVal Star
         End If
     Next
     TempPlayer(index).TradeOffer(EmptySlot).Num = invSlot
-    TempPlayer(index).TradeOffer(EmptySlot).Value = amount
+    TempPlayer(index).TradeOffer(EmptySlot).Value = Amount
     
     ' cancel any trade agreement and send new data
     TempPlayer(index).AcceptTrade = False
@@ -1062,7 +1062,7 @@ Public Sub HandleSellItem(ByVal index As Long, ByRef Data() As Byte, ByVal Start
     Dim ItemNum As Long
     Dim price As Long
     Dim multiplier As Double
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
@@ -1125,15 +1125,15 @@ End Sub
 Public Sub HandleWithdrawItem(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim BankSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
     BankSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
-    TakeBankItem index, BankSlot, amount
+    TakeBankItem index, BankSlot, Amount
     
     Buffer.Flush: Set Buffer = Nothing
 End Sub
@@ -1141,15 +1141,15 @@ End Sub
 Public Sub HandleDepositItem(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Dim Buffer As clsBuffer
     Dim invSlot As Long
-    Dim amount As Long
+    Dim Amount As Long
     
     Set Buffer = New clsBuffer
     Buffer.WriteBytes Data()
     
     invSlot = Buffer.ReadLong
-    amount = Buffer.ReadLong
+    Amount = Buffer.ReadLong
     
-    GiveBankItem index, invSlot, amount
+    GiveBankItem index, invSlot, Amount
     
     Buffer.Flush: Set Buffer = Nothing
 End Sub
@@ -1176,4 +1176,15 @@ End Sub
 ' ::::::::::::::::::::::
 Public Sub HandleQuit(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
     Call CloseSocket(index)
+End Sub
+
+Sub HandlePlayerBlock(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr As Long, ByVal ExtraVar As Long)
+    
+    Dim Buffer As clsBuffer
+    Set Buffer = New clsBuffer
+    Buffer.WriteBytes Data()
+    TempPlayer(index).PlayerBlock = Buffer.ReadByte
+    Buffer.Flush: Set Buffer = Nothing
+    
+    Call SendPlayerBlockToMap(index)
 End Sub

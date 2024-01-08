@@ -2,10 +2,10 @@ VERSION 5.00
 Begin VB.Form frmEditor_Spell 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Spell Editor"
-   ClientHeight    =   8415
+   ClientHeight    =   8865
    ClientLeft      =   45
    ClientTop       =   375
-   ClientWidth     =   10335
+   ClientWidth     =   16440
    ControlBox      =   0   'False
    BeginProperty Font 
       Name            =   "Verdana"
@@ -19,16 +19,16 @@ Begin VB.Form frmEditor_Spell
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   561
+   ScaleHeight     =   591
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   689
+   ScaleWidth      =   1096
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdCopy 
       Caption         =   "Copy"
       Height          =   375
       Left            =   6480
       TabIndex        =   56
-      Top             =   7920
+      Top             =   8280
       Width           =   975
    End
    Begin VB.CommandButton cmdPaste 
@@ -36,7 +36,7 @@ Begin VB.Form frmEditor_Spell
       Height          =   375
       Left            =   7560
       TabIndex        =   55
-      Top             =   7920
+      Top             =   8280
       Width           =   975
    End
    Begin VB.CommandButton cmdSave 
@@ -44,7 +44,7 @@ Begin VB.Form frmEditor_Spell
       Height          =   375
       Left            =   3360
       TabIndex        =   6
-      Top             =   7920
+      Top             =   8280
       Width           =   1455
    End
    Begin VB.CommandButton cmdCancel 
@@ -52,7 +52,7 @@ Begin VB.Form frmEditor_Spell
       Height          =   375
       Left            =   8640
       TabIndex        =   5
-      Top             =   7920
+      Top             =   8280
       Width           =   1575
    End
    Begin VB.CommandButton cmdDelete 
@@ -60,7 +60,7 @@ Begin VB.Form frmEditor_Spell
       Height          =   375
       Left            =   4920
       TabIndex        =   4
-      Top             =   7920
+      Top             =   8280
       Width           =   1455
    End
    Begin VB.Frame Frame3 
@@ -84,28 +84,36 @@ Begin VB.Form frmEditor_Spell
       Height          =   375
       Left            =   240
       TabIndex        =   0
-      Top             =   7920
+      Top             =   8280
       Width           =   2895
    End
    Begin VB.Frame Frame1 
       Caption         =   "Spell Properties"
-      Height          =   7695
+      Height          =   8055
       Left            =   3360
       TabIndex        =   3
       Top             =   120
       Width           =   6855
       Begin VB.Frame Frame2 
          Caption         =   "Basic Information"
-         Height          =   5655
+         Height          =   6135
          Left            =   120
          TabIndex        =   7
          Top             =   240
          Width           =   3255
+         Begin VB.HScrollBar scrlCastFrame 
+            Height          =   255
+            Left            =   120
+            Max             =   60
+            TabIndex        =   100
+            Top             =   4200
+            Width           =   3015
+         End
          Begin VB.HScrollBar scrlStun 
             Height          =   255
             Left            =   120
             TabIndex        =   57
-            Top             =   4725
+            Top             =   5160
             Width           =   3015
          End
          Begin VB.PictureBox picSprite 
@@ -127,14 +135,14 @@ Begin VB.Form frmEditor_Spell
             ScaleMode       =   3  'Pixel
             ScaleWidth      =   32
             TabIndex        =   44
-            Top             =   5040
+            Top             =   5520
             Width           =   480
          End
          Begin VB.HScrollBar scrlIcon 
             Height          =   255
             Left            =   120
             TabIndex        =   43
-            Top             =   5280
+            Top             =   5760
             Width           =   2415
          End
          Begin VB.HScrollBar scrlCool 
@@ -142,7 +150,7 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             Max             =   60
             TabIndex        =   32
-            Top             =   4185
+            Top             =   4680
             Width           =   3015
          End
          Begin VB.HScrollBar scrlCast 
@@ -201,12 +209,20 @@ Begin VB.Form frmEditor_Spell
             Top             =   480
             Width           =   3015
          End
+         Begin VB.Label lblCastFrame 
+            Caption         =   "Casting Frame: 0"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   101
+            Top             =   3960
+            Width           =   1695
+         End
          Begin VB.Label lblStun 
             Caption         =   "Stun Duration: None"
             Height          =   255
             Left            =   120
             TabIndex        =   58
-            Top             =   4485
+            Top             =   4920
             Width           =   3015
          End
          Begin VB.Label lblIcon 
@@ -214,7 +230,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   42
-            Top             =   5040
+            Top             =   5520
             Width           =   3015
          End
          Begin VB.Label lblCool 
@@ -222,7 +238,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   31
-            Top             =   3975
+            Top             =   4440
             Width           =   2535
          End
          Begin VB.Label lblCast 
@@ -288,21 +304,21 @@ Begin VB.Form frmEditor_Spell
          LargeChange     =   10
          Left            =   3480
          TabIndex        =   54
-         Top             =   7110
+         Top             =   7680
          Width           =   3255
       End
       Begin VB.HScrollBar scrlNext 
          Height          =   255
          Left            =   3480
          TabIndex        =   52
-         Top             =   6630
+         Top             =   7200
          Width           =   3255
       End
       Begin VB.HScrollBar scrlIndex 
          Height          =   255
          Left            =   3480
          TabIndex        =   50
-         Top             =   6165
+         Top             =   6720
          Width           =   3255
       End
       Begin VB.TextBox txtDesc 
@@ -312,7 +328,7 @@ Begin VB.Form frmEditor_Spell
          MultiLine       =   -1  'True
          ScrollBars      =   2  'Vertical
          TabIndex        =   46
-         Top             =   6120
+         Top             =   6600
          Width           =   3255
       End
       Begin VB.ComboBox cmbSound 
@@ -320,17 +336,34 @@ Begin VB.Form frmEditor_Spell
          Left            =   120
          Style           =   2  'Dropdown List
          TabIndex        =   48
-         Top             =   7200
+         Top             =   7680
          Width           =   3255
       End
       Begin VB.Frame fraProjectile 
          Caption         =   "Projectile"
-         Height          =   5775
+         Height          =   6255
          Left            =   3480
          TabIndex        =   59
          Top             =   120
          Visible         =   0   'False
          Width           =   3255
+         Begin VB.ComboBox cmbProjectileType 
+            Height          =   300
+            ItemData        =   "frmEditor_Spell.frx":0054
+            Left            =   1920
+            List            =   "frmEditor_Spell.frx":0067
+            Style           =   2  'Dropdown List
+            TabIndex        =   104
+            Top             =   2880
+            Width           =   1335
+         End
+         Begin VB.HScrollBar scrlCastProjectile 
+            Height          =   255
+            Left            =   120
+            TabIndex        =   102
+            Top             =   3720
+            Width           =   3015
+         End
          Begin VB.HScrollBar scrlImpact 
             Height          =   135
             Left            =   120
@@ -386,21 +419,21 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   72
-            Top             =   3990
+            Top             =   4470
             Width           =   1335
          End
          Begin VB.HScrollBar scrlProjectileRadiusY 
             Height          =   255
             Left            =   1680
             TabIndex        =   71
-            Top             =   5400
+            Top             =   5880
             Width           =   1455
          End
          Begin VB.HScrollBar scrlProjectileRadiusX 
             Height          =   255
             Left            =   120
             TabIndex        =   70
-            Top             =   5400
+            Top             =   5880
             Width           =   1455
          End
          Begin VB.CheckBox chkDirectionalProjectile 
@@ -413,12 +446,12 @@ Begin VB.Form frmEditor_Spell
          End
          Begin VB.ComboBox cmbDirection 
             Height          =   300
-            ItemData        =   "frmEditor_Spell.frx":0054
+            ItemData        =   "frmEditor_Spell.frx":0088
             Left            =   120
-            List            =   "frmEditor_Spell.frx":0067
+            List            =   "frmEditor_Spell.frx":009B
             Style           =   2  'Dropdown List
             TabIndex        =   68
-            Top             =   4260
+            Top             =   4740
             Width           =   3015
          End
          Begin VB.HScrollBar scrlOffsetProjectileX 
@@ -427,7 +460,7 @@ Begin VB.Form frmEditor_Spell
             Max             =   512
             Min             =   -512
             TabIndex        =   67
-            Top             =   4860
+            Top             =   5340
             Width           =   1455
          End
          Begin VB.HScrollBar scrlOffsetProjectileY 
@@ -436,14 +469,14 @@ Begin VB.Form frmEditor_Spell
             Max             =   512
             Min             =   -512
             TabIndex        =   66
-            Top             =   4860
+            Top             =   5340
             Width           =   1455
          End
          Begin VB.HScrollBar scrlProjectileAnimOnHit 
             Height          =   255
             Left            =   120
             TabIndex        =   65
-            Top             =   3720
+            Top             =   4200
             Width           =   3015
          End
          Begin VB.HScrollBar scrlProjectilePic 
@@ -500,6 +533,22 @@ Begin VB.Form frmEditor_Spell
             Top             =   240
             Width           =   960
          End
+         Begin VB.Label Label6 
+            Caption         =   "Projetil Type:"
+            Height          =   255
+            Left            =   1920
+            TabIndex        =   105
+            Top             =   2640
+            Width           =   1095
+         End
+         Begin VB.Label lblCastProjectile 
+            Caption         =   "Cast Anim: None"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   103
+            Top             =   3480
+            Width           =   3015
+         End
          Begin VB.Label lblImpact 
             AutoSize        =   -1  'True
             Caption         =   "Impact Range: 0"
@@ -514,7 +563,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   84
-            Top             =   5160
+            Top             =   5640
             Width           =   3015
          End
          Begin VB.Label lblX0 
@@ -524,7 +573,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   180
             Left            =   300
             TabIndex        =   83
-            Top             =   4620
+            Top             =   5100
             Width           =   825
          End
          Begin VB.Label lblY0 
@@ -534,7 +583,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   180
             Left            =   1800
             TabIndex        =   82
-            Top             =   4620
+            Top             =   5100
             Width           =   825
          End
          Begin VB.Label lblDamageProjectile 
@@ -551,7 +600,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   80
-            Top             =   3495
+            Top             =   3975
             Width           =   3015
          End
          Begin VB.Label lblProjectileDuration 
@@ -630,9 +679,9 @@ Begin VB.Form frmEditor_Spell
          End
          Begin VB.ComboBox cmbAoEDirection 
             Height          =   300
-            ItemData        =   "frmEditor_Spell.frx":0088
+            ItemData        =   "frmEditor_Spell.frx":00BC
             Left            =   120
-            List            =   "frmEditor_Spell.frx":009B
+            List            =   "frmEditor_Spell.frx":00CF
             Style           =   2  'Dropdown List
             TabIndex        =   89
             Top             =   3600
@@ -823,7 +872,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   53
-         Top             =   6915
+         Top             =   7440
          Width           =   3135
       End
       Begin VB.Label lblNext 
@@ -831,7 +880,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   51
-         Top             =   6435
+         Top             =   6960
          Width           =   3255
       End
       Begin VB.Label lblIndex 
@@ -839,7 +888,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   49
-         Top             =   5955
+         Top             =   6480
          Width           =   1815
       End
       Begin VB.Label Label4 
@@ -847,7 +896,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   120
          TabIndex        =   47
-         Top             =   6975
+         Top             =   7440
          Width           =   1215
       End
       Begin VB.Label Label3 
@@ -855,7 +904,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   120
          TabIndex        =   45
-         Top             =   5880
+         Top             =   6360
          Width           =   1215
       End
    End
@@ -977,6 +1026,10 @@ Private Sub cmbDirection_Click()
     End If
 End Sub
 
+Private Sub cmbProjectileType_Click()
+    Spell(EditorIndex).Projectile.ProjectileType = cmbProjectileType.ListIndex
+End Sub
+
 Private Sub cmbType_Click()
     Spell(EditorIndex).Type = cmbType.ListIndex
     If Spell(EditorIndex).Type = SPELL_TYPE_PROJECTILE Then
@@ -1010,7 +1063,6 @@ End Sub
 Private Sub cmdSave_Click()
     SpellEditorOk
 End Sub
-
 
 Private Sub lstIndex_Click()
     SpellEditorInit
@@ -1072,6 +1124,21 @@ End Sub
 Private Sub scrlCast_Change()
     lblCast.caption = "Casting Time: " & scrlCast.Value & "s"
     Spell(EditorIndex).CastTime = scrlCast.Value
+End Sub
+
+Private Sub scrlCastFrame_Change()
+    lblCastFrame.caption = "Casting Frame: " & scrlCastFrame.Value
+    Spell(EditorIndex).CastFrame = scrlCastFrame.Value
+End Sub
+
+Private Sub scrlCastProjectile_Change()
+    If scrlCastProjectile.Value > 0 Then
+        lblCastProjectile.caption = "Cast Projectile: " & Trim$(Animation(scrlCastProjectile.Value).Name)
+    Else
+        lblCastProjectile.caption = "Cast Projectile: None"
+    End If
+
+    Spell(EditorIndex).CastAnim = scrlCastProjectile.Value
 End Sub
 
 Private Sub scrlCool_Change()

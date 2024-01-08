@@ -140,6 +140,8 @@ Public DirUp As Boolean
 Public DirDown As Boolean
 Public DirLeft As Boolean
 Public DirRight As Boolean
+'block player
+Public eDown As Boolean
 ' Used to freeze controls when getting a new map
 Public GettingMap As Boolean
 ' Used to check if FPS needs to be drawn

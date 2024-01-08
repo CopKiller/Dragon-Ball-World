@@ -1097,7 +1097,7 @@ Public Sub DrawHotbar()
         ' draw the numbers
         SS = Str(i)
         If i = 10 Then SS = "0"
-        RenderText font(Fonts.rockwellDec_15), SS, Xo + 4, Yo + 19, White
+        RenderText font(fonts.rockwellDec_15), SS, Xo + 4, Yo + 19, White
     Next
 End Sub
 
@@ -1219,7 +1219,7 @@ Dim zonetype As String, colour As Long
         colour = Grey
     End If
     
-    RenderText font(Fonts.rockwellDec_10), Trim$(Map.MapData.Name) & " - " & zonetype, ScreenWidth - 15 - TextWidth(font(Fonts.rockwellDec_10), Trim$(Map.MapData.Name) & " - " & zonetype), 45, colour, 255
+    RenderText font(fonts.rockwellDec_10), Trim$(Map.MapData.Name) & " - " & zonetype, ScreenWidth - 15 - TextWidth(font(fonts.rockwellDec_10), Trim$(Map.MapData.Name) & " - " & zonetype), 45, colour, 255
 End Sub
 
 Public Sub DrawInviteBackground()
@@ -1236,7 +1236,7 @@ Public Sub DrawInviteBackground()
     For i = 1 To 3
         If inOffer(i) > 0 Then
             RenderDesign DesignTypes.designWindowDescription, Xo, Y, Width, Height
-            RenderText font(Fonts.georgia_16), "i", Xo + 21, Y + 15, Grey
+            RenderText font(fonts.georgia_16), "i", Xo + 21, Y + 15, Grey
             Y = Y + 37
         End If
     Next
@@ -1331,7 +1331,7 @@ Dim Xo As Long, Yo As Long, ItemPic As Long, ItemNum As Long, Amount As Long, i 
                             colour = BrightGreen
                         End If
                         
-                        RenderText font(Fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
+                        RenderText font(fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
                     End If
                 End If
             End If
@@ -1421,7 +1421,7 @@ Dim Xo As Long, Yo As Long
                         colour = BrightGreen
                     End If
                     
-                    RenderText font(Fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
+                    RenderText font(fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
                 End If
             End If
         End If
@@ -1462,7 +1462,7 @@ Dim Xo As Long, Yo As Long
                         colour = BrightGreen
                     End If
                     
-                    RenderText font(Fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
+                    RenderText font(fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
                 End If
             End If
         End If
@@ -1531,7 +1531,7 @@ Public Sub DrawBank()
                             colour = BrightGreen
                         End If
 
-                        RenderText font(Fonts.rockwell_15), ConvertCurrency(Amount), X, Y, colour
+                        RenderText font(fonts.rockwell_15), ConvertCurrency(Amount), X, Y, colour
                     End If
                 End If
             End If
@@ -1622,7 +1622,7 @@ Public Sub DrawInventory()
                                 colour = BrightGreen
                             End If
                             
-                            RenderText font(Fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
+                            RenderText font(fonts.verdana_12), ConvertCurrency(Amount), X, Y, colour
 
                         End If
                     End If
@@ -1634,12 +1634,12 @@ Public Sub DrawInventory()
     Next
 End Sub
 
-Public Sub DrawChatBubble(ByVal Index As Long)
+Public Sub DrawChatBubble(ByVal index As Long)
     Dim theArray() As String, X As Long, Y As Long, i As Long, MaxWidth As Long, X2 As Long, Y2 As Long, colour As Long, tmpNum As Long
 
 
     
-    With chatBubble(Index)
+    With chatBubble(index)
         ' exit out early
         If .target = 0 Then Exit Sub
         ' calculate position
@@ -1666,7 +1666,7 @@ Public Sub DrawChatBubble(ByVal Index As Long)
         tmpNum = UBound(theArray)
 
         For i = 1 To tmpNum
-            If TextWidth(font(Fonts.georgiaDec_16), theArray(i)) > MaxWidth Then MaxWidth = TextWidth(font(Fonts.georgiaDec_16), theArray(i))
+            If TextWidth(font(fonts.georgiaDec_16), theArray(i)) > MaxWidth Then MaxWidth = TextWidth(font(fonts.georgiaDec_16), theArray(i))
         Next
 
         ' calculate the new position
@@ -1698,7 +1698,7 @@ Public Sub DrawChatBubble(ByVal Index As Long)
         tmpNum = UBound(theArray)
 
         For i = 1 To tmpNum
-            RenderText font(Fonts.georgia_16), theArray(i), X - (TextWidth(font(Fonts.georgiaDec_16), theArray(i)) / 2), Y2, colour
+            RenderText font(fonts.georgia_16), theArray(i), X - (TextWidth(font(fonts.georgiaDec_16), theArray(i)) / 2), Y2, colour
             Y2 = Y2 + 12
 
         Next
@@ -1732,7 +1732,7 @@ Public Function hasSpriteShadow(ByVal sprite As Long) As Boolean
 
 End Function
 
-Public Sub DrawPlayer(ByVal Index As Long)
+Public Sub DrawPlayer(ByVal index As Long)
     Dim Anim As Byte, i As Long
     Dim X As Long
     Dim Y As Long
@@ -1743,23 +1743,23 @@ Public Sub DrawPlayer(ByVal Index As Long)
     Dim attackspeed As Long
 
     ' pre-load sprite for calculations
-    sprite = GetPlayerSprite(Index)
+    sprite = GetPlayerSprite(index)
 
     'SetTexture TextureChar(Sprite)
     If sprite < 1 Or sprite > CountChar Then Exit Sub
 
     ' speed from weapon
-    If GetPlayerEquipment(Index, Weapon) > 0 Then
-        attackspeed = Item(GetPlayerEquipment(Index, Weapon)).Speed
+    If GetPlayerEquipment(index, Weapon) > 0 Then
+        attackspeed = Item(GetPlayerEquipment(index, Weapon)).Speed
     Else
         attackspeed = 1000
     End If
 
-    If Not isConstAnimated(GetPlayerSprite(Index)) Then
+    If Not isConstAnimated(GetPlayerSprite(index)) Then
         ' Reset frame
         Anim = 0
 
-        With Player(Index)
+        With Player(index)
 
             ' Animação do player parado e piscando
             If getTime > .StepTimer + 250 Then
@@ -1775,27 +1775,36 @@ Public Sub DrawPlayer(ByVal Index As Long)
                 Anim = .StepEyes
             End If
 
-            ' Animação da frame de Atack
-            If .AttackMode = 8 Then
-                If getTime > .AttackModeTimer + 100 Then
-                    .AttackMode = 9
-                    .AttackModeTimer = getTime
-                End If
-            ElseIf .AttackMode = 9 Then
-                If getTime > .AttackModeTimer + 200 Then
-                    .AttackMode = 0
-                    .AttackModeTimer = 0
-                End If
+            ' Player Block
+            If .PlayerBlock = YES Then
+                Anim = 17
             End If
-
+            
+            ' Frame pré-definina pelo servidor ou projectile
+            If .playerFrame > 0 Then
+                Anim = .playerFrame
+            End If
+            
             ' Check for attacking animation
             If .AttackTimer + (attackspeed / 2) > getTime Then
                 If .Attacking = 1 Then
-                    Anim = Player(Index).AttackMode
+                    ' Animação da frame de Atack
+                    If .AttackMode = 8 Then
+                        If getTime > .AttackModeTimer + 100 Then
+                            .AttackMode = 9
+                            .AttackModeTimer = getTime
+                        End If
+                    ElseIf .AttackMode = 9 Then
+                        If getTime > .AttackModeTimer + 200 Then
+                            .AttackMode = 0
+                            .AttackModeTimer = 0
+                        End If
+                    End If
+                    Anim = Player(index).AttackMode
                 End If
             Else
                 ' If not attacking, walk normally
-                Select Case GetPlayerDir(Index)
+                Select Case GetPlayerDir(index)
                 Case DIR_UP
                     If (.yOffset > 8) Then Anim = .Step
                 Case DIR_DOWN
@@ -1824,18 +1833,18 @@ Public Sub DrawPlayer(ByVal Index As Long)
 
     Else
 
-        If Player(Index).AnimTimer + 100 <= getTime Then
-            Player(Index).Anim = Player(Index).Anim + 1
+        If Player(index).AnimTimer + 100 <= getTime Then
+            Player(index).Anim = Player(index).Anim + 1
 
-            If Player(Index).Anim >= 3 Then Player(Index).Anim = 0
-            Player(Index).AnimTimer = getTime
+            If Player(index).Anim >= 3 Then Player(index).Anim = 0
+            Player(index).AnimTimer = getTime
         End If
 
-        Anim = Player(Index).Anim
+        Anim = Player(index).Anim
     End If
 
     ' Check to see if we want to stop making him attack
-    With Player(Index)
+    With Player(index)
 
         If .AttackTimer + attackspeed < getTime Then
             .Attacking = 0
@@ -1845,7 +1854,7 @@ Public Sub DrawPlayer(ByVal Index As Long)
     End With
 
     ' Set the left
-    Select Case GetPlayerDir(Index)
+    Select Case GetPlayerDir(index)
 
     Case DIR_UP
         SpriteTop = 3
@@ -1872,29 +1881,29 @@ Public Sub DrawPlayer(ByVal Index As Long)
     End With
 
     ' Calculate the X
-    X = GetPlayerX(Index) * PIC_X + Player(Index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet - 32) / 2)
+    X = GetPlayerX(index) * PIC_X + Player(index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet - 32) / 2)
 
     ' Is the player's height more than 32..?
     If (mTexture(TextureChar(sprite)).RealHeight) > 32 Then
         ' Create a 32 pixel offset for larger sprites
-        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - ((mTexture(TextureChar(sprite)).RealHeight / 4) - 32) - 4
+        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset - ((mTexture(TextureChar(sprite)).RealHeight / 4) - 32) - 4
     Else
         ' Proceed as normal
-        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - 4
+        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset - 4
     End If
 
     RenderTexture TextureChar(sprite), ConvertMapX(X), ConvertMapY(Y), rec.Left, rec.Top, rec.Width, rec.Height, rec.Width, rec.Height
     ' check for paperdolling
     For i = 1 To UBound(PaperdollOrder)
-        If GetPlayerEquipment(Index, PaperdollOrder(i)) > 0 Then
-            If Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll > 0 Then
-                Call DrawPaperdoll(Index, Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll, X, Y, rec)
+        If GetPlayerEquipment(index, PaperdollOrder(i)) > 0 Then
+            If Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll > 0 Then
+                Call DrawPaperdoll(index, Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll, X, Y, rec)
             End If
         End If
     Next
 End Sub
 
-Public Sub DrawPaperdoll(ByVal Index As Long, ByVal sprite As Long, ByVal X2 As Long, Y2 As Long, rec As GeomRec)
+Public Sub DrawPaperdoll(ByVal index As Long, ByVal sprite As Long, ByVal X2 As Long, Y2 As Long, rec As GeomRec)
     Dim X As Long, Y As Long
     Dim Width As Long, Height As Long
 
@@ -1995,8 +2004,7 @@ Public Sub DrawProjectile(ByVal i As Long)
                     Yo = Yo + .ProjectileOffset(DIR_RIGHT + 1).Y
 
             End Select
-
-            ' ****** Render Projectile ******
+            
             If .Rotate = 0 Then
                 Call RenderTexture(TextureProjectile(.Graphic), ConvertMapX(Xo), ConvertMapY(Yo), sRECT.Left, sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top)
             Else
@@ -2320,8 +2328,8 @@ Public Sub DrawResource(ByVal Resource_num As Long)
                         If GlobalY >= Y And GlobalY <= Y + 13 Then
                             If VerifyWindowsIsInCur Then Exit Sub
                             sString = "Objective!"
-                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
-                            Call RenderText(font(Fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
+                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
+                            Call RenderText(font(fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
                         End If
                     End If
                 End If
@@ -2407,7 +2415,7 @@ Public Sub DrawItem(ByVal ItemNum As Long)
 
         colour = GetItemNameColour(Item(MapItem(ItemNum).Num).Rarity)
         If CurX = MapItem(ItemNum).X And CurY = MapItem(ItemNum).Y Then
-            RenderText font(Fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name), 16 + ConvertMapX(MapItem(ItemNum).X * PIC_X) - (TextWidth(font(Fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name)) / 2), ConvertMapY(MapItem(ItemNum).Y * PIC_Y) - 10, colour
+            RenderText font(fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name), 16 + ConvertMapX(MapItem(ItemNum).X * PIC_X) - (TextWidth(font(fonts.rockwell_15), Trim$(Item(MapItem(ItemNum).Num).Name)) / 2), ConvertMapY(MapItem(ItemNum).Y * PIC_Y) - 10, colour
         End If
     End If
 
@@ -2424,8 +2432,8 @@ Public Sub DrawItem(ByVal ItemNum As Long)
                         If GlobalY >= textY And GlobalY <= textY + 13 Then
                             If VerifyWindowsIsInCur Then Exit Sub
                             sString = "Objective!"
-                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(Fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
-                            Call RenderText(font(Fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(Fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
+                            Call RenderEntity_Square(TextureDesign(6), GlobalX - ((TextWidth(font(fonts.georgiaBold_16), sString) / 2)) - 5, GlobalY - 35, TextWidth(font(fonts.georgiaBold_16), sString) + 10, 20, 5, 200)
+                            Call RenderText(font(fonts.georgiaBold_16), sString, GlobalX - ((TextWidth(font(fonts.georgiaBold_16), sString) / 2)), GlobalY - 32, Yellow)
                         End If
                     End If
 
@@ -2602,41 +2610,41 @@ Public Sub DrawMenuBG()
     RenderTexture TextureSurface(12), ScreenWidth - 2048, ScreenHeight - 1088, 0, 0, 512, 64, 512, 64
 End Sub
 
-Public Sub DrawAnimation(ByVal Index As Long, ByVal Layer As Long)
+Public Sub DrawAnimation(ByVal index As Long, ByVal Layer As Long)
     Dim sprite As Integer, sRECT As GeomRec, Width As Long, Height As Long, FrameCount As Long
     Dim X As Long, Y As Long, lockindex As Long
 
 
-    If AnimInstance(Index).Animation = 0 Then
-        ClearAnimInstance Index
+    If AnimInstance(index).Animation = 0 Then
+        ClearAnimInstance index
         Exit Sub
     End If
 
-    sprite = Animation(AnimInstance(Index).Animation).sprite(Layer)
+    sprite = Animation(AnimInstance(index).Animation).sprite(Layer)
 
     If sprite < 1 Or sprite > CountAnim Then Exit Sub
     ' pre-load texture for calculations
     'SetTexture TextureAnim(Sprite)
-    FrameCount = Animation(AnimInstance(Index).Animation).Frames(Layer)
+    FrameCount = Animation(AnimInstance(index).Animation).Frames(Layer)
     ' total width divided by frame count
     Width = 192 'mTexture(TextureAnim(Sprite)).width / frameCount
     Height = 192 'mTexture(TextureAnim(Sprite)).height
 
     With sRECT
-        .Top = (Height * ((AnimInstance(Index).frameIndex(Layer) - 1) \ AnimColumns))
+        .Top = (Height * ((AnimInstance(index).frameIndex(Layer) - 1) \ AnimColumns))
         .Height = Height
-        .Left = (Width * (((AnimInstance(Index).frameIndex(Layer) - 1) Mod AnimColumns)))
+        .Left = (Width * (((AnimInstance(index).frameIndex(Layer) - 1) Mod AnimColumns)))
         .Width = Width
 
     End With
 
     ' change x or y if locked
-    If AnimInstance(Index).LockType > TARGET_TYPE_NONE Then ' if <> none
+    If AnimInstance(index).LockType > TARGET_TYPE_NONE Then ' if <> none
 
         ' is a player
-        If AnimInstance(Index).LockType = TARGET_TYPE_PLAYER Then
+        If AnimInstance(index).LockType = TARGET_TYPE_PLAYER Then
             ' quick save the index
-            lockindex = AnimInstance(Index).lockindex
+            lockindex = AnimInstance(index).lockindex
 
             ' check if is ingame
             If IsPlaying(lockindex) Then
@@ -2650,9 +2658,9 @@ Public Sub DrawAnimation(ByVal Index As Long, ByVal Layer As Long)
                 End If
             End If
 
-        ElseIf AnimInstance(Index).LockType = TARGET_TYPE_NPC Then
+        ElseIf AnimInstance(index).LockType = TARGET_TYPE_NPC Then
             ' quick save the index
-            lockindex = AnimInstance(Index).lockindex
+            lockindex = AnimInstance(index).lockindex
 
             ' check if NPC exists
             If MapNpc(lockindex).Num > 0 Then
@@ -2665,21 +2673,21 @@ Public Sub DrawAnimation(ByVal Index As Long, ByVal Layer As Long)
 
                 Else
                     ' npc not alive anymore, kill the animation
-                    ClearAnimInstance Index
+                    ClearAnimInstance index
                     Exit Sub
                 End If
 
             Else
                 ' npc not alive anymore, kill the animation
-                ClearAnimInstance Index
+                ClearAnimInstance index
                 Exit Sub
             End If
         End If
 
     Else
         ' no lock, default x + y
-        X = (AnimInstance(Index).X * 32) + 16 - (Width / 2)
-        Y = (AnimInstance(Index).Y * 32) + 16 - (Height / 2)
+        X = (AnimInstance(index).X * 32) + 16 - (Width / 2)
+        Y = (AnimInstance(index).Y * 32) + 16 - (Height / 2)
     End If
 
     X = ConvertMapX(X)
@@ -2820,6 +2828,7 @@ Public Sub Render_Graphics()
                 If IsPlaying(i) And GetPlayerMap(i) = GetPlayerMap(MyIndex) Then
                     If Player(i).Y = Y Then
                         Call DrawPlayer(i)
+                        Call DrawProjectileAnimation(i)
                     End If
                 End If
             Next
@@ -2948,13 +2957,13 @@ Public Sub Render_Graphics()
     If InMapEditor Then DrawTileSelection
   
     ' render FPS
-    If Not screenshotMode Then RenderText font(Fonts.rockwell_15), "FPS: " & GameFPS, 1, 1, White
+    If Not screenshotMode Then RenderText font(fonts.rockwell_15), "FPS: " & GameFPS, 1, 1, White
 
     ' draw loc
     If BLoc Then
-        RenderText font(Fonts.georgiaDec_16), Trim$("cur x: " & CurX & " y: " & CurY), 260, 6, Yellow
-        RenderText font(Fonts.georgiaDec_16), Trim$("loc x: " & GetPlayerX(MyIndex) & " y: " & GetPlayerY(MyIndex)), 260, 22, Yellow
-        RenderText font(Fonts.georgiaDec_16), Trim$(" (map #" & GetPlayerMap(MyIndex) & ")"), 260, 38, Yellow
+        RenderText font(fonts.georgiaDec_16), Trim$("cur x: " & CurX & " y: " & CurY), 260, 6, Yellow
+        RenderText font(fonts.georgiaDec_16), Trim$("loc x: " & GetPlayerX(MyIndex) & " y: " & GetPlayerY(MyIndex)), 260, 22, Yellow
+        RenderText font(fonts.georgiaDec_16), Trim$(" (map #" & GetPlayerMap(MyIndex) & ")"), 260, 38, Yellow
     End If
     ' draw map name
     RenderMapName

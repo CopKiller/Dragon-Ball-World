@@ -157,7 +157,12 @@ Public Type TempPlayerRec
     ImpactedTick As Long
     
     ' -> Ao pressionar a tecla de bloqueio no client, ativa o block hit!
-    PlayerBlock As Boolean
+    PlayerBlock As Byte
+    
+    PlayerFrame As Byte
+    
+    ProjectileCustomType As Byte
+    ProjectileCustomNum As Long
 End Type
 
 Private Type ClassRec

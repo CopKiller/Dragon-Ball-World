@@ -495,7 +495,7 @@ Public Sub SendDoorAnimation(ByVal mapnum As Long, ByVal x As Long, ByVal y As L
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Public Sub SendActionMsg(ByVal mapnum As Long, ByVal Message As String, ByVal color As Long, ByVal MsgType As Long, ByVal x As Long, ByVal y As Long, Optional PlayerOnlyNum As Long = 0)
+Public Sub SendActionMsg(ByVal mapnum As Long, ByVal Message As String, ByVal color As Long, ByVal MsgType As Long, ByVal x As Long, ByVal y As Long, Optional ByVal fonte As fonts = 10, Optional PlayerOnlyNum As Long = 0)
     Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
@@ -505,6 +505,7 @@ Public Sub SendActionMsg(ByVal mapnum As Long, ByVal Message As String, ByVal co
     Buffer.WriteLong MsgType
     Buffer.WriteLong x
     Buffer.WriteLong y
+    Buffer.WriteLong fonte
     
     If PlayerOnlyNum > 0 Then
         SendDataTo PlayerOnlyNum, Buffer.ToArray()
@@ -515,12 +516,11 @@ Public Sub SendActionMsg(ByVal mapnum As Long, ByVal Message As String, ByVal co
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Public Sub SendClearSpellBuffer(ByVal Index As Long)
+Public Sub SendClearSpellBufferTo(ByVal Index As Long)
     Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
     Buffer.WriteLong SClearSpellBuffer
-    
     SendDataTo Index, Buffer.ToArray()
     Buffer.Flush: Set Buffer = Nothing
 End Sub
@@ -664,13 +664,13 @@ Public Sub SendNpcDeath(ByVal mapnum As Long, ByVal mapNpcNum As Long)
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Public Sub SendChatBubble(ByVal mapnum As Long, ByVal Target As Long, ByVal targetType As Long, ByVal Message As String, ByVal colour As Long)
+Public Sub SendChatBubble(ByVal mapnum As Long, ByVal Target As Long, ByVal TargetType As Long, ByVal Message As String, ByVal colour As Long)
     Dim Buffer As clsBuffer
 
     Set Buffer = New clsBuffer
     Buffer.WriteLong SChatBubble
     Buffer.WriteLong Target
-    Buffer.WriteLong targetType
+    Buffer.WriteLong TargetType
     Buffer.WriteString Message
     Buffer.WriteLong colour
     

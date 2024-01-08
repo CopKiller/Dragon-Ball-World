@@ -5,7 +5,7 @@ Public Sub GameLoop()
     Dim i As Long, X As Long, Y As Long
     Dim barDifference As Long
     On Error GoTo retry
-    
+
     ' *** Start GameLoop ***
     Do While InGame
 retry:
@@ -15,16 +15,16 @@ retry:
             Tick = getTime                            ' Set the inital tick
             ElapsedTime = Tick - FrameTime                 ' Set the time difference for time-based movement
             FrameTime = Tick                               ' Set the time second loop time to the first.
-            
+
             If Thread = False Then
                 GameLooptmr = Tick + 25
             End If
-    
+
             ' handle input
             If GetForegroundWindow() = frmMain.hWnd Then
                 HandleMouseInput
             End If
-    
+
             ' * Check surface timers *
             ' Sprites
             If tmr10000 < Tick Then
@@ -32,15 +32,15 @@ retry:
                 Call GetPing
                 tmr10000 = Tick + 10000
             End If
-    
+
             If tmr25 < Tick Then
                 InGame = IsConnected
-                Call CheckKeys ' Check to make sure they aren't trying to auto do anything
-    
+                Call CheckKeys    ' Check to make sure they aren't trying to auto do anything
+
                 If GetForegroundWindow() = frmMain.hWnd Then
-                    Call CheckInputKeys ' Check which keys were pressed
+                    Call CheckInputKeys    ' Check which keys were pressed
                 End If
-    
+
                 ' check if we need to end the CD icon
                 If CountSpellicon > 0 Then
                     For i = 1 To MAX_PLAYER_SPELLS
@@ -53,51 +53,54 @@ retry:
                         End If
                     Next
                 End If
-    
+
                 ' check if we need to unlock the player's spell casting restriction
                 If SpellBuffer > 0 Then
                     If SpellBufferTimer + (Spell(PlayerSpells(SpellBuffer).Spell).CastTime * 1000) < Tick Then
                         SpellBuffer = 0
                         SpellBufferTimer = 0
+                        ClearPlayerFrame MyIndex
+                        
+                        Player(MyIndex).ProjectileCustomType = ProjectileTypeEnum.None
+                        Player(MyIndex).ProjectileCustomNum = 0
                     End If
                 End If
-    
+
                 If CanMoveNow Then
-                    Call CheckMovement ' Check if player is trying to move
-                    Call CheckAttack   ' Check to see if player is trying to attack
+                    Call ProcessPlayerActions
                 End If
-    
+
                 For i = 1 To MAX_BYTE
                     CheckAnimInstance i
                 Next
-                
+
                 ' appear tile logic
                 AppearTileFadeLogic
                 CheckAppearTiles
-    
+
                 tmr25 = Tick + 25
             End If
-    
+
             ' targetting
             If targetTmr < Tick Then
                 If tabDown Then
                     FindNearestTarget
                 End If
-    
+
                 targetTmr = Tick + 50
             End If
-            
+
             ' chat timer
             If chatTmr < Tick Then
                 ' scrolling
                 If ChatButtonUp Then
                     ScrollChatBox 0
                 End If
-    
+
                 If ChatButtonDown Then
                     ScrollChatBox 1
                 End If
-                
+
                 ' remove messages
                 If chatLastRemove + CHAT_DIFFERENCE_TIMER < getTime Then
                     ' remove timed out messages from chat
@@ -113,10 +116,10 @@ retry:
                         End If
                     Next
                 End If
-    
+
                 chatTmr = Tick + 50
             End If
-            
+
             If tmr45 <= Tick Then
                 For i = 1 To LastProjectile
                     If MapProjectile(i).Owner > 0 Then
@@ -129,26 +132,26 @@ retry:
                         End If
                     End If
                 Next
-                
+
                 tmr45 = Tick + 45
             End If
-    
+
             ' fog scrolling
             If fogTmr < Tick Then
                 If CurrentFogSpeed > 0 Then
                     ' move
                     fogOffsetX = fogOffsetX - 1
                     fogOffsetY = fogOffsetY - 1
-        
+
                     ' reset
                     If fogOffsetX < -256 Then fogOffsetX = 0
                     If fogOffsetY < -256 Then fogOffsetY = 0
-                    
+
                     ' reset timer
                     fogTmr = Tick + 255 - CurrentFogSpeed
                 End If
             End If
-    
+
             ' elastic bars
             If barTmr < Tick Then
                 SetBarWidth BarWidth_GuiHP_Max, BarWidth_GuiHP
@@ -159,94 +162,94 @@ retry:
                         SetBarWidth BarWidth_NpcHP_Max(i), BarWidth_NpcHP(i)
                     End If
                 Next
-    
+
                 For i = 1 To Player_HighIndex
                     If IsPlaying(i) And GetPlayerMap(i) = GetPlayerMap(MyIndex) Then
                         SetBarWidth BarWidth_PlayerHP_Max(i), BarWidth_PlayerHP(i)
                     End If
                 Next
-    
+
                 ' reset timer
                 barTmr = Tick + 10
             End If
-    
+
             ' Animations!
             If mapTimer < Tick Then
-    
+
                 ' animate waterfalls
                 Select Case waterfallFrame
-    
-                    Case 0
-                        waterfallFrame = 1
-    
-                    Case 1
-                        waterfallFrame = 2
-    
-                    Case 2
-                        waterfallFrame = 0
+
+                Case 0
+                    waterfallFrame = 1
+
+                Case 1
+                    waterfallFrame = 2
+
+                Case 2
+                    waterfallFrame = 0
                 End Select
-    
+
                 ' animate autotiles
                 Select Case autoTileFrame
-    
-                    Case 0
-                        autoTileFrame = 1
-    
-                    Case 1
-                        autoTileFrame = 2
-    
-                    Case 2
-                        autoTileFrame = 0
+
+                Case 0
+                    autoTileFrame = 1
+
+                Case 1
+                    autoTileFrame = 2
+
+                Case 2
+                    autoTileFrame = 0
                 End Select
-    
+
                 ' animate textbox
                 If chatShowLine = "|" Then
                     chatShowLine = vbNullString
                 Else
                     chatShowLine = "|"
                 End If
-                
+
                 ' re-set timer
                 mapTimer = Tick + 500
             End If
-            
+
             Call ProcessWeather
-    
+
             ' Process input before rendering, otherwise input will be behind by 1 frame
             If WalkTimer < Tick Then
-    
+
                 For i = 1 To Player_HighIndex
-    
+
                     If IsPlaying(i) Then
                         Call ProcessMovement(i)
                     End If
-    
+
                 Next i
-    
+
                 ' Process npc movements (actually move them)
                 For i = 1 To Npc_HighIndex
-    
+
                     If Map.MapData.Npc(i) > 0 Then
                         Call ProcessNpcMovement(i)
                     End If
-    
+
                 Next i
-    
-                WalkTimer = Tick + 30 ' edit this value to change WalkTimer
+
+                WalkTimer = Tick + 30    ' edit this value to change WalkTimer
             End If
-    
+
             ' *********************
             ' ** Render Graphics **
             ' *********************
             If Thread = False Then
                 Call Render_Graphics
                 Call UpdateSounds
-            
+
                 If Options.FPSLock And FPS > 60 Then
                     Tick = Tick + SKIP_TICKS
                     Loops = Loops + 1
                 End If
-                
+
                 ' Calculate fps
                 If TickFPS <= Tick Then
                     GameFPS = FPS
@@ -255,25 +258,25 @@ retry:
                 Else
                     FPS = FPS + 1
                 End If
-            
+
                 If Options.FPSLock And FPS > 60 Then
                     Sleep SKIP_TICKS
                 End If
             End If
-            
+
             DoEvents
-            
+
             If Thread And GameLooptmr > Tick Then
                 Thread = False
                 Exit Sub
             End If
-    
+
         Loop
         ' Mute everything but still keep everything playing
         If frmMain.WindowState = vbMinimized Then
             Stop_Music
         End If
-        
+
         Sleep MAX_FRAME_SKIP
         DoEvents
     Loop
@@ -379,84 +382,112 @@ retry:
 
 End Sub
 
-Public Sub ProcessMovement(ByVal Index As Long)
+Public Sub ProcessMovement(ByVal index As Long)
     Dim MovementSpeed As Long
     
     ' Check if player is walking, and if so process moving them over
-    Select Case Player(Index).Moving
+    Select Case Player(index).Moving
             Case MOVING_RUNNING: MovementSpeed = RUN_SPEED
             Case MOVING_WALKING: MovementSpeed = WALK_SPEED
         Case Else: Exit Sub
     End Select
     
-    Select Case GetPlayerDir(Index)
+    Select Case GetPlayerDir(index)
         Case DIR_UP
-            Player(Index).yOffset = Player(Index).yOffset - MovementSpeed
-            If Player(Index).yOffset < 0 Then Player(Index).yOffset = 0
+            Player(index).yOffset = Player(index).yOffset - MovementSpeed
+            If Player(index).yOffset < 0 Then Player(index).yOffset = 0
         Case DIR_DOWN
-            Player(Index).yOffset = Player(Index).yOffset + MovementSpeed
-            If Player(Index).yOffset > 0 Then Player(Index).yOffset = 0
+            Player(index).yOffset = Player(index).yOffset + MovementSpeed
+            If Player(index).yOffset > 0 Then Player(index).yOffset = 0
         Case DIR_LEFT
-            Player(Index).xOffset = Player(Index).xOffset - MovementSpeed
-            If Player(Index).xOffset < 0 Then Player(Index).xOffset = 0
+            Player(index).xOffset = Player(index).xOffset - MovementSpeed
+            If Player(index).xOffset < 0 Then Player(index).xOffset = 0
         Case DIR_RIGHT
-            Player(Index).xOffset = Player(Index).xOffset + MovementSpeed
-            If Player(Index).xOffset > 0 Then Player(Index).xOffset = 0
+            Player(index).xOffset = Player(index).xOffset + MovementSpeed
+            If Player(index).xOffset > 0 Then Player(index).xOffset = 0
         Case DIR_UP_LEFT
-            Player(Index).yOffset = Player(Index).yOffset - MovementSpeed
-            If Player(Index).yOffset < 0 Then Player(Index).yOffset = 0
-            Player(Index).xOffset = Player(Index).xOffset - MovementSpeed
-            If Player(Index).xOffset < 0 Then Player(Index).xOffset = 0
+            Player(index).yOffset = Player(index).yOffset - MovementSpeed
+            If Player(index).yOffset < 0 Then Player(index).yOffset = 0
+            Player(index).xOffset = Player(index).xOffset - MovementSpeed
+            If Player(index).xOffset < 0 Then Player(index).xOffset = 0
         
         Case DIR_UP_RIGHT
-            Player(Index).yOffset = Player(Index).yOffset - MovementSpeed
-            If Player(Index).yOffset < 0 Then Player(Index).yOffset = 0
-            Player(Index).xOffset = Player(Index).xOffset + MovementSpeed
-            If Player(Index).xOffset > 0 Then Player(Index).xOffset = 0
+            Player(index).yOffset = Player(index).yOffset - MovementSpeed
+            If Player(index).yOffset < 0 Then Player(index).yOffset = 0
+            Player(index).xOffset = Player(index).xOffset + MovementSpeed
+            If Player(index).xOffset > 0 Then Player(index).xOffset = 0
 
         Case DIR_DOWN_LEFT
-            Player(Index).yOffset = Player(Index).yOffset + MovementSpeed
-            If Player(Index).yOffset > 0 Then Player(Index).yOffset = 0
-            Player(Index).xOffset = Player(Index).xOffset - MovementSpeed
-            If Player(Index).xOffset < 0 Then Player(Index).xOffset = 0
+            Player(index).yOffset = Player(index).yOffset + MovementSpeed
+            If Player(index).yOffset > 0 Then Player(index).yOffset = 0
+            Player(index).xOffset = Player(index).xOffset - MovementSpeed
+            If Player(index).xOffset < 0 Then Player(index).xOffset = 0
         
         Case DIR_DOWN_RIGHT
-            Player(Index).yOffset = Player(Index).yOffset + MovementSpeed
-            If Player(Index).yOffset > 0 Then Player(Index).yOffset = 0
-            Player(Index).xOffset = Player(Index).xOffset + MovementSpeed
-            If Player(Index).xOffset > 0 Then Player(Index).xOffset = 0
+            Player(index).yOffset = Player(index).yOffset + MovementSpeed
+            If Player(index).yOffset > 0 Then Player(index).yOffset = 0
+            Player(index).xOffset = Player(index).xOffset + MovementSpeed
+            If Player(index).xOffset > 0 Then Player(index).xOffset = 0
     End Select
     
-    Player(Index).AttackMode = 0
-    Player(Index).AttackModeTimer = 0
-    
-    ' Set the first step movement
-    If Player(Index).Step = 0 Then Player(Index).Step = 2
+    'Player(Index).AttackMode = 0
+    'Player(Index).AttackModeTimer = 0
 
     ' Check if completed walking over to the next tile
-    If Player(Index).Moving > 0 Then
-        If GetPlayerDir(Index) = DIR_RIGHT Or GetPlayerDir(Index) = DIR_DOWN Or GetPlayerDir(Index) = DIR_DOWN_RIGHT Then
-            If (Player(Index).xOffset >= 0) And (Player(Index).yOffset >= 0) Then
-                Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 2 Then
-                    Player(Index).Step = 3
+    Select Case Player(index).Moving
+        Case MOVING_WALKING
+        ' Set the first step movement
+        If Player(index).Step = 0 Then Player(index).Step = 2
+    
+        If GetPlayerDir(index) = DIR_RIGHT Or GetPlayerDir(index) = DIR_DOWN Or GetPlayerDir(index) = DIR_DOWN_RIGHT Then
+            If (Player(index).xOffset >= 0) And (Player(index).yOffset >= 0) Then
+                Player(index).Moving = 0
+                Player(index).StepTimer = getTime
+                If Player(index).Step = 2 Then
+                    Player(index).Step = 3
                 Else
-                    Player(Index).Step = 2
+                    Player(index).Step = 2
                 End If
             End If
         Else
-            If (Player(Index).xOffset <= 0) And (Player(Index).yOffset <= 0) Then
-                Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 2 Then
-                    Player(Index).Step = 3
+            If (Player(index).xOffset <= 0) And (Player(index).yOffset <= 0) Then
+                Player(index).Moving = 0
+                Player(index).StepTimer = getTime
+                If Player(index).Step = 2 Then
+                    Player(index).Step = 3
                 Else
-                    Player(Index).Step = 2
+                    Player(index).Step = 2
                 End If
             End If
         End If
-    End If
+        
+        Case MOVING_RUNNING
+        ' Set the first step movement
+        If Player(index).Step = 0 Then Player(index).Step = 2
+    
+        If GetPlayerDir(index) = DIR_RIGHT Or GetPlayerDir(index) = DIR_DOWN Or GetPlayerDir(index) = DIR_DOWN_RIGHT Then
+            If (Player(index).xOffset >= 0) And (Player(index).yOffset >= 0) Then
+                Player(index).Moving = 0
+                Player(index).StepTimer = getTime
+                If Player(index).Step = 4 Then
+                    Player(index).Step = 5
+                Else
+                    Player(index).Step = 4
+                End If
+            End If
+        Else
+            If (Player(index).xOffset <= 0) And (Player(index).yOffset <= 0) Then
+                Player(index).Moving = 0
+                Player(index).StepTimer = getTime
+                If Player(index).Step = 4 Then
+                    Player(index).Step = 5
+                Else
+                    Player(index).Step = 4
+                End If
+            End If
+        End If
+        
+    End Select
     
 End Sub
 
@@ -616,6 +647,7 @@ Public Sub CheckAttack()
     Dim attackspeed As Long
 
     If ControlDown Then
+        
         If SpellBuffer > 0 Then Exit Sub ' currently casting a spell, can't attack
         If StunDuration > 0 Then Exit Sub ' stunned, can't attack
 
@@ -634,6 +666,7 @@ Public Sub CheckAttack()
                     .AttackModeTimer = getTime
                     .Attacking = 1
                     .AttackTimer = getTime
+                    '.StepTimer = getTime
                 End With
                 
                 Set buffer = New clsBuffer
@@ -1119,6 +1152,7 @@ Sub CheckMovement()
     With Player(MyIndex)
         If Not GettingMap Then
             If IsTryingToMove Then
+                
                 If CanMove Then
                     X = GetPlayerX(MyIndex)
                     Y = GetPlayerY(MyIndex)
@@ -1414,7 +1448,7 @@ Public Sub CastSpell(ByVal spellSlot As Long)
         AddText "Spell has not cooled down yet!", BrightRed
         Exit Sub
     End If
-    
+
     ' make sure we're not casting same spell
     If SpellBuffer > 0 Then
         If SpellBuffer = spellSlot Then
@@ -1441,6 +1475,16 @@ Public Sub CastSpell(ByVal spellSlot As Long)
                 buffer.Flush: Set buffer = Nothing
                 SpellBuffer = spellSlot
                 SpellBufferTimer = getTime
+
+                If Spell(PlayerSpells(spellSlot).Spell).CastFrame > 0 Then
+                    Call SetPlayerFrame(MyIndex, Spell(PlayerSpells(spellSlot).Spell).CastFrame)
+                End If
+                
+                If Spell(PlayerSpells(spellSlot).Spell).Projectile.ProjectileType = ProjectileTypeEnum.GekiDama Then
+                    ResetProjectileAnimation MyIndex
+                    Player(MyIndex).ProjectileCustomType = ProjectileTypeEnum.GekiDama
+                    Player(MyIndex).ProjectileCustomNum = Spell(PlayerSpells(spellSlot).Spell).Projectile.Graphic
+                End If
             Else
                 Call AddText("Cannot cast while walking!", BrightRed)
             End If
@@ -1531,7 +1575,7 @@ Public Sub CacheResources()
     Resource_Index = Resource_Count
 End Sub
 
-Public Sub CreateActionMsg(ByVal message As String, ByVal Color As Integer, ByVal MsgType As Byte, ByVal X As Long, ByVal Y As Long)
+Public Sub CreateActionMsg(ByVal message As String, ByVal Color As Integer, ByVal MsgType As Byte, ByVal X As Long, ByVal Y As Long, ByVal fonte As fonts)
     Dim i As Long
     ActionMsgIndex = ActionMsgIndex + 1
 
@@ -1546,6 +1590,7 @@ Public Sub CreateActionMsg(ByVal message As String, ByVal Color As Integer, ByVa
         .X = X
         .Y = Y
         .alpha = 255
+        .fonte = fonte
     End With
 
     If ActionMsg(ActionMsgIndex).Type = ACTIONMsgSCROLL Then
@@ -1567,10 +1612,10 @@ Public Sub CreateActionMsg(ByVal message As String, ByVal Color As Integer, ByVa
     If Action_HighIndex > MAX_BYTE Then Action_HighIndex = MAX_BYTE
 End Sub
 
-Public Sub ClearActionMsg(ByVal Index As Byte)
+Public Sub ClearActionMsg(ByVal index As Byte)
     Dim i As Long
-    ActionMsg(Index) = EmptyActionMsg
-    ActionMsg(Index).message = vbNullString
+    ActionMsg(index) = EmptyActionMsg
+    ActionMsg(index).message = vbNullString
 
     ' find the new high index
     For i = MAX_BYTE To 1 Step -1
@@ -1586,51 +1631,51 @@ Public Sub ClearActionMsg(ByVal Index As Byte)
     If Action_HighIndex > MAX_BYTE Then Action_HighIndex = MAX_BYTE
 End Sub
 
-Public Sub CheckAnimInstance(ByVal Index As Long)
+Public Sub CheckAnimInstance(ByVal index As Long)
     Dim looptime As Long
     Dim Layer As Long
     Dim FrameCount As Long
 
     ' if doesn't exist then exit sub
-    If AnimInstance(Index).Animation <= 0 Then Exit Sub
-    If AnimInstance(Index).Animation >= MAX_ANIMATIONS Then Exit Sub
+    If AnimInstance(index).Animation <= 0 Then Exit Sub
+    If AnimInstance(index).Animation >= MAX_ANIMATIONS Then Exit Sub
 
     For Layer = 0 To 1
 
-        If AnimInstance(Index).Used(Layer) Then
-            looptime = Animation(AnimInstance(Index).Animation).looptime(Layer)
+        If AnimInstance(index).Used(Layer) Then
+            looptime = Animation(AnimInstance(index).Animation).looptime(Layer)
 
-            FrameCount = Animation(AnimInstance(Index).Animation).Frames(Layer)
+            FrameCount = Animation(AnimInstance(index).Animation).Frames(Layer)
 
             ' if zero'd then set so we don't have extra loop and/or frame
-            If AnimInstance(Index).frameIndex(Layer) = 0 Then AnimInstance(Index).frameIndex(Layer) = 1
-            If AnimInstance(Index).LoopIndex(Layer) = 0 Then AnimInstance(Index).LoopIndex(Layer) = 1
+            If AnimInstance(index).frameIndex(Layer) = 0 Then AnimInstance(index).frameIndex(Layer) = 1
+            If AnimInstance(index).LoopIndex(Layer) = 0 Then AnimInstance(index).LoopIndex(Layer) = 1
 
             ' check if frame timer is set, and needs to have a frame change
-            If AnimInstance(Index).timer(Layer) + looptime <= getTime Then
+            If AnimInstance(index).timer(Layer) + looptime <= getTime Then
 
                 ' check if out of range
-                If AnimInstance(Index).frameIndex(Layer) >= FrameCount Then
-                    AnimInstance(Index).LoopIndex(Layer) = AnimInstance(Index).LoopIndex(Layer) + 1
+                If AnimInstance(index).frameIndex(Layer) >= FrameCount Then
+                    AnimInstance(index).LoopIndex(Layer) = AnimInstance(index).LoopIndex(Layer) + 1
 
-                    If AnimInstance(Index).LoopIndex(Layer) > Animation(AnimInstance(Index).Animation).LoopCount(Layer) Then
-                        AnimInstance(Index).Used(Layer) = False
+                    If AnimInstance(index).LoopIndex(Layer) > Animation(AnimInstance(index).Animation).LoopCount(Layer) Then
+                        AnimInstance(index).Used(Layer) = False
                     Else
-                        AnimInstance(Index).frameIndex(Layer) = 1
+                        AnimInstance(index).frameIndex(Layer) = 1
                     End If
 
                 Else
-                    AnimInstance(Index).frameIndex(Layer) = AnimInstance(Index).frameIndex(Layer) + 1
+                    AnimInstance(index).frameIndex(Layer) = AnimInstance(index).frameIndex(Layer) + 1
                 End If
 
-                AnimInstance(Index).timer(Layer) = getTime
+                AnimInstance(index).timer(Layer) = getTime
             End If
         End If
 
     Next
 
     ' if neither layer is used, clear
-    If AnimInstance(Index).Used(0) = False And AnimInstance(Index).Used(1) = False Then ClearAnimInstance (Index)
+    If AnimInstance(index).Used(0) = False And AnimInstance(index).Used(1) = False Then ClearAnimInstance (index)
 End Sub
 
 Public Function GetBankItemNum(ByVal BankSlot As Long) As Long
@@ -1738,7 +1783,7 @@ Public Sub CloseDialogue()
     HideWindow GetWindowIndex("winDialogue")
 End Sub
 
-Public Sub Dialogue(ByVal header As String, ByVal body As String, ByVal body2 As String, ByVal Index As Long, Optional ByVal Style As Byte = 1, Optional ByVal Data1 As Long = 0)
+Public Sub Dialogue(ByVal header As String, ByVal body As String, ByVal body2 As String, ByVal index As Long, Optional ByVal Style As Byte = 1, Optional ByVal Data1 As Long = 0)
 
     ' exit out if we've already got a dialogue open
     If diaIndex > 0 Then Exit Sub
@@ -1773,7 +1818,7 @@ Public Sub Dialogue(ByVal header As String, ByVal body As String, ByVal body2 As
     End With
     
     ' set it all up
-    diaIndex = Index
+    diaIndex = index
     diaData1 = Data1
     diaStyle = Style
     
@@ -1782,7 +1827,7 @@ Public Sub Dialogue(ByVal header As String, ByVal body As String, ByVal body2 As
     ShowWindow GetWindowIndex("winDialogue"), True
 End Sub
 
-Public Sub dialogueHandler(ByVal Index As Long)
+Public Sub dialogueHandler(ByVal index As Long)
 Dim Value As Long, diaInput As String
 
     Dim buffer As New clsBuffer
@@ -1791,7 +1836,7 @@ Dim Value As Long, diaInput As String
     diaInput = Trim$(Windows(GetWindowIndex("winDialogue")).Controls(GetControlIndex("winDialogue", "txtInput")).text)
 
     ' find out which button
-    If Index = 1 Then ' okay button
+    If index = 1 Then ' okay button
 
         ' dialogue index
         Select Case diaIndex
@@ -1809,7 +1854,7 @@ Dim Value As Long, diaInput As String
                     SendDropItem diaData1, Value
         End Select
 
-    ElseIf Index = 2 Then ' yes button
+    ElseIf index = 2 Then ' yes button
 
         ' dialogue index
         Select Case diaIndex
@@ -2884,7 +2929,7 @@ Public Sub ClearMapCache()
 End Sub
 
 Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal Msg As String, ByVal colour As Long)
-    Dim i As Long, Index As Long
+    Dim i As Long, index As Long
     ' set the global index
     chatBubbleIndex = chatBubbleIndex + 1
     
@@ -2896,7 +2941,7 @@ Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal M
 
     If chatBubbleIndex < 1 Or chatBubbleIndex > MAX_BYTE Then chatBubbleIndex = 1
     ' default to new bubble
-    Index = chatBubbleIndex
+    index = chatBubbleIndex
 
     ' loop through and see if that player/npc already has a chat bubble
     For i = 1 To MAX_BYTE
@@ -2905,14 +2950,14 @@ Public Sub AddChatBubble(ByVal target As Long, ByVal TargetType As Byte, ByVal M
                 ' reset master index
                 If chatBubbleIndex > 1 Then chatBubbleIndex = chatBubbleIndex - 1
                 ' we use this one now, yes?
-                Index = i
+                index = i
                 Exit For
             End If
         End If
     Next
 
     ' set the bubble up
-    With chatBubble(Index)
+    With chatBubble(index)
         .target = target
         .TargetType = TargetType
         .Msg = Msg
@@ -3032,11 +3077,11 @@ Public Sub SetBarWidth(ByRef MaxWidth As Long, ByRef Width As Long)
 
 End Sub
 
-Public Sub DialogueAlert(ByVal Index As Long)
+Public Sub DialogueAlert(ByVal index As Long)
     Dim header As String, body As String, body2 As String
 
     ' find the body/header
-    Select Case Index
+    Select Case index
 
         Case MsgCONNECTION
             header = "Connection Problem"
@@ -3132,7 +3177,7 @@ Public Sub DialogueAlert(ByVal Index As Long)
     Dialogue header, body, body2, TypeALERT
 End Sub
 
-Public Function hasProficiency(ByVal Index As Long, ByVal proficiency As Long) As Boolean
+Public Function hasProficiency(ByVal index As Long, ByVal proficiency As Long) As Boolean
 
     Select Case proficiency
 
@@ -3142,14 +3187,14 @@ Public Function hasProficiency(ByVal Index As Long, ByVal proficiency As Long) A
 
         Case 1 ' Heavy
 
-            If GetPlayerClass(Index) = 1 Then
+            If GetPlayerClass(index) = 1 Then
                 hasProficiency = True
                 Exit Function
             End If
 
         Case 2 ' Light
 
-            If GetPlayerClass(Index) = 2 Or GetPlayerClass(Index) = 3 Then
+            If GetPlayerClass(index) = 2 Or GetPlayerClass(index) = 3 Then
                 hasProficiency = True
                 Exit Function
             End If
@@ -3762,8 +3807,8 @@ Dim i As Long
     Next
 End Function
 
-Sub ShowPlayerMenu(Index As Long, X As Long, Y As Long)
-    PlayerMenuIndex = Index
+Sub ShowPlayerMenu(index As Long, X As Long, Y As Long)
+    PlayerMenuIndex = index
     If PlayerMenuIndex = 0 Then Exit Sub
     Windows(GetWindowIndex("winPlayerMenu")).Window.Left = X - 5
     Windows(GetWindowIndex("winPlayerMenu")).Window.Top = Y - 5
@@ -4487,4 +4532,30 @@ Public Sub ProcessWeather()
             End If
         End If
     Next
+End Sub
+
+Public Sub SetPlayerBlock(ByVal PlayerBlockValue As Byte)
+    If PlayerBlockValue <> GetPlayerBlock Then
+        Player(MyIndex).PlayerBlock = PlayerBlockValue
+        Call SendPlayerBlock
+    End If
+End Sub
+Public Function GetPlayerBlock() As Byte
+    GetPlayerBlock = Player(MyIndex).PlayerBlock
+End Function
+
+Public Sub ProcessPlayerActions()
+    ' This player select one of actions! Not permited simultaneos
+    
+    Call CheckMovement      ' Check if player is trying to move
+    Call CheckAttack        ' Check to see if player is trying to attack
+    Call CheckPlayerBlock   ' Check to see if player is trying to block action
+End Sub
+
+Private Sub CheckPlayerBlock()
+    If eDown Then
+        Call SetPlayerBlock(YES)
+    Else
+        Call SetPlayerBlock(NO)
+    End If
 End Sub

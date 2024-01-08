@@ -26,6 +26,11 @@ Sub ServerLoop()
                             TempPlayer(i).spellBuffer.Timer = 0
                             TempPlayer(i).spellBuffer.Target = 0
                             TempPlayer(i).spellBuffer.tType = 0
+                            
+                            Call ClearPlayerFrameToMapBut(i)
+                            If TempPlayer(i).ProjectileCustomType <> ProjectileTypeEnum.None Then
+                                SendPlayerConjureProjectileCustomToMapBut i, None, 0
+                            End If
                         End If
                     End If
                     ' check if need to turn off stunned
@@ -278,7 +283,7 @@ Private Sub UpdateMapLogic()
 
                             ' Check to see if its time for the npc to walk
                             If Npc(npcNum).Behaviour <> NPC_BEHAVIOUR_SHOPKEEPER Then
-                                If GetTickCount <= MapNpc(mapnum).Npc(x).ImpactedTick Then
+                                If MapNpc(mapnum).Npc(x).ImpactedTick <= GetTickCount Then
                                     If TargetType = 1 Then    ' player
 
                                         ' Check to see if we are following a player or not
@@ -789,7 +794,7 @@ Private Sub UpdateMapLogic()
 End Sub
 
 Private Sub UpdatePlayerFood(ByVal i As Long)
-Dim vitalType As Long, colour As Long, x As Long
+Dim vitalType As Long, colour As Long, x As Long, fonte As fonts
 
     For x = 1 To Vitals.Vital_Count - 1
         If TempPlayer(i).foodItem(x) > 0 Then
@@ -813,8 +818,8 @@ Dim vitalType As Long, colour As Long, x As Long
                     ' give them the healing
                     SetPlayerVital i, vitalType, GetPlayerVital(i, vitalType) + Item(TempPlayer(i).foodItem(x)).FoodPerTick
                     ' let them know with messages
-                    If vitalType = 2 Then colour = BrightBlue Else colour = Green
-                    SendActionMsg GetPlayerMap(i), "+" & Item(TempPlayer(i).foodItem(x)).FoodPerTick, colour, ACTIONMSG_SCROLL, GetPlayerX(i) * 32, GetPlayerY(i) * 32
+                    If vitalType = 2 Then colour = BrightBlue: fonte = energy Else colour = Green: fonte = health
+                    SendActionMsg GetPlayerMap(i), "+" & Item(TempPlayer(i).foodItem(x)).FoodPerTick, colour, ACTIONMSG_SCROLL, GetPlayerX(i) * 32, GetPlayerY(i) * 32, fonte
                     ' send vitals
                     SendVital i, vitalType
                     ' increment tick count

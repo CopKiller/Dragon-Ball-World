@@ -7,11 +7,11 @@ Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivat
 Private crcTable(0 To 255) As Long
 
 Public Sub InitCRC32()
-Dim i As Long, n As Long, CRC As Long
+Dim i As Long, N As Long, CRC As Long
 
     For i = 0 To 255
         CRC = i
-        For n = 0 To 7
+        For N = 0 To 7
             If CRC And 1 Then
                 CRC = (((CRC And &HFFFFFFFE) \ 2) And &H7FFFFFFF) Xor &HEDB88320
             Else
@@ -38,12 +38,12 @@ End Function
 
 Public Sub ChkDir(ByVal tDir As String, ByVal tName As String)
 
-    If LCase$(Dir$(tDir & tName, vbDirectory)) <> tName Then Call MkDir(tDir & tName)
+    If LCase$(dir$(tDir & tName, vbDirectory)) <> tName Then Call MkDir(tDir & tName)
 End Sub
 
 Public Function FileExist(ByVal FileName As String) As Boolean
 
-    If LenB(Dir$(FileName)) > 0 Then
+    If LenB(dir$(FileName)) > 0 Then
         FileExist = True
     End If
 
@@ -305,20 +305,23 @@ Public Sub LoadMap(ByVal mapNum As Long)
     ClearTempTile
 End Sub
 
-Public Sub ClearPlayer(ByVal Index As Long)
-    Player(Index) = EmptyPlayer
-    Player(Index).Name = vbNullString
+Public Sub ClearPlayer(ByVal index As Long)
+    Player(index) = EmptyPlayer
+    Player(index).Name = vbNullString
 End Sub
 
 Public Sub ClearProjectile(ByVal ProjectileSlot As Long)
+    If MapProjectile(ProjectileSlot).OwnerType = TARGET_TYPE_PLAYER Then
+        SetPlayerFrame MapProjectile(ProjectileSlot).Owner, 0
+    End If
     MapProjectile(ProjectileSlot) = EmptyMapProjectile
 End Sub
 
-Public Sub ClearItem(ByVal Index As Long)
-    Item(Index) = EmptyItem
-    Item(Index).Name = vbNullString
-    Item(Index).Desc = vbNullString
-    Item(Index).sound = "None."
+Public Sub ClearItem(ByVal index As Long)
+    Item(index) = EmptyItem
+    Item(index).Name = vbNullString
+    Item(index).Desc = vbNullString
+    Item(index).sound = "None."
 End Sub
 
 Public Sub ClearItems()
@@ -330,8 +333,8 @@ Public Sub ClearItems()
 
 End Sub
 
-Public Sub ClearMapItem(ByVal Index As Long)
-    MapItem(Index) = EmptyMapItem
+Public Sub ClearMapItem(ByVal index As Long)
+    MapItem(index) = EmptyMapItem
 End Sub
 
 Public Sub ClearMap()
@@ -352,8 +355,8 @@ Public Sub ClearMapItems()
 
 End Sub
 
-Public Sub ClearMapNpc(ByVal Index As Long)
-    MapNpc(Index) = EmptyMapNpc
+Public Sub ClearMapNpc(ByVal index As Long)
+    MapNpc(index) = EmptyMapNpc
 End Sub
 
 Public Sub ClearMapNpcs()
@@ -368,221 +371,221 @@ End Sub
 ' **********************
 ' ** Player functions **
 ' **********************
-Function GetPlayerName(ByVal Index As Long) As String
+Function GetPlayerName(ByVal index As Long) As String
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerName = Trim$(Player(Index).Name)
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerName = Trim$(Player(index).Name)
 End Function
 
-Sub SetPlayerName(ByVal Index As Long, ByVal Name As String)
+Sub SetPlayerName(ByVal index As Long, ByVal Name As String)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Name = Name
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Name = Name
 End Sub
 
-Function GetPlayerClass(ByVal Index As Long) As Long
+Function GetPlayerClass(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerClass = Player(Index).Class
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerClass = Player(index).Class
 End Function
 
-Sub SetPlayerClass(ByVal Index As Long, ByVal ClassNum As Long)
+Sub SetPlayerClass(ByVal index As Long, ByVal ClassNum As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Class = ClassNum
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Class = ClassNum
 End Sub
 
-Function GetPlayerSprite(ByVal Index As Long) As Long
+Function GetPlayerSprite(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerSprite = Player(Index).sprite
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerSprite = Player(index).sprite
 End Function
 
-Sub SetPlayerSprite(ByVal Index As Long, ByVal sprite As Long)
+Sub SetPlayerSprite(ByVal index As Long, ByVal sprite As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).sprite = sprite
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).sprite = sprite
 End Sub
 
-Function GetPlayerLevel(ByVal Index As Long) As Long
+Function GetPlayerLevel(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerLevel = Player(Index).Level
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerLevel = Player(index).Level
 End Function
 
-Sub SetPlayerLevel(ByVal Index As Long, ByVal Level As Long)
+Sub SetPlayerLevel(ByVal index As Long, ByVal Level As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Level = Level
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Level = Level
 End Sub
 
-Function GetPlayerExp(ByVal Index As Long) As Long
+Function GetPlayerExp(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerExp = Player(Index).EXP
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerExp = Player(index).EXP
 End Function
 
-Sub SetPlayerExp(ByVal Index As Long, ByVal EXP As Long)
+Sub SetPlayerExp(ByVal index As Long, ByVal EXP As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).EXP = EXP
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).EXP = EXP
 End Sub
 
-Function GetPlayerAccess(ByVal Index As Long) As Long
+Function GetPlayerAccess(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerAccess = Player(Index).Access
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerAccess = Player(index).Access
 End Function
 
-Sub SetPlayerAccess(ByVal Index As Long, ByVal Access As Long)
+Sub SetPlayerAccess(ByVal index As Long, ByVal Access As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Access = Access
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Access = Access
 End Sub
 
-Function GetPlayerPK(ByVal Index As Long) As Long
+Function GetPlayerPK(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerPK = Player(Index).PK
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerPK = Player(index).PK
 End Function
 
-Sub SetPlayerPK(ByVal Index As Long, ByVal PK As Long)
+Sub SetPlayerPK(ByVal index As Long, ByVal PK As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).PK = PK
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).PK = PK
 End Sub
 
-Function GetPlayerVital(ByVal Index As Long, ByVal Vital As Vitals) As Long
+Function GetPlayerVital(ByVal index As Long, ByVal Vital As Vitals) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerVital = Player(Index).Vital(Vital)
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerVital = Player(index).Vital(Vital)
 End Function
 
-Sub SetPlayerVital(ByVal Index As Long, ByVal Vital As Vitals, ByVal Value As Long)
+Sub SetPlayerVital(ByVal index As Long, ByVal Vital As Vitals, ByVal Value As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Vital(Vital) = Value
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Vital(Vital) = Value
 
-    If GetPlayerVital(Index, Vital) > GetPlayerMaxVital(Index, Vital) Then
-        Player(Index).Vital(Vital) = GetPlayerMaxVital(Index, Vital)
+    If GetPlayerVital(index, Vital) > GetPlayerMaxVital(index, Vital) Then
+        Player(index).Vital(Vital) = GetPlayerMaxVital(index, Vital)
     End If
 
 End Sub
 
-Function GetPlayerMaxVital(ByVal Index As Long, ByVal Vital As Vitals) As Long
+Function GetPlayerMaxVital(ByVal index As Long, ByVal Vital As Vitals) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerMaxVital = Player(Index).MaxVital(Vital)
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerMaxVital = Player(index).MaxVital(Vital)
 End Function
 
-Function GetPlayerStat(ByVal Index As Long, Stat As Stats) As Long
+Function GetPlayerStat(ByVal index As Long, Stat As Stats) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerStat = Player(Index).Stat(Stat)
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerStat = Player(index).Stat(Stat)
 End Function
 
-Sub SetPlayerStat(ByVal Index As Long, Stat As Stats, ByVal Value As Long)
+Sub SetPlayerStat(ByVal index As Long, Stat As Stats, ByVal Value As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
+    If index > MAX_PLAYERS Then Exit Sub
     If Value <= 0 Then Value = 1
     If Value > MAX_BYTE Then Value = MAX_BYTE
-    Player(Index).Stat(Stat) = Value
+    Player(index).Stat(Stat) = Value
 End Sub
 
-Function GetPlayerPOINTS(ByVal Index As Long) As Long
+Function GetPlayerPOINTS(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerPOINTS = Player(Index).POINTS
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerPOINTS = Player(index).POINTS
 End Function
 
-Sub SetPlayerPOINTS(ByVal Index As Long, ByVal POINTS As Long)
+Sub SetPlayerPOINTS(ByVal index As Long, ByVal POINTS As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).POINTS = POINTS
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).POINTS = POINTS
 End Sub
 
-Function GetPlayerMap(ByVal Index As Long) As Long
+Function GetPlayerMap(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Or Index <= 0 Then Exit Function
-    GetPlayerMap = Player(Index).Map
+    If index > MAX_PLAYERS Or index <= 0 Then Exit Function
+    GetPlayerMap = Player(index).Map
 End Function
 
-Sub SetPlayerMap(ByVal Index As Long, ByVal mapNum As Long)
+Sub SetPlayerMap(ByVal index As Long, ByVal mapNum As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Map = mapNum
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Map = mapNum
 End Sub
 
-Function GetPlayerX(ByVal Index As Long) As Long
+Function GetPlayerX(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerX = Player(Index).X
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerX = Player(index).X
 End Function
 
-Sub SetPlayerX(ByVal Index As Long, ByVal X As Long)
+Sub SetPlayerX(ByVal index As Long, ByVal X As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).X = X
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).X = X
 End Sub
 
-Function GetPlayerY(ByVal Index As Long) As Long
+Function GetPlayerY(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerY = Player(Index).Y
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerY = Player(index).Y
 End Function
 
-Sub SetPlayerY(ByVal Index As Long, ByVal Y As Long)
+Sub SetPlayerY(ByVal index As Long, ByVal Y As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Y = Y
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).Y = Y
 End Sub
 
-Function GetPlayerDir(ByVal Index As Long) As Long
+Function GetPlayerDir(ByVal index As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
-    GetPlayerDir = Player(Index).Dir
+    If index > MAX_PLAYERS Then Exit Function
+    GetPlayerDir = Player(index).dir
 End Function
 
-Sub SetPlayerDir(ByVal Index As Long, ByVal Dir As Long)
+Sub SetPlayerDir(ByVal index As Long, ByVal dir As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Dir = Dir
+    If index > MAX_PLAYERS Then Exit Sub
+    Player(index).dir = dir
 End Sub
 
-Function GetPlayerInvItemNum(ByVal Index As Long, ByVal invSlot As Long) As Long
+Function GetPlayerInvItemNum(ByVal index As Long, ByVal invSlot As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
+    If index > MAX_PLAYERS Then Exit Function
     If invSlot = 0 Then Exit Function
     GetPlayerInvItemNum = PlayerInv(invSlot).Num
 End Function
 
-Sub SetPlayerInvItemNum(ByVal Index As Long, ByVal invSlot As Long, ByVal ItemNum As Long)
+Sub SetPlayerInvItemNum(ByVal index As Long, ByVal invSlot As Long, ByVal ItemNum As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
+    If index > MAX_PLAYERS Then Exit Sub
     PlayerInv(invSlot).Num = ItemNum
 End Sub
 
-Function GetPlayerInvItemValue(ByVal Index As Long, ByVal invSlot As Long) As Long
+Function GetPlayerInvItemValue(ByVal index As Long, ByVal invSlot As Long) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
+    If index > MAX_PLAYERS Then Exit Function
     GetPlayerInvItemValue = PlayerInv(invSlot).Value
 End Function
 
-Sub SetPlayerInvItemValue(ByVal Index As Long, ByVal invSlot As Long, ByVal ItemValue As Long)
+Sub SetPlayerInvItemValue(ByVal index As Long, ByVal invSlot As Long, ByVal ItemValue As Long)
 
-    If Index > MAX_PLAYERS Then Exit Sub
+    If index > MAX_PLAYERS Then Exit Sub
     PlayerInv(invSlot).Value = ItemValue
 End Sub
 
-Function GetPlayerEquipment(ByVal Index As Long, ByVal EquipmentSlot As Equipment) As Long
+Function GetPlayerEquipment(ByVal index As Long, ByVal EquipmentSlot As Equipment) As Long
 
-    If Index > MAX_PLAYERS Then Exit Function
+    If index > MAX_PLAYERS Then Exit Function
     If EquipmentSlot <= 0 Then Exit Function
-    GetPlayerEquipment = Player(Index).Equipment(EquipmentSlot)
+    GetPlayerEquipment = Player(index).Equipment(EquipmentSlot)
 End Function
 
-Sub SetPlayerEquipment(ByVal Index As Long, ByVal invNum As Long, ByVal EquipmentSlot As Equipment)
+Sub SetPlayerEquipment(ByVal index As Long, ByVal invNum As Long, ByVal EquipmentSlot As Equipment)
 
-    If Index < 1 Or Index > MAX_PLAYERS Then Exit Sub
-    Player(Index).Equipment(EquipmentSlot) = invNum
+    If index < 1 Or index > MAX_PLAYERS Then Exit Sub
+    Player(index).Equipment(EquipmentSlot) = invNum
 End Sub

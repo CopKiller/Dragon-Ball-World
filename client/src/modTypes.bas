@@ -12,7 +12,6 @@ Public Class() As ClassRec
 Public Item(1 To MAX_ITEMS) As ItemRec
 Public MapItem(1 To MAX_MAP_ITEMS) As MapItemRec
 Public MapNpc(1 To MAX_MAP_NPCS) As MapNpcRec
-Public ActionMsg(1 To MAX_BYTE) As ActionMsgRec
 Public Blood(1 To MAX_BYTE) As BloodRec
 Public Party As PartyRec
 Public Autotile() As AutotileRec
@@ -29,7 +28,6 @@ Public EmptyPlayer As PlayerRec
 Public EmptyItem As ItemRec
 Public EmptyMapItem As MapItemRec
 Public EmptyMapNpc As MapNpcRec
-Public EmptyActionMsg As ActionMsgRec
 
 'Client
 Public WeatherParticle(1 To MAX_WEATHER_PARTICLES) As WeatherParticleRec
@@ -134,15 +132,10 @@ Private Type PlayerRec
     ' Quest
     PlayerQuest(1 To MAX_QUESTS) As PlayerQuestRec
     
-    ' Client use only
-    xOffset As Integer
-    yOffset As Integer
-    Moving As Byte
-    Attacking As Byte
-    AttackTimer As Long
-    MapGetTimer As Long
-    
     '--> Frames
+    playerFrame As Byte
+    
+    ' Client use only
     Anim As Long
     AnimTimer As Long
     
@@ -155,6 +148,18 @@ Private Type PlayerRec
     
     AttackMode As Byte
     AttackModeTimer As Long
+    
+    PlayerBlock As Byte
+    
+    xOffset As Integer
+    yOffset As Integer
+    Moving As Byte
+    Attacking As Byte
+    AttackTimer As Long
+    MapGetTimer As Long
+    
+    ProjectileCustomType As Byte
+    ProjectileCustomNum As Long
 End Type
 
 Private Type EventCommandRec
@@ -372,19 +377,6 @@ Public Type MapResourceRec
     X As Long
     Y As Long
     ResourceState As Byte
-End Type
-
-Private Type ActionMsgRec
-    message As String
-    Created As Long
-
-    Type As Long
-    Color As Long
-    Scroll As Long
-    X As Long
-    Y As Long
-    timer As Long
-    alpha As Long
 End Type
 
 Private Type BloodRec

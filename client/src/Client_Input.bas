@@ -16,6 +16,7 @@ Public Sub CheckKeys()
     If GetAsyncKeyState(VK_CONTROL) >= 0 Then ControlDown = False
     If GetAsyncKeyState(VK_SHIFT) >= 0 Then ShiftDown = False
     If GetAsyncKeyState(VK_TAB) >= 0 Then tabDown = False
+    If GetAsyncKeyState(VK_E) >= 0 Then eDown = False
 End Sub
 
 Public Sub CheckInputKeys()
@@ -43,6 +44,13 @@ Public Sub CheckInputKeys()
         tabDown = True
     Else
         tabDown = False
+    End If
+    
+    ' block player
+    If GetKeyState(vbKeyE) < 0 Then
+        eDown = True
+    Else
+        eDown = False
     End If
 
     'Move Up

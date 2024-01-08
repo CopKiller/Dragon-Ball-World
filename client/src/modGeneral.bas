@@ -98,6 +98,8 @@ Dim i As Long
     End If
     Call InitTime
     
+    Call ClearAllGameData
+    
     Call MenuLoop
 End Sub
 
@@ -174,7 +176,7 @@ Public Sub logoutGame()
     Dim i As Long
     isLogging = True
     InGame = False
-    
+
     DestroyTCP
 
     ' destroy the animations loaded
@@ -182,13 +184,15 @@ Public Sub logoutGame()
         ClearAnimInstance (i)
     Next
 
+
+    SpellBuffer = 0
+    SpellBufferTimer = 0
+
     ' destroy temp values
     DragInvSlotNum = 0
     LastItemDesc = 0
     MyIndex = 0
     InventoryItemSelected = 0
-    SpellBuffer = 0
-    SpellBufferTimer = 0
     tmpCurrencyItem = 0
     ' unload editors
     Unload frmEditor_Animation
@@ -199,10 +203,14 @@ Public Sub logoutGame()
     Unload frmEditor_Resource
     Unload frmEditor_Shop
     Unload frmEditor_Spell
+    Unload frmEditor_Conv
+    Unload frmeditor_quests
     ' clear chat
     For i = 1 To ChatLines
         Chat(i).text = vbNullString
     Next
+
+    Call ClearAllGameData
 
     inMenu = True
     MenuLoop
@@ -303,24 +311,24 @@ End Function
 Public Sub PopulateLists()
     Dim strLoad As String, i As Long
     ' Cache music list
-    strLoad = Dir$(App.Path & MUSIC_PATH & "*.*")
+    strLoad = dir$(App.Path & MUSIC_PATH & "*.*")
     i = 1
 
     Do While strLoad > vbNullString
         ReDim Preserve musicCache(1 To i) As String
         musicCache(i) = strLoad
-        strLoad = Dir
+        strLoad = dir
         i = i + 1
     Loop
 
     ' Cache sound list
-    strLoad = Dir$(App.Path & SOUND_PATH & "*.*")
+    strLoad = dir$(App.Path & SOUND_PATH & "*.*")
     i = 1
 
     Do While strLoad > vbNullString
         ReDim Preserve soundCache(1 To i) As String
         soundCache(i) = strLoad
-        strLoad = Dir
+        strLoad = dir
         i = i + 1
     Loop
 
@@ -390,3 +398,15 @@ ErrOut:
 
     Exit Function
 End Function
+
+Sub ClearAllGameData()
+    Call ClearQuests
+    Call ClearItems
+    Call ClearSpells
+    Call ClearNpcs
+    Call ClearResources
+    Call ClearMap
+    Call ClearShops
+    Call ClearConvs
+    Call ClearAnimations
+End Sub

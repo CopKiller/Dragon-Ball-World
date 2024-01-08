@@ -370,6 +370,7 @@ End Sub
 Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As Long, Optional ByVal sendToSelf As Boolean = False)
     Dim Buffer As clsBuffer, mapnum As Long, x As Long, y As Long, moved As Byte, MovedSoFar As Boolean, newMapX As Byte, newMapY As Byte
     Dim TileType As Long, vitalType As Long, colour As Long, Amount As Long, canMoveResult As Long, i As Long
+    Dim fonte As fonts
 
     ' Check for subscript out of range
     If IsPlaying(index) = False Or Dir < DIR_UP Or Dir > DIR_DOWN_RIGHT Or movement < 1 Or movement > 2 Then
@@ -385,11 +386,13 @@ Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As 
     ' check if they're casting a spell
     If TempPlayer(index).spellBuffer.Spell > 0 Then
         SendCancelAnimation index
-        SendClearSpellBuffer index
         TempPlayer(index).spellBuffer.Spell = 0
         TempPlayer(index).spellBuffer.Target = 0
         TempPlayer(index).spellBuffer.Timer = 0
         TempPlayer(index).spellBuffer.tType = 0
+        
+        Call SendClearSpellBufferTo(index)
+        Call ClearPlayerFrameToMapBut(i)
     End If
     
     ' check directions
@@ -495,10 +498,12 @@ Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As 
             If Not GetPlayerVital(index, vitalType) = GetPlayerMaxVital(index, vitalType) Then
                 If vitalType = Vitals.HP Then
                     colour = BrightGreen
+                    fonte = health
                 Else
                     colour = BrightBlue
+                    fonte = energy
                 End If
-                SendActionMsg GetPlayerMap(index), "+" & Amount, colour, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, 1
+                SendActionMsg GetPlayerMap(index), "+" & Amount, colour, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, fonte, index
                 SetPlayerVital index, vitalType, GetPlayerVital(index, vitalType) + Amount
                 PlayerMsg index, "You feel rejuvinating forces flowing through your boy.", BrightGreen
                 Call SendVital(index, vitalType)
@@ -511,7 +516,7 @@ Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As 
         ' Check if it's a trap tile
         If .Type = TILE_TYPE_TRAP Then
             Amount = .Data1
-            SendActionMsg GetPlayerMap(index), "-" & Amount, BrightRed, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, 1
+            SendActionMsg GetPlayerMap(index), "-" & Amount, BrightRed, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, fonts.Damage, index
             If GetPlayerVital(index, HP) - Amount <= 0 Then
                 KillPlayer index
                 PlayerMsg index, "You're killed by a trap.", BrightRed
@@ -799,7 +804,7 @@ Sub PlayerMapGetItem(ByVal index As Long)
                             
                             Call SendInventoryUpdate(index, n)
                             Call SpawnItemSlot(i, 0, 0, GetPlayerMap(index), 0, 0)
-                            SendActionMsg GetPlayerMap(index), Msg, White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32)
+                            SendActionMsg GetPlayerMap(index), Msg, White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), alert
                             Exit For
                         Else
                             Call PlayerMsg(index, "Your inventory is full.", BrightRed)
@@ -984,7 +989,7 @@ Sub OnDeath(ByVal index As Long)
     TempPlayer(index).spellBuffer.Timer = 0
     TempPlayer(index).spellBuffer.Target = 0
     TempPlayer(index).spellBuffer.tType = 0
-    Call SendClearSpellBuffer(index)
+    Call SendClearSpellBufferTo(index)
     
     ' Restore vitals
     Call SetPlayerVital(index, Vitals.HP, GetPlayerMaxVital(index, Vitals.HP))
@@ -1066,13 +1071,13 @@ Sub CheckResource(ByVal index As Long, ByVal x As Long, ByVal y As Long)
                 If Damage > 0 Then
                     ' cut it down!
                     If ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).cur_health - Damage <= 0 Then
-                        SendActionMsg GetPlayerMap(index), "-" & ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).cur_health, BrightRed, 1, (rX * 32), (rY * 32)
+                        SendActionMsg GetPlayerMap(index), "-" & ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).cur_health, BrightRed, 1, (rX * 32), (rY * 32), Damage
                         ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).ResourceState = 1    ' Cut
                         ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).ResourceTimer = GetTickCount
                         SendResourceCacheToMap GetPlayerMap(index), Resource_num
                         ' send message if it exists
                         If Len(Trim$(Resource(Resource_index).SuccessMessage)) > 0 Then
-                            SendActionMsg GetPlayerMap(index), Trim$(Resource(Resource_index).SuccessMessage), BrightGreen, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32)
+                            SendActionMsg GetPlayerMap(index), Trim$(Resource(Resource_index).SuccessMessage), BrightGreen, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), alert
                         End If
                         ' carry on
                         GiveInvItem index, Resource(Resource_index).ItemReward, 1
@@ -1080,19 +1085,19 @@ Sub CheckResource(ByVal index As Long, ByVal x As Long, ByVal y As Long)
                     Else
                         ' just do the damage
                         ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).cur_health = ResourceCache(GetPlayerMap(index)).ResourceData(Resource_num).cur_health - Damage
-                        SendActionMsg GetPlayerMap(index), "-" & Damage, BrightRed, 1, (rX * 32), (rY * 32)
+                        SendActionMsg GetPlayerMap(index), "-" & Damage, BrightRed, 1, (rX * 32), (rY * 32), Damage
                         SendAnimation GetPlayerMap(index), Resource(Resource_index).Animation, rX, rY
                     End If
                     ' send the sound
                     SendMapSound index, rX, rY, SoundEntity.seResource, Resource_index
                 Else
                     ' too weak
-                    SendActionMsg GetPlayerMap(index), "Miss!", BrightRed, 1, (rX * 32), (rY * 32)
+                    SendActionMsg GetPlayerMap(index), "Miss!", BrightRed, 1, (rX * 32), (rY * 32), alert
                 End If
             Else
                 ' send message if it exists
                 If Len(Trim$(Resource(Resource_index).EmptyMessage)) > 0 Then
-                    SendActionMsg GetPlayerMap(index), Trim$(Resource(Resource_index).EmptyMessage), BrightRed, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32)
+                    SendActionMsg GetPlayerMap(index), Trim$(Resource(Resource_index).EmptyMessage), BrightRed, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), alert
                 End If
             End If
 
@@ -1309,7 +1314,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
                 ' add hp
                 If Item(ItemNum).AddHP > 0 Then
                     Player(index).Vital(Vitals.HP) = Player(index).Vital(Vitals.HP) + Item(ItemNum).AddHP
-                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddHP, BrightGreen, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32
+                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddHP, BrightGreen, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, health
                     SendVital index, HP
                     ' send vitals to party if in one
                     If TempPlayer(index).inParty > 0 Then SendPartyVitals TempPlayer(index).inParty, index
@@ -1317,7 +1322,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
                 ' add mp
                 If Item(ItemNum).AddMP > 0 Then
                     Player(index).Vital(Vitals.MP) = Player(index).Vital(Vitals.MP) + Item(ItemNum).AddMP
-                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddMP, BrightBlue, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32
+                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddMP, BrightBlue, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, energy
                     SendVital index, MP
                     ' send vitals to party if in one
                     If TempPlayer(index).inParty > 0 Then SendPartyVitals TempPlayer(index).inParty, index
@@ -1326,7 +1331,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
                 If Item(ItemNum).AddEXP > 0 Then
                     SetPlayerExp index, GetPlayerExp(index) + Item(ItemNum).AddEXP
                     CheckPlayerLevelUp index
-                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddEXP & " EXP", White, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32
+                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddEXP & " EXP", White, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, exp
                     SendEXP index
                 End If
                 Call SendAnimation(GetPlayerMap(index), Item(ItemNum).Animation, 0, 0, TARGET_TYPE_PLAYER, index)

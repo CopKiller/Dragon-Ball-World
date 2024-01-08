@@ -455,13 +455,16 @@ Public Function CanPlayerCriticalHit(ByVal index As Long) As Boolean
 
 End Function
 
-Public Function CanPlayerBlockHit(ByVal Victim As Long, Optional ByVal AttackerType As Byte, Optional ByVal AttackerID As Long) As Boolean
+Public Function CanPlayerBlockHit(ByVal Victim As Long, _
+                                  ByVal Damage As Long, _
+                                  Optional ByVal AttackerType As Byte, _
+                                  Optional ByVal AttackerID As Long) As Long
     Dim rndNum As Long
     Dim Value As Long
     Dim Rate As Single
-    Dim NpcNum As Long
+    Dim npcNum As Long
 
-    If TempPlayer(Victim).PlayerBlock Then
+    If TempPlayer(Victim).PlayerBlock = YES Then
 
         ' Obtém a chance de acerto do atacante.
         If AttackerType = TARGET_TYPE_PLAYER Then
@@ -469,22 +472,58 @@ Public Function CanPlayerBlockHit(ByVal Victim As Long, Optional ByVal AttackerT
             Rate = CSng(Value / GetPlayerRawStat(AttackerID, Stats.Agility))
 
         ElseIf AttackerType = TARGET_TYPE_NPC Then
-            NpcNum = MapNpc(GetPlayerMap(Victim)).Npc(AttackerID).Num
-            Value = Npc(NpcNum).Stat(Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
-            Rate = CSng(Value / Npc(NpcNum).Stat(Stats.Agility))
+            npcNum = MapNpc(GetPlayerMap(Victim)).Npc(AttackerID).Num
+            Value = Npc(npcNum).Stat(Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
+            Rate = CSng(Value / Npc(npcNum).Stat(Stats.Agility))
         End If
 
-        ' Inverte os valores para obter a chance de esquiva.
+        ' Inverte os valores para obter a chance de bloqueio.
         Rate = 100 - (Rate * 100)
 
-        ' Limita a chance em 90%
+        ' Limita a chance máxima em 90%
         If Rate > 90 Then Rate = 90
-        If Rate < 0 Then Rate = 1
+        ' Limita a chance mínima em 25%
+        If Rate < 0 Then Rate = 25
 
         rndNum = RAND(1, 100)
         If rndNum <= Rate Then
-            CanPlayerBlock = True
+            CanPlayerBlockHit = Damage / 2
         End If
     End If
 
 End Function
+
+'Public Function CanPlayerBlockHit(ByVal Victim As Long, Optional ByVal AttackerType As Byte, Optional ByVal AttackerID As Long) As Boolean
+'  Dim rndNum As Long
+' Dim Value As Long
+'  Dim Rate As Single
+'   Dim npcNum As Long
+
+'   If TempPlayer(Victim).PlayerBlock = YES Then
+
+' Obtém a chance de acerto do atacante.
+'        If AttackerType = TARGET_TYPE_PLAYER Then
+'            Value = GetPlayerRawStat(AttackerID, Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
+'            Rate = CSng(Value / GetPlayerRawStat(AttackerID, Stats.Agility))
+
+'        ElseIf AttackerType = TARGET_TYPE_NPC Then
+'            npcNum = MapNpc(GetPlayerMap(Victim)).Npc(AttackerID).Num
+'            Value = Npc(npcNum).Stat(Stats.Agility) - GetPlayerRawStat(Victim, Stats.Agility)
+'            Rate = CSng(Value / Npc(npcNum).Stat(Stats.Agility))
+'        End If
+
+' Inverte os valores para obter a chance de bloqueio.
+'        Rate = 100 - (Rate * 100)
+
+' Limita a chance máxima em 90%
+'        If Rate > 90 Then Rate = 90
+' Limita a chance mínima em 25%
+'        If Rate < 0 Then Rate = 25
+
+'        rndNum = RAND(1, 100)
+'        If rndNum <= Rate Then
+'            CanPlayerBlockHit = True
+'        End If
+'    End If
+
+'End Function

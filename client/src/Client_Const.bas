@@ -92,6 +92,7 @@ Public Const VK_A As Long = &H41
 Public Const VK_D As Long = &H44
 Public Const VK_S As Long = &H53
 Public Const VK_W As Long = &H57
+Public Const VK_E As Long = &H45 'block
 Public Const VK_SHIFT As Long = &H10
 Public Const VK_RETURN As Long = &HD
 Public Const VK_CONTROL As Long = &H11

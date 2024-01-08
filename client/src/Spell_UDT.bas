@@ -14,6 +14,7 @@ Public Type ProjectileDataRec
     AnimOnHit As Long
     ProjectileOffset(1 To 4) As XYRec
     ImpactRange As Byte
+    ProjectileType As Byte
 End Type
 
 Public Type SpellRec
@@ -53,5 +54,7 @@ Public Type SpellRec
     UniqueIndex As Long
     NextRank As Long
     NextUses As Long
+    
+    CastFrame As Byte
 End Type
 

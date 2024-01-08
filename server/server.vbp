@@ -69,6 +69,7 @@ Module=Quest_Handle; src\Quest_Handle.bas
 Module=Quest_TCP; src\Quest_TCP.bas
 Module=Quest_UDT; src\Quest_UDT.bas
 Module=Quest_Logic; src\Quest_Logic.bas
+Module=Player_Frames; src\Player_Frames.bas
 IconForm="frmServer"
 Startup="Sub Main"
 HelpFile=""

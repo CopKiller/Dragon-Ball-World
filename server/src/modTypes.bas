@@ -12,7 +12,6 @@ End Type
 Public Type SpellBufferRec
     Spell As Long
     Timer As Long
-    target As Long
+    Target As Long
     tType As Byte
 End Type
-

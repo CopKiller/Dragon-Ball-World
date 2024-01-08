@@ -14,6 +14,7 @@ Public Type ProjectileDataRec
     AnimOnHit As Long
     ProjectileOffset(1 To 4) As XYRec
     ImpactRange As Byte
+    ProjectileType As Byte
 End Type
 
 Private Type SpellRec
@@ -30,8 +31,8 @@ Private Type SpellRec
     CDTime As Long
     Icon As Long
     Map As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     Dir As Byte
     Vital As Long
     Duration As Long
@@ -53,4 +54,6 @@ Private Type SpellRec
     UniqueIndex As Long
     NextRank As Long
     NextUses As Long
+    
+    CastFrame As Byte
 End Type

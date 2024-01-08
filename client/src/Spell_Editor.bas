@@ -83,6 +83,8 @@ Public Sub SpellEditorInit()
         .scrlStun.Value = Spell(EditorIndex).StunDuration
         .scrlIcon.Value = Spell(EditorIndex).icon
         
+        .scrlCastFrame = Spell(EditorIndex).CastFrame
+        
         If .cmbType.ListIndex = SPELL_TYPE_PROJECTILE Then
             ' Definições
             .scrlProjectilePic.max = CountProjectile
@@ -139,6 +141,23 @@ Public Sub SpellEditorInit()
             .scrlOffsetProjectileY.enabled = False
             
             .scrlImpact.Value = Spell(EditorIndex).Projectile.ImpactRange
+            
+            .scrlCastProjectile.min = 0
+            .scrlCastProjectile.max = MAX_ANIMATIONS
+            .scrlCastProjectile = Spell(EditorIndex).CastAnim
+            
+            
+            .cmbProjectileType.Clear
+            .cmbProjectileType.AddItem "None"
+            For i = 1 To ProjectileTypeEnum.ProjectileTypeCount - 1
+                Select Case i
+                    Case ProjectileTypeEnum.KiBall
+                        .cmbProjectileType.AddItem "KiBall"
+                    Case ProjectileTypeEnum.GekiDama
+                        .cmbProjectileType.AddItem "GenkiDama"
+                End Select
+            Next
+            .cmbProjectileType.ListIndex = Spell(EditorIndex).Projectile.ProjectileType
         Else
             .fraSpellData.visible = True
             .fraProjectile.visible = False
@@ -175,6 +194,11 @@ Public Sub SpellEditorInit()
         .scrlIndex.Value = Spell(EditorIndex).UniqueIndex
         .scrlNext.Value = Spell(EditorIndex).NextRank
         .scrlUses.Value = Spell(EditorIndex).NextUses
+        
+        'Spell(EditorIndex).NextUses = 0
+        'Spell(EditorIndex).NextRank = 0
+        'Spell(EditorIndex).UniqueIndex = 0
+        'Spell(EditorIndex).Desc = vbNullString
 
         ' find the sound we have set
         If .cmbSound.ListCount >= 0 Then
