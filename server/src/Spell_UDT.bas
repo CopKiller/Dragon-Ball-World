@@ -4,19 +4,6 @@ Option Explicit
 Public Spell(1 To MAX_SPELLS) As SpellRec
 Public EmptySpell As SpellRec
 
-Public Type ProjectileDataRec
-    Graphic As Long
-    RecuringDamage As Boolean
-    Speed As Long
-    Rotation As Integer
-    Ammo As Long
-    Despawn As Long
-    AnimOnHit As Long
-    ProjectileOffset(1 To 4) As XYRec
-    ImpactRange As Byte
-    ProjectileType As Byte
-End Type
-
 Private Type SpellRec
     Name As String * NAME_LENGTH
     Desc As String * 255

@@ -8,9 +8,6 @@ Public TempTile(1 To MAX_MAPS) As TempTileRec
 Public MapItem(1 To MAX_MAPS, 1 To MAX_MAP_ITEMS) As MapItemRec
 Public MapNpc(1 To MAX_MAPS) As MapNpcDataRec
 
-Public MapProjectile() As ProjectileRenderRec
-Public EmptyMapProjectile As ProjectileRenderRec
-
 Public EmptyMap As MapRec
 Public EmptyResourceCache As ResourceCacheRec
 Public EmptyMapItem As MapItemRec
@@ -39,8 +36,8 @@ Private Type MapDataRec
     BootX As Byte
     BootY As Byte
     
-    MaxX As Byte
-    MaxY As Byte
+    maxX As Byte
+    maxY As Byte
     
     Weather As Long
     WeatherIntensity As Long
@@ -154,36 +151,4 @@ End Type
 Private Type TempTileRec
     DoorOpen() As Byte
     DoorTimer As Long
-End Type
-
-Public Type XYRec
-    x As Double
-    y As Double
-End Type
-
-Public Type ProjectileRenderRec
-    Owner As Long
-    OwnerType As Byte
-    Graphic As Long
-    Speed As Long
-    RotateSpeed As Byte
-    Rotate As Single
-    Duration As Long
-    ProjectileOffset(1 To 4) As XYRec
-    direction As Byte
-    x As Long
-    y As Long
-    xOffset As Long
-    yOffset As Long
-    tX As Long
-    tY As Long
-    ' Servidor apenas
-    AttackTimer(1 To MAX_MAP_NPCS) As Long ' <----
-    Range As Byte
-    Damage As Long
-    AnimOnHit As Long
-    spellNum As Long
-    xTargetAoE As Long
-    yTargetAoE As Long
-    mapnum As Long
 End Type

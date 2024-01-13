@@ -1,18 +1,18 @@
 Attribute VB_Name = "Item_TCP"
-Public Sub SendUpdateItemTo(ByVal index As Long, ByVal itemNum As Long)
+Public Sub SendUpdateItemTo(ByVal index As Long, ByVal ItemNum As Long)
     Dim packet As String
     Dim Buffer As clsBuffer
     Dim ItemSize As Long
     Dim ItemData() As Byte
     
     Set Buffer = New clsBuffer
-    ItemSize = LenB(Item(itemNum))
+    ItemSize = LenB(Item(ItemNum))
     
     ReDim ItemData(ItemSize - 1)
-    CopyMemory ItemData(0), ByVal VarPtr(Item(itemNum)), ItemSize
+    CopyMemory ItemData(0), ByVal VarPtr(Item(ItemNum)), ItemSize
     
     Buffer.WriteLong SUpdateItem
-    Buffer.WriteLong itemNum
+    Buffer.WriteLong ItemNum
     Buffer.WriteBytes ItemData
     
     SendDataTo index, Buffer.ToArray()
@@ -32,20 +32,20 @@ Public Sub SendItems(ByVal index As Long)
 
 End Sub
 
-Public Sub SendUpdateItemToAll(ByVal itemNum As Long)
+Public Sub SendUpdateItemToAll(ByVal ItemNum As Long)
     Dim packet As String
     Dim Buffer As clsBuffer
     Dim ItemSize As Long
     Dim ItemData() As Byte
     
     Set Buffer = New clsBuffer
-    ItemSize = LenB(Item(itemNum))
+    ItemSize = LenB(Item(ItemNum))
     
     ReDim ItemData(ItemSize - 1)
-    CopyMemory ItemData(0), ByVal VarPtr(Item(itemNum)), ItemSize
+    CopyMemory ItemData(0), ByVal VarPtr(Item(ItemNum)), ItemSize
     
     Buffer.WriteLong SUpdateItem
-    Buffer.WriteLong itemNum
+    Buffer.WriteLong ItemNum
     Buffer.WriteBytes ItemData
     
     SendDataToAll Buffer.ToArray()

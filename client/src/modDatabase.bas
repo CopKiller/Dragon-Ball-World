@@ -7,11 +7,11 @@ Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivat
 Private crcTable(0 To 255) As Long
 
 Public Sub InitCRC32()
-Dim i As Long, N As Long, CRC As Long
+Dim i As Long, n As Long, CRC As Long
 
     For i = 0 To 255
         CRC = i
-        For N = 0 To 7
+        For n = 0 To 7
             If CRC And 1 Then
                 CRC = (((CRC And &HFFFFFFFE) \ 2) And &H7FFFFFFF) Xor &HEDB88320
             Else
@@ -132,11 +132,11 @@ ErrorHandler:
     Exit Sub
 End Sub
 
-Public Sub SaveMap(ByVal mapNum As Long)
-    Dim FileName As String, f As Long, X As Long, Y As Long, i As Long
+Public Sub SaveMap(ByVal mapnum As Long)
+    Dim FileName As String, f As Long, x As Long, y As Long, i As Long
     
     ' save map data
-    FileName = App.Path & MAP_PATH & mapNum & "_.dat"
+    FileName = App.Path & MAP_PATH & mapnum & "_.dat"
     
     ' if it exists then kill the ini
     If FileExist(FileName) Then Kill FileName
@@ -153,8 +153,8 @@ Public Sub SaveMap(ByVal mapNum As Long)
         PutVar FileName, "General", "BootMap", Val(.BootMap)
         PutVar FileName, "General", "BootX", Val(.BootX)
         PutVar FileName, "General", "BootY", Val(.BootY)
-        PutVar FileName, "General", "MaxX", Val(.MaxX)
-        PutVar FileName, "General", "MaxY", Val(.MaxY)
+        PutVar FileName, "General", "MaxX", Val(.maxX)
+        PutVar FileName, "General", "MaxY", Val(.maxY)
         
         PutVar FileName, "General", "Weather", Val(.Weather)
         PutVar FileName, "General", "WeatherIntensity", Val(.WeatherIntensity)
@@ -175,7 +175,7 @@ Public Sub SaveMap(ByVal mapNum As Long)
     End With
     
     ' dump tile data
-    FileName = App.Path & MAP_PATH & mapNum & ".dat"
+    FileName = App.Path & MAP_PATH & mapnum & ".dat"
     
     ' if it exists then kill the ini
     If FileExist(FileName) Then Kill FileName
@@ -183,20 +183,20 @@ Public Sub SaveMap(ByVal mapNum As Long)
     f = FreeFile
     With Map
         Open FileName For Binary As #f
-            For X = 0 To .MapData.MaxX
-                For Y = 0 To .MapData.MaxY
-                    Put #f, , .TileData.Tile(X, Y).Type
-                    Put #f, , .TileData.Tile(X, Y).Data1
-                    Put #f, , .TileData.Tile(X, Y).Data2
-                    Put #f, , .TileData.Tile(X, Y).Data3
-                    Put #f, , .TileData.Tile(X, Y).Data4
-                    Put #f, , .TileData.Tile(X, Y).Data5
-                    Put #f, , .TileData.Tile(X, Y).Autotile
-                    Put #f, , .TileData.Tile(X, Y).DirBlock
+            For x = 0 To .MapData.maxX
+                For y = 0 To .MapData.maxY
+                    Put #f, , .TileData.Tile(x, y).Type
+                    Put #f, , .TileData.Tile(x, y).Data1
+                    Put #f, , .TileData.Tile(x, y).Data2
+                    Put #f, , .TileData.Tile(x, y).Data3
+                    Put #f, , .TileData.Tile(x, y).Data4
+                    Put #f, , .TileData.Tile(x, y).Data5
+                    Put #f, , .TileData.Tile(x, y).Autotile
+                    Put #f, , .TileData.Tile(x, y).DirBlock
                     For i = 1 To MapLayer.Layer_Count - 1
-                        Put #f, , .TileData.Tile(X, Y).Layer(i).tileSet
-                        Put #f, , .TileData.Tile(X, Y).Layer(i).X
-                        Put #f, , .TileData.Tile(X, Y).Layer(i).Y
+                        Put #f, , .TileData.Tile(x, y).Layer(i).tileSet
+                        Put #f, , .TileData.Tile(x, y).Layer(i).x
+                        Put #f, , .TileData.Tile(x, y).Layer(i).y
                     Next
                 Next
             Next
@@ -206,41 +206,41 @@ Public Sub SaveMap(ByVal mapNum As Long)
     Close #f
 End Sub
 
-Public Sub GetMapCRC32(mapNum As Long)
+Public Sub GetMapCRC32(mapnum As Long)
     Dim Data() As Byte, FileName As String, f As Long
     ' map data
-    FileName = App.Path & MAP_PATH & mapNum & "_.dat"
+    FileName = App.Path & MAP_PATH & mapnum & "_.dat"
     If FileExist(FileName) Then
         f = FreeFile
         Open FileName For Binary As #f
             Data = Space$(LOF(f))
             Get #f, , Data
         Close #f
-        MapCRC32(mapNum).MapDataCRC = CRC32(Data)
+        MapCRC32(mapnum).MapDataCRC = CRC32(Data)
     Else
-        MapCRC32(mapNum).MapDataCRC = 0
+        MapCRC32(mapnum).MapDataCRC = 0
     End If
     ' clear
     Erase Data
     ' tile data
-    FileName = App.Path & MAP_PATH & mapNum & ".dat"
+    FileName = App.Path & MAP_PATH & mapnum & ".dat"
     If FileExist(FileName) Then
         f = FreeFile
         Open FileName For Binary As #f
             Data = Space$(LOF(f))
             Get #f, , Data
         Close #f
-        MapCRC32(mapNum).MapTileCRC = CRC32(Data)
+        MapCRC32(mapnum).MapTileCRC = CRC32(Data)
     Else
-        MapCRC32(mapNum).MapTileCRC = 0
+        MapCRC32(mapnum).MapTileCRC = 0
     End If
 End Sub
 
-Public Sub LoadMap(ByVal mapNum As Long)
-    Dim FileName As String, i As Long, f As Long, X As Long, Y As Long
+Public Sub LoadMap(ByVal mapnum As Long)
+    Dim FileName As String, i As Long, f As Long, x As Long, y As Long
     
     ' load map data
-    FileName = App.Path & MAP_PATH & mapNum & "_.dat"
+    FileName = App.Path & MAP_PATH & mapnum & "_.dat"
     
     ' General
     With Map.MapData
@@ -254,8 +254,8 @@ Public Sub LoadMap(ByVal mapNum As Long)
         .BootMap = Val(GetVar(FileName, "General", "BootMap"))
         .BootX = Val(GetVar(FileName, "General", "BootX"))
         .BootY = Val(GetVar(FileName, "General", "BootY"))
-        .MaxX = Val(GetVar(FileName, "General", "MaxX"))
-        .MaxY = Val(GetVar(FileName, "General", "MaxY"))
+        .maxX = Val(GetVar(FileName, "General", "MaxX"))
+        .maxY = Val(GetVar(FileName, "General", "MaxY"))
         
         .Weather = Val(GetVar(FileName, "General", "Weather"))
         .WeatherIntensity = Val(GetVar(FileName, "General", "WeatherIntensity"))
@@ -275,27 +275,27 @@ Public Sub LoadMap(ByVal mapNum As Long)
     End With
     
     ' dump tile data
-    FileName = App.Path & MAP_PATH & mapNum & ".dat"
+    FileName = App.Path & MAP_PATH & mapnum & ".dat"
     f = FreeFile
     
-    ReDim Map.TileData.Tile(0 To Map.MapData.MaxX, 0 To Map.MapData.MaxY) As TileRec
+    ReDim Map.TileData.Tile(0 To Map.MapData.maxX, 0 To Map.MapData.maxY) As TileRec
     
     With Map
         Open FileName For Binary As #f
-            For X = 0 To .MapData.MaxX
-                For Y = 0 To .MapData.MaxY
-                    Get #f, , .TileData.Tile(X, Y).Type
-                    Get #f, , .TileData.Tile(X, Y).Data1
-                    Get #f, , .TileData.Tile(X, Y).Data2
-                    Get #f, , .TileData.Tile(X, Y).Data3
-                    Get #f, , .TileData.Tile(X, Y).Data4
-                    Get #f, , .TileData.Tile(X, Y).Data5
-                    Get #f, , .TileData.Tile(X, Y).Autotile
-                    Get #f, , .TileData.Tile(X, Y).DirBlock
+            For x = 0 To .MapData.maxX
+                For y = 0 To .MapData.maxY
+                    Get #f, , .TileData.Tile(x, y).Type
+                    Get #f, , .TileData.Tile(x, y).Data1
+                    Get #f, , .TileData.Tile(x, y).Data2
+                    Get #f, , .TileData.Tile(x, y).Data3
+                    Get #f, , .TileData.Tile(x, y).Data4
+                    Get #f, , .TileData.Tile(x, y).Data5
+                    Get #f, , .TileData.Tile(x, y).Autotile
+                    Get #f, , .TileData.Tile(x, y).DirBlock
                     For i = 1 To MapLayer.Layer_Count - 1
-                        Get #f, , .TileData.Tile(X, Y).Layer(i).tileSet
-                        Get #f, , .TileData.Tile(X, Y).Layer(i).X
-                        Get #f, , .TileData.Tile(X, Y).Layer(i).Y
+                        Get #f, , .TileData.Tile(x, y).Layer(i).tileSet
+                        Get #f, , .TileData.Tile(x, y).Layer(i).x
+                        Get #f, , .TileData.Tile(x, y).Layer(i).y
                     Next
                 Next
             Next
@@ -305,23 +305,16 @@ Public Sub LoadMap(ByVal mapNum As Long)
     ClearTempTile
 End Sub
 
-Public Sub ClearPlayer(ByVal index As Long)
-    Player(index) = EmptyPlayer
-    Player(index).Name = vbNullString
+Public Sub ClearPlayer(ByVal Index As Long)
+    Player(Index) = EmptyPlayer
+    Player(Index).Name = vbNullString
 End Sub
 
-Public Sub ClearProjectile(ByVal ProjectileSlot As Long)
-    If MapProjectile(ProjectileSlot).OwnerType = TARGET_TYPE_PLAYER Then
-        SetPlayerFrame MapProjectile(ProjectileSlot).Owner, 0
-    End If
-    MapProjectile(ProjectileSlot) = EmptyMapProjectile
-End Sub
-
-Public Sub ClearItem(ByVal index As Long)
-    Item(index) = EmptyItem
-    Item(index).Name = vbNullString
-    Item(index).Desc = vbNullString
-    Item(index).sound = "None."
+Public Sub ClearItem(ByVal Index As Long)
+    Item(Index) = EmptyItem
+    Item(Index).Name = vbNullString
+    Item(Index).Desc = vbNullString
+    Item(Index).sound = "None."
 End Sub
 
 Public Sub ClearItems()
@@ -333,16 +326,16 @@ Public Sub ClearItems()
 
 End Sub
 
-Public Sub ClearMapItem(ByVal index As Long)
-    MapItem(index) = EmptyMapItem
+Public Sub ClearMapItem(ByVal Index As Long)
+    MapItem(Index) = EmptyMapItem
 End Sub
 
 Public Sub ClearMap()
     Map = EmptyMap
     Map.MapData.Name = vbNullString
-    Map.MapData.MaxX = MAX_MAPX
-    Map.MapData.MaxY = MAX_MAPY
-    ReDim Map.TileData.Tile(0 To Map.MapData.MaxX, 0 To Map.MapData.MaxY)
+    Map.MapData.maxX = MAX_MAPX
+    Map.MapData.maxY = MAX_MAPY
+    ReDim Map.TileData.Tile(0 To Map.MapData.maxX, 0 To Map.MapData.maxY)
     initAutotiles
 End Sub
 
@@ -355,8 +348,8 @@ Public Sub ClearMapItems()
 
 End Sub
 
-Public Sub ClearMapNpc(ByVal index As Long)
-    MapNpc(index) = EmptyMapNpc
+Public Sub ClearMapNpc(ByVal Index As Long)
+    MapNpc(Index) = EmptyMapNpc
 End Sub
 
 Public Sub ClearMapNpcs()
@@ -371,221 +364,221 @@ End Sub
 ' **********************
 ' ** Player functions **
 ' **********************
-Function GetPlayerName(ByVal index As Long) As String
+Function GetPlayerName(ByVal Index As Long) As String
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerName = Trim$(Player(index).Name)
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerName = Trim$(Player(Index).Name)
 End Function
 
-Sub SetPlayerName(ByVal index As Long, ByVal Name As String)
+Sub SetPlayerName(ByVal Index As Long, ByVal Name As String)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Name = Name
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Name = Name
 End Sub
 
-Function GetPlayerClass(ByVal index As Long) As Long
+Function GetPlayerClass(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerClass = Player(index).Class
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerClass = Player(Index).Class
 End Function
 
-Sub SetPlayerClass(ByVal index As Long, ByVal ClassNum As Long)
+Sub SetPlayerClass(ByVal Index As Long, ByVal ClassNum As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Class = ClassNum
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Class = ClassNum
 End Sub
 
-Function GetPlayerSprite(ByVal index As Long) As Long
+Function GetPlayerSprite(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerSprite = Player(index).sprite
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerSprite = Player(Index).sprite
 End Function
 
-Sub SetPlayerSprite(ByVal index As Long, ByVal sprite As Long)
+Sub SetPlayerSprite(ByVal Index As Long, ByVal sprite As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).sprite = sprite
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).sprite = sprite
 End Sub
 
-Function GetPlayerLevel(ByVal index As Long) As Long
+Function GetPlayerLevel(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerLevel = Player(index).Level
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerLevel = Player(Index).Level
 End Function
 
-Sub SetPlayerLevel(ByVal index As Long, ByVal Level As Long)
+Sub SetPlayerLevel(ByVal Index As Long, ByVal Level As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Level = Level
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Level = Level
 End Sub
 
-Function GetPlayerExp(ByVal index As Long) As Long
+Function GetPlayerExp(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerExp = Player(index).EXP
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerExp = Player(Index).EXP
 End Function
 
-Sub SetPlayerExp(ByVal index As Long, ByVal EXP As Long)
+Sub SetPlayerExp(ByVal Index As Long, ByVal EXP As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).EXP = EXP
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).EXP = EXP
 End Sub
 
-Function GetPlayerAccess(ByVal index As Long) As Long
+Function GetPlayerAccess(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerAccess = Player(index).Access
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerAccess = Player(Index).Access
 End Function
 
-Sub SetPlayerAccess(ByVal index As Long, ByVal Access As Long)
+Sub SetPlayerAccess(ByVal Index As Long, ByVal Access As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Access = Access
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Access = Access
 End Sub
 
-Function GetPlayerPK(ByVal index As Long) As Long
+Function GetPlayerPK(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerPK = Player(index).PK
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerPK = Player(Index).PK
 End Function
 
-Sub SetPlayerPK(ByVal index As Long, ByVal PK As Long)
+Sub SetPlayerPK(ByVal Index As Long, ByVal PK As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).PK = PK
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).PK = PK
 End Sub
 
-Function GetPlayerVital(ByVal index As Long, ByVal Vital As Vitals) As Long
+Function GetPlayerVital(ByVal Index As Long, ByVal Vital As Vitals) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerVital = Player(index).Vital(Vital)
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerVital = Player(Index).Vital(Vital)
 End Function
 
-Sub SetPlayerVital(ByVal index As Long, ByVal Vital As Vitals, ByVal Value As Long)
+Sub SetPlayerVital(ByVal Index As Long, ByVal Vital As Vitals, ByVal Value As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Vital(Vital) = Value
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Vital(Vital) = Value
 
-    If GetPlayerVital(index, Vital) > GetPlayerMaxVital(index, Vital) Then
-        Player(index).Vital(Vital) = GetPlayerMaxVital(index, Vital)
+    If GetPlayerVital(Index, Vital) > GetPlayerMaxVital(Index, Vital) Then
+        Player(Index).Vital(Vital) = GetPlayerMaxVital(Index, Vital)
     End If
 
 End Sub
 
-Function GetPlayerMaxVital(ByVal index As Long, ByVal Vital As Vitals) As Long
+Function GetPlayerMaxVital(ByVal Index As Long, ByVal Vital As Vitals) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerMaxVital = Player(index).MaxVital(Vital)
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerMaxVital = Player(Index).MaxVital(Vital)
 End Function
 
-Function GetPlayerStat(ByVal index As Long, Stat As Stats) As Long
+Function GetPlayerStat(ByVal Index As Long, Stat As Stats) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerStat = Player(index).Stat(Stat)
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerStat = Player(Index).Stat(Stat)
 End Function
 
-Sub SetPlayerStat(ByVal index As Long, Stat As Stats, ByVal Value As Long)
+Sub SetPlayerStat(ByVal Index As Long, Stat As Stats, ByVal Value As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
+    If Index > MAX_PLAYERS Then Exit Sub
     If Value <= 0 Then Value = 1
     If Value > MAX_BYTE Then Value = MAX_BYTE
-    Player(index).Stat(Stat) = Value
+    Player(Index).Stat(Stat) = Value
 End Sub
 
-Function GetPlayerPOINTS(ByVal index As Long) As Long
+Function GetPlayerPOINTS(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerPOINTS = Player(index).POINTS
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerPOINTS = Player(Index).POINTS
 End Function
 
-Sub SetPlayerPOINTS(ByVal index As Long, ByVal POINTS As Long)
+Sub SetPlayerPOINTS(ByVal Index As Long, ByVal POINTS As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).POINTS = POINTS
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).POINTS = POINTS
 End Sub
 
-Function GetPlayerMap(ByVal index As Long) As Long
+Function GetPlayerMap(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Or index <= 0 Then Exit Function
-    GetPlayerMap = Player(index).Map
+    If Index > MAX_PLAYERS Or Index <= 0 Then Exit Function
+    GetPlayerMap = Player(Index).Map
 End Function
 
-Sub SetPlayerMap(ByVal index As Long, ByVal mapNum As Long)
+Sub SetPlayerMap(ByVal Index As Long, ByVal mapnum As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Map = mapNum
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Map = mapnum
 End Sub
 
-Function GetPlayerX(ByVal index As Long) As Long
+Function GetPlayerX(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerX = Player(index).X
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerX = Player(Index).x
 End Function
 
-Sub SetPlayerX(ByVal index As Long, ByVal X As Long)
+Sub SetPlayerX(ByVal Index As Long, ByVal x As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).X = X
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).x = x
 End Sub
 
-Function GetPlayerY(ByVal index As Long) As Long
+Function GetPlayerY(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerY = Player(index).Y
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerY = Player(Index).y
 End Function
 
-Sub SetPlayerY(ByVal index As Long, ByVal Y As Long)
+Sub SetPlayerY(ByVal Index As Long, ByVal y As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).Y = Y
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).y = y
 End Sub
 
-Function GetPlayerDir(ByVal index As Long) As Long
+Function GetPlayerDir(ByVal Index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
-    GetPlayerDir = Player(index).dir
+    If Index > MAX_PLAYERS Then Exit Function
+    GetPlayerDir = Player(Index).dir
 End Function
 
-Sub SetPlayerDir(ByVal index As Long, ByVal dir As Long)
+Sub SetPlayerDir(ByVal Index As Long, ByVal dir As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
-    Player(index).dir = dir
+    If Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).dir = dir
 End Sub
 
-Function GetPlayerInvItemNum(ByVal index As Long, ByVal invSlot As Long) As Long
+Function GetPlayerInvItemNum(ByVal Index As Long, ByVal invSlot As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
+    If Index > MAX_PLAYERS Then Exit Function
     If invSlot = 0 Then Exit Function
     GetPlayerInvItemNum = PlayerInv(invSlot).Num
 End Function
 
-Sub SetPlayerInvItemNum(ByVal index As Long, ByVal invSlot As Long, ByVal ItemNum As Long)
+Sub SetPlayerInvItemNum(ByVal Index As Long, ByVal invSlot As Long, ByVal ItemNum As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
+    If Index > MAX_PLAYERS Then Exit Sub
     PlayerInv(invSlot).Num = ItemNum
 End Sub
 
-Function GetPlayerInvItemValue(ByVal index As Long, ByVal invSlot As Long) As Long
+Function GetPlayerInvItemValue(ByVal Index As Long, ByVal invSlot As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
+    If Index > MAX_PLAYERS Then Exit Function
     GetPlayerInvItemValue = PlayerInv(invSlot).Value
 End Function
 
-Sub SetPlayerInvItemValue(ByVal index As Long, ByVal invSlot As Long, ByVal ItemValue As Long)
+Sub SetPlayerInvItemValue(ByVal Index As Long, ByVal invSlot As Long, ByVal ItemValue As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
+    If Index > MAX_PLAYERS Then Exit Sub
     PlayerInv(invSlot).Value = ItemValue
 End Sub
 
-Function GetPlayerEquipment(ByVal index As Long, ByVal EquipmentSlot As Equipment) As Long
+Function GetPlayerEquipment(ByVal Index As Long, ByVal EquipmentSlot As Equipment) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
+    If Index > MAX_PLAYERS Then Exit Function
     If EquipmentSlot <= 0 Then Exit Function
-    GetPlayerEquipment = Player(index).Equipment(EquipmentSlot)
+    GetPlayerEquipment = Player(Index).Equipment(EquipmentSlot)
 End Function
 
-Sub SetPlayerEquipment(ByVal index As Long, ByVal invNum As Long, ByVal EquipmentSlot As Equipment)
+Sub SetPlayerEquipment(ByVal Index As Long, ByVal invNum As Long, ByVal EquipmentSlot As Equipment)
 
-    If index < 1 Or index > MAX_PLAYERS Then Exit Sub
-    Player(index).Equipment(EquipmentSlot) = invNum
+    If Index < 1 Or Index > MAX_PLAYERS Then Exit Sub
+    Player(Index).Equipment(EquipmentSlot) = invNum
 End Sub

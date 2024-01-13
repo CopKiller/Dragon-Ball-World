@@ -19,10 +19,6 @@ Public MapSounds() As MapSoundRec
 Public MapSoundCount As Long
 Public Options As OptionsRec
 
-' Cliente strutures
-Public MapProjectile() As ProjectileRenderRec
-Public EmptyMapProjectile As ProjectileRenderRec
-
 Public EmptyMap As MapRec
 Public EmptyPlayer As PlayerRec
 Public EmptyItem As ItemRec
@@ -50,35 +46,6 @@ Private Type OptionsRec
     PlayIntro As Byte
     resolution As Byte
     Fullscreen As Byte
-End Type
-
-Public Type XYRec
-    X As Double
-    Y As Double
-End Type
-
-Public Type ProjectileRenderRec
-    Owner As Long
-    OwnerType As Byte
-    Graphic As Long
-    
-    Speed As Long
-    RotateSpeed As Byte
-    Rotate As Single
-    Duration As Long
-    ProjectileOffset(1 To 4) As XYRec
-    Direction As Byte
-    X As Long
-    Y As Long
-    xOffset As Long
-    yOffset As Long
-    tx As Long
-    ty As Long
-    'Cliente Apenas
-    IsAoE As Boolean
-    IsDirectional As Boolean
-    curAnim As Long
-    EndTime As Long
 End Type
 
 Public Type PartyRec
@@ -123,8 +90,8 @@ Private Type PlayerRec
     Projectile(1 To MAX_PROJECTILE_PLAYER) As Long
     ' Position
     Map As Long
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     dir As Byte
     ' Variables
     Variable(1 To MAX_BYTE) As Long
@@ -158,8 +125,8 @@ Private Type PlayerRec
     AttackTimer As Long
     MapGetTimer As Long
     
-    ProjectileCustomType As Byte
-    ProjectileCustomNum As Long
+    ConjureAnimProjectileType As Byte
+    ConjureAnimProjectileNum As Long
 End Type
 
 Private Type EventCommandRec
@@ -169,8 +136,8 @@ Private Type EventCommandRec
     Channel As Byte
     TargetType As Byte
     target As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
 Public Type EventPageRec
@@ -207,8 +174,8 @@ End Type
 
 Public Type EventRec
     Name As String
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     pageCount As Long
     EventPage() As EventPageRec
 End Type
@@ -227,8 +194,8 @@ Private Type MapDataRec
     BootX As Byte
     BootY As Byte
     
-    MaxX As Byte
-    MaxY As Byte
+    maxX As Byte
+    maxY As Byte
     
     Weather As Long
     WeatherIntensity As Long
@@ -248,8 +215,8 @@ Private Type MapDataRec
 End Type
 
 Private Type TileDataRec
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     tileSet As Long
 End Type
 
@@ -329,8 +296,8 @@ Private Type MapItemRec
     Num As Long
     Value As Long
     Frame As Byte
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     bound As Boolean
     Gravity As Integer
     yOffset As Integer
@@ -343,8 +310,8 @@ Private Type MapNpcRec
     TargetType As Byte
     Vital(1 To Vitals.Vital_Count - 1) As Long
     Map As Long
-    X As Byte
-    Y As Byte
+    x As Byte
+    y As Byte
     dir As Byte
     ' Client use only
     xOffset As Long
@@ -374,16 +341,16 @@ Private Type TempTileRec
 End Type
 
 Public Type MapResourceRec
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     ResourceState As Byte
 End Type
 
 Private Type BloodRec
     sprite As Long
     timer As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
 Public Type HotbarRec
@@ -392,8 +359,8 @@ Public Type HotbarRec
 End Type
 
 Public Type PointRec
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
 End Type
 
 Public Type QuarterTileRec
@@ -430,16 +397,16 @@ End Type
 
 Public Type WeatherParticleRec
     Type As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     Velocity As Long
     InUse As Long
 End Type
 
 Public Type ParticulaRec
     Type As Long
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     Movimento As Long
     InUse As Long
     dir As Byte
@@ -453,8 +420,8 @@ Public Type ParticulaRec
 End Type
 
 Public Type MapSoundRec
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     SoundHandle As Long
     InUse As Boolean
     Channel As Long

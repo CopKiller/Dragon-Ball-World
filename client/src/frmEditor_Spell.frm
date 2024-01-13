@@ -2,10 +2,10 @@ VERSION 5.00
 Begin VB.Form frmEditor_Spell 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Spell Editor"
-   ClientHeight    =   8865
+   ClientHeight    =   8745
    ClientLeft      =   45
    ClientTop       =   375
-   ClientWidth     =   16440
+   ClientWidth     =   10305
    ControlBox      =   0   'False
    BeginProperty Font 
       Name            =   "Verdana"
@@ -19,9 +19,9 @@ Begin VB.Form frmEditor_Spell
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   591
+   ScaleHeight     =   583
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   1096
+   ScaleWidth      =   687
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdCopy 
       Caption         =   "Copy"
@@ -105,7 +105,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             Max             =   60
-            TabIndex        =   100
+            TabIndex        =   99
             Top             =   4200
             Width           =   3015
          End
@@ -213,7 +213,7 @@ Begin VB.Form frmEditor_Spell
             Caption         =   "Casting Frame: 0"
             Height          =   255
             Left            =   120
-            TabIndex        =   101
+            TabIndex        =   100
             Top             =   3960
             Width           =   1695
          End
@@ -304,21 +304,21 @@ Begin VB.Form frmEditor_Spell
          LargeChange     =   10
          Left            =   3480
          TabIndex        =   54
-         Top             =   7680
+         Top             =   7320
          Width           =   3255
       End
       Begin VB.HScrollBar scrlNext 
          Height          =   255
          Left            =   3480
          TabIndex        =   52
-         Top             =   7200
+         Top             =   6840
          Width           =   3255
       End
       Begin VB.HScrollBar scrlIndex 
          Height          =   255
          Left            =   3480
          TabIndex        =   50
-         Top             =   6720
+         Top             =   6360
          Width           =   3255
       End
       Begin VB.TextBox txtDesc 
@@ -341,7 +341,7 @@ Begin VB.Form frmEditor_Spell
       End
       Begin VB.Frame fraProjectile 
          Caption         =   "Projectile"
-         Height          =   6255
+         Height          =   5775
          Left            =   3480
          TabIndex        =   59
          Top             =   120
@@ -350,35 +350,27 @@ Begin VB.Form frmEditor_Spell
          Begin VB.ComboBox cmbProjectileType 
             Height          =   300
             ItemData        =   "frmEditor_Spell.frx":0054
-            Left            =   1920
+            Left            =   120
             List            =   "frmEditor_Spell.frx":0067
             Style           =   2  'Dropdown List
-            TabIndex        =   104
-            Top             =   2880
-            Width           =   1335
+            TabIndex        =   103
+            Top             =   480
+            Width           =   1695
          End
          Begin VB.HScrollBar scrlCastProjectile 
             Height          =   255
             Left            =   120
-            TabIndex        =   102
-            Top             =   3720
-            Width           =   3015
-         End
-         Begin VB.HScrollBar scrlImpact 
-            Height          =   135
-            Left            =   120
-            Max             =   10
-            TabIndex        =   98
-            Top             =   1440
+            TabIndex        =   101
+            Top             =   4440
             Width           =   1695
          End
-         Begin VB.CheckBox chkTrap 
-            Caption         =   "Is Trap?"
+         Begin VB.HScrollBar scrlImpact 
             Height          =   255
-            Left            =   1920
+            Left            =   120
+            Max             =   10
             TabIndex        =   97
             Top             =   2040
-            Width           =   1215
+            Width           =   1695
          End
          Begin VB.HScrollBar scrlDurationProjectile 
             Height          =   255
@@ -386,8 +378,8 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             SmallChange     =   50
             TabIndex        =   96
-            Top             =   3240
-            Width           =   3015
+            Top             =   3960
+            Width           =   1695
          End
          Begin VB.HScrollBar scrlProjectileSpeed 
             Height          =   255
@@ -395,7 +387,7 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             SmallChange     =   50
             TabIndex        =   95
-            Top             =   480
+            Top             =   1080
             Width           =   1695
          End
          Begin VB.HScrollBar scrlDamageProjectile 
@@ -403,38 +395,38 @@ Begin VB.Form frmEditor_Spell
             LargeChange     =   5
             Left            =   120
             TabIndex        =   94
-            Top             =   960
+            Top             =   1560
             Width           =   1695
          End
          Begin VB.CheckBox chkRecuringDamage 
-            Caption         =   "Chain Dam"
+            Caption         =   "Rescuring"
             Height          =   255
             Left            =   1920
             TabIndex        =   73
-            Top             =   2280
+            Top             =   2040
             Width           =   1215
          End
          Begin VB.CheckBox chkProjectileAoE 
-            Caption         =   "Damage AoE"
+            Caption         =   "AoE"
             Height          =   255
-            Left            =   120
+            Left            =   1920
             TabIndex        =   72
-            Top             =   4470
-            Width           =   1335
+            Top             =   2280
+            Width           =   735
          End
          Begin VB.HScrollBar scrlProjectileRadiusY 
             Height          =   255
-            Left            =   1680
+            Left            =   1920
             TabIndex        =   71
-            Top             =   5880
-            Width           =   1455
+            Top             =   4920
+            Width           =   1215
          End
          Begin VB.HScrollBar scrlProjectileRadiusX 
             Height          =   255
-            Left            =   120
+            Left            =   1920
             TabIndex        =   70
-            Top             =   5880
-            Width           =   1455
+            Top             =   4320
+            Width           =   1215
          End
          Begin VB.CheckBox chkDirectionalProjectile 
             Caption         =   "Directional?"
@@ -447,37 +439,37 @@ Begin VB.Form frmEditor_Spell
          Begin VB.ComboBox cmbDirection 
             Height          =   300
             ItemData        =   "frmEditor_Spell.frx":0088
-            Left            =   120
+            Left            =   1920
             List            =   "frmEditor_Spell.frx":009B
             Style           =   2  'Dropdown List
             TabIndex        =   68
-            Top             =   4740
-            Width           =   3015
+            Top             =   2520
+            Width           =   1335
          End
          Begin VB.HScrollBar scrlOffsetProjectileX 
             Height          =   255
-            Left            =   120
+            Left            =   1920
             Max             =   512
             Min             =   -512
             TabIndex        =   67
-            Top             =   5340
-            Width           =   1455
+            Top             =   3120
+            Width           =   1215
          End
          Begin VB.HScrollBar scrlOffsetProjectileY 
             Height          =   255
-            Left            =   1680
+            Left            =   1920
             Max             =   512
             Min             =   -512
             TabIndex        =   66
-            Top             =   5340
-            Width           =   1455
+            Top             =   3720
+            Width           =   1215
          End
          Begin VB.HScrollBar scrlProjectileAnimOnHit 
             Height          =   255
             Left            =   120
             TabIndex        =   65
-            Top             =   4200
-            Width           =   3015
+            Top             =   4920
+            Width           =   1695
          End
          Begin VB.HScrollBar scrlProjectilePic 
             Height          =   255
@@ -491,7 +483,7 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             Max             =   255
             TabIndex        =   63
-            Top             =   1835
+            Top             =   2550
             Width           =   1695
          End
          Begin VB.HScrollBar scrlProjectileRotation 
@@ -500,7 +492,7 @@ Begin VB.Form frmEditor_Spell
             Left            =   120
             Max             =   100
             TabIndex        =   62
-            Top             =   2315
+            Top             =   3030
             Value           =   1
             Width           =   1695
          End
@@ -508,7 +500,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   61
-            Top             =   2760
+            Top             =   3480
             Width           =   1695
          End
          Begin VB.PictureBox picProjectile 
@@ -533,47 +525,59 @@ Begin VB.Form frmEditor_Spell
             Top             =   240
             Width           =   960
          End
+         Begin VB.Label lblRadiusY 
+            AutoSize        =   -1  'True
+            Caption         =   "Radius Y:"
+            Height          =   180
+            Left            =   1920
+            TabIndex        =   105
+            Top             =   4680
+            Width           =   720
+         End
          Begin VB.Label Label6 
             Caption         =   "Projetil Type:"
             Height          =   255
-            Left            =   1920
-            TabIndex        =   105
-            Top             =   2640
+            Left            =   120
+            TabIndex        =   104
+            Top             =   240
             Width           =   1095
          End
          Begin VB.Label lblCastProjectile 
+            AutoSize        =   -1  'True
+            BackStyle       =   0  'Transparent
             Caption         =   "Cast Anim: None"
-            Height          =   255
+            Height          =   180
             Left            =   120
-            TabIndex        =   103
-            Top             =   3480
-            Width           =   3015
+            TabIndex        =   102
+            Top             =   4200
+            Width           =   1290
          End
          Begin VB.Label lblImpact 
             AutoSize        =   -1  'True
             Caption         =   "Impact Range: 0"
             Height          =   180
             Left            =   120
-            TabIndex        =   99
-            Top             =   1200
+            TabIndex        =   98
+            Top             =   1800
             Width           =   1260
          End
-         Begin VB.Label lblAoEProjectile 
-            Caption         =   "No AoE damage settings"
-            Height          =   255
-            Left            =   120
+         Begin VB.Label lblRadiusX 
+            AutoSize        =   -1  'True
+            Caption         =   "Radius X:"
+            Height          =   180
+            Left            =   1920
             TabIndex        =   84
-            Top             =   5640
-            Width           =   3015
+            Top             =   4080
+            Width           =   720
          End
          Begin VB.Label lblX0 
             AutoSize        =   -1  'True
             BackStyle       =   0  'Transparent
             Caption         =   "X Offset: 0"
             Height          =   180
-            Left            =   300
+            Left            =   1920
             TabIndex        =   83
-            Top             =   5100
+            Top             =   2880
             Width           =   825
          End
          Begin VB.Label lblY0 
@@ -581,9 +585,9 @@ Begin VB.Form frmEditor_Spell
             BackStyle       =   0  'Transparent
             Caption         =   "Y Offset: 0"
             Height          =   180
-            Left            =   1800
+            Left            =   1920
             TabIndex        =   82
-            Top             =   5100
+            Top             =   3480
             Width           =   825
          End
          Begin VB.Label lblDamageProjectile 
@@ -592,16 +596,18 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   81
-            Top             =   720
+            Top             =   1320
             Width           =   1575
          End
          Begin VB.Label lblAnimOnHit 
+            AutoSize        =   -1  'True
+            BackStyle       =   0  'Transparent
             Caption         =   "Anim on hit: None"
-            Height          =   255
+            Height          =   180
             Left            =   120
             TabIndex        =   80
-            Top             =   3975
-            Width           =   3015
+            Top             =   4695
+            Width           =   1350
          End
          Begin VB.Label lblProjectileDuration 
             AutoSize        =   -1  'True
@@ -610,7 +616,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   180
             Left            =   120
             TabIndex        =   79
-            Top             =   3000
+            Top             =   3720
             Width           =   1290
          End
          Begin VB.Label lblProjectileSpeed 
@@ -619,7 +625,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   78
-            Top             =   240
+            Top             =   840
             Width           =   1575
          End
          Begin VB.Label lblProjectilePic 
@@ -636,7 +642,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   76
-            Top             =   1635
+            Top             =   2355
             Width           =   1695
          End
          Begin VB.Label lblProjectileRotation 
@@ -644,7 +650,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   75
-            Top             =   2100
+            Top             =   2820
             Width           =   1815
          End
          Begin VB.Label lblProjectileAmmo 
@@ -652,7 +658,7 @@ Begin VB.Form frmEditor_Spell
             Height          =   255
             Left            =   120
             TabIndex        =   74
-            Top             =   2570
+            Top             =   3285
             Width           =   1335
          End
       End
@@ -872,7 +878,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   53
-         Top             =   7440
+         Top             =   7080
          Width           =   3135
       End
       Begin VB.Label lblNext 
@@ -880,7 +886,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   51
-         Top             =   6960
+         Top             =   6600
          Width           =   3255
       End
       Begin VB.Label lblIndex 
@@ -888,7 +894,7 @@ Begin VB.Form frmEditor_Spell
          Height          =   255
          Left            =   3480
          TabIndex        =   49
-         Top             =   6480
+         Top             =   6120
          Width           =   1815
       End
       Begin VB.Label Label4 
@@ -964,10 +970,6 @@ Private Sub chkRecuringDamage_Click()
     End If
 End Sub
 
-Private Sub chkTrap_Click()
-    Call IsTrap
-End Sub
-
 Private Sub cmbAoEDirection_Click()
     If cmbAoEDirection.ListIndex < 1 Then
         scrlRadiusX.Value = Spell(EditorIndex).RadiusX
@@ -997,7 +999,7 @@ Private Sub cmbDirection_Click()
         
         scrlProjectileRadiusX.Value = 0
         scrlProjectileRadiusY.Value = 0
-        lblAoEProjectile.caption = "Sem configurações de dano AoE"
+
         scrlProjectileRadiusX.enabled = False
         scrlProjectileRadiusY.enabled = False
 
@@ -1199,7 +1201,7 @@ Private Sub scrlDurationProjectile_Change()
         lblProjectileDuration.caption = "Duration: 0 seg"
     End If
     
-    Spell(EditorIndex).Projectile.Despawn = (Duration * 100)
+    Spell(EditorIndex).Projectile.Duration = (Duration * 100)
 End Sub
 
 Private Sub scrlIcon_Change()
@@ -1306,26 +1308,18 @@ End Sub
 
 Private Sub scrlProjectileRadiusX_Change()
     If cmbDirection.ListIndex = 0 Then
-        If scrlProjectileRadiusX.Value > 0 Or scrlRadiusY.Value > 0 Then
-            lblAoEProjectile.caption = "Radius X: " & scrlProjectileRadiusX.Value & " Radius Y: " & scrlProjectileRadiusY.Value & " tiles."
-        Else
-            lblAoEProjectile.caption = "Damage Default"
-        End If
+        lblRadiusX.caption = "Radius X: "
     Else
-        lblAoEProjectile.caption = cmbDirection.list(cmbDirection.ListIndex) & " Radius X: " & scrlProjectileRadiusX.Value & " and Radius Y: " & scrlProjectileRadiusY.Value
+        lblRadiusX.caption = "Radius X: " & scrlProjectileRadiusX.Value & " SQM"
         Spell(EditorIndex).DirectionAoE(cmbDirection.ListIndex).X = scrlProjectileRadiusX.Value
     End If
 End Sub
 
 Private Sub scrlProjectileRadiusY_Change()
     If cmbDirection.ListIndex = 0 Then
-        If scrlProjectileRadiusX.Value > 0 Or scrlRadiusY.Value > 0 Then
-            lblAoEProjectile.caption = "Radius X: " & scrlProjectileRadiusX.Value & " Radius Y: " & scrlProjectileRadiusY.Value & " tiles."
-        Else
-            lblAoEProjectile.caption = "Damage Default"
-        End If
+        lblRadiusY.caption = "Radius Y: "
     Else
-        lblAoEProjectile.caption = cmbDirection.list(cmbDirection.ListIndex) & " Radius X: " & scrlProjectileRadiusX.Value & " and Radius Y: " & scrlProjectileRadiusY.Value
+        lblRadiusY.caption = "Radius Y: " & scrlProjectileRadiusY.Value & " SQM"
         Spell(EditorIndex).DirectionAoE(cmbDirection.ListIndex).Y = scrlProjectileRadiusY.Value
     End If
 End Sub

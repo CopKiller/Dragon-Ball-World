@@ -441,6 +441,7 @@ Dim i As Long, N As Long
     Call D3DDevice.SetTextureStageState(0, D3DTSS_ALPHAARG1, 2)
     
     LoadTextures
+    LoadFonts
 End Sub
 
 Public Function SetTexture(ByVal TextureNum As Long) As Boolean
@@ -928,8 +929,8 @@ Public Sub DrawFog()
             D3DDevice.SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR
     End Select
 
-    For X = 0 To ((Map.MapData.MaxX * 32) / 256) + 1
-        For Y = 0 To ((Map.MapData.MaxY * 32) / 256) + 1
+    For X = 0 To ((Map.MapData.maxX * 32) / 256) + 1
+        For Y = 0 To ((Map.MapData.maxY * 32) / 256) + 1
             RenderTexture TextureFog(fogNum), ConvertMapX((X * 256) + fogOffsetX), ConvertMapY((Y * 256) + fogOffsetY), 0, 0, 256, 256, 256, 256, colour
         Next
     Next
@@ -1104,8 +1105,8 @@ End Sub
 Public Sub RenderAppearTileFade()
 Dim X As Long, Y As Long, tileSet As Long, sX As Long, sY As Long, layernum As Long
 
-    For X = 0 To Map.MapData.MaxX
-        For Y = 0 To Map.MapData.MaxY
+    For X = 0 To Map.MapData.maxX
+        For Y = 0 To Map.MapData.maxY
             For layernum = MapLayer.Ground To MapLayer.Mask
                 ' check if it's fading
                 If TempTile(X, Y).fadeAlpha(layernum) > 0 Then
@@ -1634,12 +1635,12 @@ Public Sub DrawInventory()
     Next
 End Sub
 
-Public Sub DrawChatBubble(ByVal index As Long)
+Public Sub DrawChatBubble(ByVal Index As Long)
     Dim theArray() As String, X As Long, Y As Long, i As Long, MaxWidth As Long, X2 As Long, Y2 As Long, colour As Long, tmpNum As Long
 
 
     
-    With chatBubble(index)
+    With chatBubble(Index)
         ' exit out early
         If .target = 0 Then Exit Sub
         ' calculate position
@@ -1732,7 +1733,7 @@ Public Function hasSpriteShadow(ByVal sprite As Long) As Boolean
 
 End Function
 
-Public Sub DrawPlayer(ByVal index As Long)
+Public Sub DrawPlayer(ByVal Index As Long)
     Dim Anim As Byte, i As Long
     Dim X As Long
     Dim Y As Long
@@ -1743,23 +1744,23 @@ Public Sub DrawPlayer(ByVal index As Long)
     Dim attackspeed As Long
 
     ' pre-load sprite for calculations
-    sprite = GetPlayerSprite(index)
+    sprite = GetPlayerSprite(Index)
 
     'SetTexture TextureChar(Sprite)
     If sprite < 1 Or sprite > CountChar Then Exit Sub
 
     ' speed from weapon
-    If GetPlayerEquipment(index, Weapon) > 0 Then
-        attackspeed = Item(GetPlayerEquipment(index, Weapon)).Speed
+    If GetPlayerEquipment(Index, Weapon) > 0 Then
+        attackspeed = Item(GetPlayerEquipment(Index, Weapon)).Speed
     Else
         attackspeed = 1000
     End If
 
-    If Not isConstAnimated(GetPlayerSprite(index)) Then
+    If Not isConstAnimated(GetPlayerSprite(Index)) Then
         ' Reset frame
         Anim = 0
 
-        With Player(index)
+        With Player(Index)
 
             ' Animação do player parado e piscando
             If getTime > .StepTimer + 250 Then
@@ -1800,11 +1801,11 @@ Public Sub DrawPlayer(ByVal index As Long)
                             .AttackModeTimer = 0
                         End If
                     End If
-                    Anim = Player(index).AttackMode
+                    Anim = Player(Index).AttackMode
                 End If
             Else
                 ' If not attacking, walk normally
-                Select Case GetPlayerDir(index)
+                Select Case GetPlayerDir(Index)
                 Case DIR_UP
                     If (.yOffset > 8) Then Anim = .Step
                 Case DIR_DOWN
@@ -1833,18 +1834,18 @@ Public Sub DrawPlayer(ByVal index As Long)
 
     Else
 
-        If Player(index).AnimTimer + 100 <= getTime Then
-            Player(index).Anim = Player(index).Anim + 1
+        If Player(Index).AnimTimer + 100 <= getTime Then
+            Player(Index).Anim = Player(Index).Anim + 1
 
-            If Player(index).Anim >= 3 Then Player(index).Anim = 0
-            Player(index).AnimTimer = getTime
+            If Player(Index).Anim >= 3 Then Player(Index).Anim = 0
+            Player(Index).AnimTimer = getTime
         End If
 
-        Anim = Player(index).Anim
+        Anim = Player(Index).Anim
     End If
 
     ' Check to see if we want to stop making him attack
-    With Player(index)
+    With Player(Index)
 
         If .AttackTimer + attackspeed < getTime Then
             .Attacking = 0
@@ -1854,7 +1855,7 @@ Public Sub DrawPlayer(ByVal index As Long)
     End With
 
     ' Set the left
-    Select Case GetPlayerDir(index)
+    Select Case GetPlayerDir(Index)
 
     Case DIR_UP
         SpriteTop = 3
@@ -1881,29 +1882,29 @@ Public Sub DrawPlayer(ByVal index As Long)
     End With
 
     ' Calculate the X
-    X = GetPlayerX(index) * PIC_X + Player(index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet - 32) / 2)
+    X = GetPlayerX(Index) * PIC_X + Player(Index).xOffset - ((mTexture(TextureChar(sprite)).RealWidth / framesCountInSpriteSheet - 32) / 2)
 
     ' Is the player's height more than 32..?
     If (mTexture(TextureChar(sprite)).RealHeight) > 32 Then
         ' Create a 32 pixel offset for larger sprites
-        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset - ((mTexture(TextureChar(sprite)).RealHeight / 4) - 32) - 4
+        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - ((mTexture(TextureChar(sprite)).RealHeight / 4) - 32) - 4
     Else
         ' Proceed as normal
-        Y = GetPlayerY(index) * PIC_Y + Player(index).yOffset - 4
+        Y = GetPlayerY(Index) * PIC_Y + Player(Index).yOffset - 4
     End If
 
     RenderTexture TextureChar(sprite), ConvertMapX(X), ConvertMapY(Y), rec.Left, rec.Top, rec.Width, rec.Height, rec.Width, rec.Height
     ' check for paperdolling
     For i = 1 To UBound(PaperdollOrder)
-        If GetPlayerEquipment(index, PaperdollOrder(i)) > 0 Then
-            If Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll > 0 Then
-                Call DrawPaperdoll(index, Item(GetPlayerEquipment(index, PaperdollOrder(i))).Paperdoll, X, Y, rec)
+        If GetPlayerEquipment(Index, PaperdollOrder(i)) > 0 Then
+            If Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll > 0 Then
+                Call DrawPaperdoll(Index, Item(GetPlayerEquipment(Index, PaperdollOrder(i))).Paperdoll, X, Y, rec)
             End If
         End If
     Next
 End Sub
 
-Public Sub DrawPaperdoll(ByVal index As Long, ByVal sprite As Long, ByVal X2 As Long, Y2 As Long, rec As GeomRec)
+Public Sub DrawPaperdoll(ByVal Index As Long, ByVal sprite As Long, ByVal X2 As Long, Y2 As Long, rec As GeomRec)
     Dim X As Long, Y As Long
     Dim Width As Long, Height As Long
 
@@ -1913,178 +1914,6 @@ Public Sub DrawPaperdoll(ByVal index As Long, ByVal sprite As Long, ByVal X2 As 
     Height = (rec.Height - rec.Top)
     
     RenderTexture TexturePaperdoll(sprite), ConvertMapX(X2), ConvertMapY(Y2), rec.Left, rec.Top, rec.Width, rec.Height, rec.Width, rec.Height, D3DColorRGBA(255, 255, 255, 255)
-End Sub
-
-Public Sub DrawProjectile(ByVal i As Long)
-    Dim Angle As Long, X As Long, Y As Long, N As Long, SpriteTop As Byte
-    Dim Xo As Long, Yo As Long
-    Dim sRECT As RECT, Anim As Long
-
-    If i < 0 Or i > MAX_PROJECTILE_MAP Then Exit Sub
-    
-    ' ****** Create Particle ******
-    With MapProjectile(i)
-        If .Graphic > 0 Then
-            If .Speed < 5000 Then
-        
-                ' ****** Update Position ******
-                Angle = DegreeToRadian * Engine_GetAngle(.X, .Y, .tx, .ty)
-                .X = .X + (Sin(Angle) * ElapsedTime * (.Speed / 1000))
-                .Y = .Y - (Cos(Angle) * ElapsedTime * (.Speed / 1000))
-                
-                ' ****** Update Rotation ******
-                If .RotateSpeed > 0 Then
-                    .Rotate = .Rotate + (.RotateSpeed * ElapsedTime * 0.01)
-                    Do While .Rotate > 360
-                        .Rotate = .Rotate - 360
-                    Loop
-                End If
-                
-                If Abs(.X - .tx) < 60 Then
-                    If Abs(.Y - .ty) < 60 Then
-                        If .curAnim < 9 Then
-                            .curAnim = 9
-                        End If
-                    End If
-                End If
-            Else
-                If Tick + 120 >= .Duration Then
-                    .curAnim = 9
-                End If
-            End If
-            
-            
-            
-            Anim = .curAnim
-            Xo = .X
-            Yo = .Y
-            
-            With sRECT
-                If MapProjectile(i).IsDirectional Then
-                    Select Case MapProjectile(i).Direction
-                        Case DIR_UP
-                            SpriteTop = 0
-                        Case DIR_DOWN
-                            SpriteTop = 1
-                        Case DIR_LEFT, DIR_UP_LEFT, DIR_DOWN_LEFT
-                            SpriteTop = 2
-                        Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
-                            SpriteTop = 3
-                    End Select
-                    
-                    .Top = SpriteTop * (mTexture(TextureProjectile(MapProjectile(i).Graphic)).RealHeight / 4)
-                    .Bottom = .Top + (mTexture(TextureProjectile(MapProjectile(i).Graphic)).RealHeight / 4)
-                Else
-                    .Top = 0
-                    .Bottom = .Top + (mTexture(TextureProjectile(MapProjectile(i).Graphic)).RealHeight)
-                End If
-                .Left = Anim * (mTexture(TextureProjectile(MapProjectile(i).Graphic)).RealWidth / 12)
-                .Right = .Left + (mTexture(TextureProjectile(MapProjectile(i).Graphic)).RealWidth / 12)
-            End With
-            
-            Select Case .Direction
-                ' Up
-                Case DIR_UP
-                    Xo = Xo + .ProjectileOffset(DIR_UP + 1).X
-                    Yo = Yo + .ProjectileOffset(DIR_UP + 1).Y
-
-                ' Down
-                Case DIR_DOWN
-                    Xo = Xo + .ProjectileOffset(DIR_DOWN + 1).X
-                    Yo = Yo + .ProjectileOffset(DIR_DOWN + 1).Y
-
-                ' Left
-                Case DIR_LEFT, DIR_UP_LEFT, DIR_DOWN_LEFT
-                    Xo = Xo + .ProjectileOffset(DIR_LEFT + 1).X
-                    Yo = Yo + .ProjectileOffset(DIR_LEFT + 1).Y
-
-                ' Right
-                Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
-                    Xo = Xo + .ProjectileOffset(DIR_RIGHT + 1).X
-                    Yo = Yo + .ProjectileOffset(DIR_RIGHT + 1).Y
-
-            End Select
-            
-            If .Rotate = 0 Then
-                Call RenderTexture(TextureProjectile(.Graphic), ConvertMapX(Xo), ConvertMapY(Yo), sRECT.Left, sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top)
-            Else
-                Call RenderTexture(TextureProjectile(.Graphic), ConvertMapX(Xo), ConvertMapY(Yo), sRECT.Left, sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top, sRECT.Right - sRECT.Left, sRECT.Bottom - sRECT.Top, , , .Rotate)
-            End If
-            
-        End If
-    End With
-    
-    ' ****** Erase Projectile ******    Seperate Loop For Erasing
-    If MapProjectile(i).Graphic Then
-        ' VERIFICA TYLE_BLOCK e TYLE_RESOURCE
-        For X = 0 To Map.MapData.MaxX
-            For Y = 0 To Map.MapData.MaxY
-                If Map.TileData.Tile(X, Y).Type = TILE_TYPE_BLOCKED Or Map.TileData.Tile(X, Y).Type = TILE_TYPE_RESOURCE Then
-                    If Abs(MapProjectile(i).X - (X * PIC_X)) < 20 Then
-                        If Abs(MapProjectile(i).Y - (Y * PIC_Y)) < 20 Then
-                            Call ClearProjectile(i)
-                            Exit Sub
-                        End If
-                    End If
-                End If
-            Next Y
-        Next X
-        
-        ' VERIFICA PLAYER NO CAMINHO
-        For N = 1 To Player_HighIndex
-            If MyIndex <> MapProjectile(i).Owner Then
-                If IsPlaying(N) Then
-                    If Abs(MapProjectile(i).X - (GetPlayerX(N) * PIC_X)) < 20 Then
-                        If Abs(MapProjectile(i).Y - (GetPlayerY(N) * PIC_Y)) < 20 Then
-                            If MapProjectile(i).Speed <> 6000 Then
-                                Call SendTarget(N, TARGET_TYPE_PLAYER)
-                                If Not MapProjectile(i).IsAoE Then
-                                    Call ClearProjectile(i)
-                                    Exit Sub
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-        Next
-    
-        ' VERIFICA NPC NO CAMINHO
-        For N = 1 To Npc_HighIndex
-            If MapNpc(N).Num <> 0 Then
-                If Abs(MapProjectile(i).X - (MapNpc(N).X * PIC_X)) < 20 Then
-                    If Abs(MapProjectile(i).Y - (MapNpc(N).Y * PIC_Y)) < 20 Then
-                        If MapProjectile(i).Speed <> 6000 Then
-                            Call SendTarget(N, TARGET_TYPE_NPC)
-                            If Not MapProjectile(i).IsAoE Then
-                                Call ClearProjectile(i)
-                                Exit Sub
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-        Next
-        
-        ' VERIFICA SE CHEGOU AO ALVO
-        If Abs(MapProjectile(i).X - MapProjectile(i).tx) < 20 Then
-            If Abs(MapProjectile(i).Y - MapProjectile(i).ty) < 20 Then
-                If MapProjectile(i).Speed <> 6000 Then
-                    Call ClearProjectile(i)
-                    Exit Sub
-                End If
-            End If
-        End If
-        
-
-        ' VERIFICAR SE Ã‰ UMA TRAP E O TEMPO DE SPAWN ACABOU
-        If MapProjectile(i).Speed >= 5000 Then
-            If Tick >= MapProjectile(i).Duration Then
-                Call ClearProjectile(i)
-                Exit Sub
-            End If
-        End If
-    End If
 End Sub
 
 Public Sub DrawNpc(ByVal MapNpcNum As Long)
@@ -2281,8 +2110,8 @@ Public Sub DrawResource(ByVal Resource_num As Long)
     X = MapResource(Resource_num).X
     Y = MapResource(Resource_num).Y
 
-    If X < 0 Or X > Map.MapData.MaxX Then Exit Sub
-    If Y < 0 Or Y > Map.MapData.MaxY Then Exit Sub
+    If X < 0 Or X > Map.MapData.maxX Then Exit Sub
+    If Y < 0 Or Y > Map.MapData.maxY Then Exit Sub
     ' Get the Resource type
     Resource_master = Map.TileData.Tile(X, Y).Data1
 
@@ -2610,41 +2439,41 @@ Public Sub DrawMenuBG()
     RenderTexture TextureSurface(12), ScreenWidth - 2048, ScreenHeight - 1088, 0, 0, 512, 64, 512, 64
 End Sub
 
-Public Sub DrawAnimation(ByVal index As Long, ByVal Layer As Long)
+Public Sub DrawAnimation(ByVal Index As Long, ByVal Layer As Long)
     Dim sprite As Integer, sRECT As GeomRec, Width As Long, Height As Long, FrameCount As Long
     Dim X As Long, Y As Long, lockindex As Long
 
 
-    If AnimInstance(index).Animation = 0 Then
-        ClearAnimInstance index
+    If AnimInstance(Index).Animation = 0 Then
+        ClearAnimInstance Index
         Exit Sub
     End If
 
-    sprite = Animation(AnimInstance(index).Animation).sprite(Layer)
+    sprite = Animation(AnimInstance(Index).Animation).sprite(Layer)
 
     If sprite < 1 Or sprite > CountAnim Then Exit Sub
     ' pre-load texture for calculations
     'SetTexture TextureAnim(Sprite)
-    FrameCount = Animation(AnimInstance(index).Animation).Frames(Layer)
+    FrameCount = Animation(AnimInstance(Index).Animation).Frames(Layer)
     ' total width divided by frame count
     Width = 192 'mTexture(TextureAnim(Sprite)).width / frameCount
     Height = 192 'mTexture(TextureAnim(Sprite)).height
 
     With sRECT
-        .Top = (Height * ((AnimInstance(index).frameIndex(Layer) - 1) \ AnimColumns))
+        .Top = (Height * ((AnimInstance(Index).frameIndex(Layer) - 1) \ AnimColumns))
         .Height = Height
-        .Left = (Width * (((AnimInstance(index).frameIndex(Layer) - 1) Mod AnimColumns)))
+        .Left = (Width * (((AnimInstance(Index).frameIndex(Layer) - 1) Mod AnimColumns)))
         .Width = Width
 
     End With
 
     ' change x or y if locked
-    If AnimInstance(index).LockType > TARGET_TYPE_NONE Then ' if <> none
+    If AnimInstance(Index).LockType > TARGET_TYPE_NONE Then ' if <> none
 
         ' is a player
-        If AnimInstance(index).LockType = TARGET_TYPE_PLAYER Then
+        If AnimInstance(Index).LockType = TARGET_TYPE_PLAYER Then
             ' quick save the index
-            lockindex = AnimInstance(index).lockindex
+            lockindex = AnimInstance(Index).lockindex
 
             ' check if is ingame
             If IsPlaying(lockindex) Then
@@ -2658,9 +2487,9 @@ Public Sub DrawAnimation(ByVal index As Long, ByVal Layer As Long)
                 End If
             End If
 
-        ElseIf AnimInstance(index).LockType = TARGET_TYPE_NPC Then
+        ElseIf AnimInstance(Index).LockType = TARGET_TYPE_NPC Then
             ' quick save the index
-            lockindex = AnimInstance(index).lockindex
+            lockindex = AnimInstance(Index).lockindex
 
             ' check if NPC exists
             If MapNpc(lockindex).Num > 0 Then
@@ -2673,21 +2502,21 @@ Public Sub DrawAnimation(ByVal index As Long, ByVal Layer As Long)
 
                 Else
                     ' npc not alive anymore, kill the animation
-                    ClearAnimInstance index
+                    ClearAnimInstance Index
                     Exit Sub
                 End If
 
             Else
                 ' npc not alive anymore, kill the animation
-                ClearAnimInstance index
+                ClearAnimInstance Index
                 Exit Sub
             End If
         End If
 
     Else
         ' no lock, default x + y
-        X = (AnimInstance(index).X * 32) + 16 - (Width / 2)
-        Y = (AnimInstance(index).Y * 32) + 16 - (Height / 2)
+        X = (AnimInstance(Index).X * 32) + 16 - (Width / 2)
+        Y = (AnimInstance(Index).Y * 32) + 16 - (Height / 2)
     End If
 
     X = ConvertMapX(X)
@@ -2720,12 +2549,22 @@ End Sub
 ' Main Loop
 Public Sub Render_Graphics()
     Dim X As Long, Y As Long, i As Long, bgColour As Long
+
+    On Error GoTo errhandler
+
+retry:
+
     ' fuck off if we're not doing anything
     If GettingMap Then Exit Sub
-    
+
+    ' se estiver minimizado nao tem processamento gráfico
+    If frmMain.WindowState = vbMinimized Then
+        Exit Sub
+    End If
+
     ' update the camera
     UpdateCamera
-    
+
     ' check graphics
     CheckGFX
 
@@ -2735,11 +2574,11 @@ Public Sub Render_Graphics()
     Else
         bgColour = DX8Colour(Red, 255)
     End If
-    
+
     ' Bg
     Call D3DDevice.Clear(0, ByVal 0, D3DCLEAR_TARGET, bgColour, 1#, 0)
     Call D3DDevice.BeginScene
-    
+
     ' render black if map
     If InMapEditor Then
         For X = TileView.Left To TileView.Right
@@ -2784,8 +2623,8 @@ Public Sub Render_Graphics()
     For Y = TileView.Top To TileView.Bottom + 5
         ' draw traps on map
         For i = 1 To LastProjectile
-            If MapProjectile(i).Owner > 0 Then
-                If MapProjectile(i).Speed >= 5000 Then
+            If MapProjectile(i).Graphic > 0 Then
+                If Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.IsTrap Then
                     If Int(MapProjectile(i).Y / PIC_Y) = Y Then
                         Call DrawProjectile(i)
                     End If
@@ -2840,11 +2679,11 @@ Public Sub Render_Graphics()
                 End If
             Next
         End If
-        
+
         ' draw projectiles on map
         For i = 1 To LastProjectile
-            If MapProjectile(i).Owner > 0 Then
-                If MapProjectile(i).Speed < 5000 Then
+            If MapProjectile(i).Graphic > 0 Then
+                If Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.KiBall Or Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.GenkiDama Then
                     If Int(MapProjectile(i).Y / PIC_Y) = Y Then
                         Call DrawProjectile(i)
                     End If
@@ -2852,8 +2691,8 @@ Public Sub Render_Graphics()
             End If
         Next
     Next Y
-    
-    
+
+
 
     ' render out upper tiles
     If CountTileset > 0 Then
@@ -2891,7 +2730,7 @@ Public Sub Render_Graphics()
 
     ' blt the hover icon
     DrawTargetHover
-    
+
     ' draw the bars
     DrawBars
 
@@ -2941,21 +2780,21 @@ Public Sub Render_Graphics()
             DrawChatBubble i
         End If
     Next
-    
+
     If DrawThunder > 0 Then RenderTexture TextureWhite, 0, 0, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 32, 32, D3DColorRGBA(255, 255, 255, 160): DrawThunder = DrawThunder - 1
-    
+
     ' draw shadow
     If Not screenshotMode Then
         RenderTexture TextureGUI(43), 0, 0, 0, 0, ScreenWidth, 64, 1, 64
         RenderTexture TextureGUI(42), 0, ScreenHeight - 64, 0, 0, ScreenWidth, 64, 1, 64
     End If
-    
+
     ' Render entities
     If Not InMapEditor And Not hideGUI And Not screenshotMode Then RenderEntities
-    
+
     ' render the tile selection
     If InMapEditor Then DrawTileSelection
-  
+
     ' render FPS
     If Not screenshotMode Then RenderText font(fonts.rockwell_15), "FPS: " & GameFPS, 1, 1, White
 
@@ -2970,12 +2809,36 @@ Public Sub Render_Graphics()
 
     ' End the rendering
     Call D3DDevice.EndScene
-    Call D3DDevice.Present(ByVal 0, ByVal 0, 0, ByVal 0)
+
+    If D3DDevice.TestCooperativeLevel = D3D_OK And Not D3DDevice.TestCooperativeLevel = D3DERR_DEVICELOST And Not D3DDevice.TestCooperativeLevel = D3DERR_DEVICENOTRESET Then
+        D3DDevice.Present ByVal 0, ByVal 0, 0, ByVal 0
+    End If
+
     ' GDI Rendering
     DrawGDI
+
+    Exit Sub
+errhandler:
+    If Err.Number = -2005530520 Then
+        Err.Clear
+        GoTo retry
+    Else
+        MsgBox "Erro: " & Err.Number & " " & Err.Description & " - Contatar um administrador"
+        DestroyGame
+    End If
 End Sub
 
 Public Sub Render_Menu()
+
+    On Error GoTo errhandler
+
+retry:
+
+    ' se estiver minimizado nao tem processamento gráfico
+    If frmMain.WindowState = vbMinimized Then
+        Exit Sub
+    End If
+
     ' check graphics
     CheckGFX
     ' Start rendering
@@ -2989,5 +2852,18 @@ Public Sub Render_Menu()
     DrawFade
     ' End the rendering
     Call D3DDevice.EndScene
-    Call D3DDevice.Present(ByVal 0, ByVal 0, 0, ByVal 0)
+
+    If D3DDevice.TestCooperativeLevel = D3D_OK And Not D3DDevice.TestCooperativeLevel = D3DERR_DEVICELOST And Not D3DDevice.TestCooperativeLevel = D3DERR_DEVICENOTRESET Then
+        D3DDevice.Present ByVal 0, ByVal 0, 0, ByVal 0
+    End If
+
+    Exit Sub
+errhandler:
+    If Err.Number = -2005530520 Then
+        Err.Clear
+        GoTo retry
+    Else
+        MsgBox "Erro: " & Err.Number & " " & Err.Description & " - Contatar um administrador"
+        DestroyGame
+    End If
 End Sub

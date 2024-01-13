@@ -15,24 +15,6 @@ Public Sub SpellEditorPaste()
     frmEditor_Spell.txtName_Validate False
 End Sub
 
-Public Sub IsTrap()
-    If frmEditor_Spell.chkTrap.Value = 1 Then
-        frmEditor_Spell.scrlProjectileSpeed.enabled = False
-        frmEditor_Spell.scrlProjectileRange.enabled = False
-        frmEditor_Spell.scrlProjectileRotation.enabled = False
-        frmEditor_Spell.scrlDurationProjectile.enabled = True
-        Spell(EditorIndex).Projectile.Speed = 5000
-        Spell(EditorIndex).Range = 1
-        Spell(EditorIndex).Projectile.Rotation = 0
-    Else
-        frmEditor_Spell.scrlProjectileSpeed.enabled = True
-        frmEditor_Spell.scrlProjectileRange.enabled = True
-        frmEditor_Spell.scrlProjectileRotation.enabled = True
-        frmEditor_Spell.scrlDurationProjectile.enabled = False
-        Spell(EditorIndex).Projectile.Despawn = 0
-    End If
-End Sub
-
 Public Sub SpellEditorInit()
     Dim i As Long
     Dim SoundSet As Boolean
@@ -93,13 +75,6 @@ Public Sub SpellEditorInit()
             ' Sets
             .scrlProjectileSpeed.Value = Spell(EditorIndex).Projectile.Speed
             
-            If .scrlProjectileSpeed.Value = 5000 Then
-                .chkTrap.Value = 1
-            Else
-                .chkTrap.Value = 0
-            End If
-            
-            Call IsTrap
             .scrlDamageProjectile.Value = Spell(EditorIndex).Vital
             
             If Spell(EditorIndex).Projectile.RecuringDamage Then
@@ -126,7 +101,7 @@ Public Sub SpellEditorInit()
             .scrlProjectileRange.Value = Spell(EditorIndex).Range
             .scrlProjectileRotation.Value = Spell(EditorIndex).Projectile.Rotation
             .scrlProjectileAmmo.Value = Spell(EditorIndex).Projectile.Ammo
-            .scrlDurationProjectile.Value = Int(Spell(EditorIndex).Projectile.Despawn / 100)
+            .scrlDurationProjectile.Value = Int(Spell(EditorIndex).Projectile.Duration / 100)
             .scrlProjectileAnimOnHit.Value = Spell(EditorIndex).Projectile.AnimOnHit
             
             .cmbDirection.ListIndex = 0
@@ -153,8 +128,10 @@ Public Sub SpellEditorInit()
                 Select Case i
                     Case ProjectileTypeEnum.KiBall
                         .cmbProjectileType.AddItem "KiBall"
-                    Case ProjectileTypeEnum.GekiDama
+                    Case ProjectileTypeEnum.GenkiDama
                         .cmbProjectileType.AddItem "GenkiDama"
+                    Case ProjectileTypeEnum.IsTrap
+                        .cmbProjectileType.AddItem "IsTrap"
                 End Select
             Next
             .cmbProjectileType.ListIndex = Spell(EditorIndex).Projectile.ProjectileType

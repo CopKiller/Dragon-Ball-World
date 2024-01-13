@@ -19,8 +19,8 @@ Public Function PlayerData(ByVal index As Long) As Byte()
     Buffer.WriteLong GetPlayerPK(index)
     Buffer.WriteLong GetPlayerClass(index)
     Buffer.WriteByte GetPlayerFrame(index)
-    Buffer.WriteLong TempPlayer(index).ProjectileCustomType
-    Buffer.WriteLong TempPlayer(index).ProjectileCustomNum
+    Buffer.WriteLong TempPlayer(index).ConjureAnimProjectileType
+    Buffer.WriteLong TempPlayer(index).ConjureAnimProjectileNum
     
     For i = 1 To Stats.Stat_Count - 1
         Buffer.WriteLong GetPlayerStat(index, i)
@@ -143,7 +143,7 @@ Public Sub SendPlayerXYToMap(ByVal index As Long, Optional ByVal ImpactedDir As 
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Sub SendMapNpcXY(ByVal index As Long, ByVal mapnum As Long, Optional ByVal ImpactedDir As Byte = 0)
+Sub SendMapNpcXY(ByVal index As Long, ByVal mapNum As Long, Optional ByVal ImpactedDir As Byte = 0)
     Dim packet As String
     Dim i As Long
     Dim Buffer As clsBuffer
@@ -152,12 +152,12 @@ Sub SendMapNpcXY(ByVal index As Long, ByVal mapnum As Long, Optional ByVal Impac
     Buffer.WriteLong SMapNpcDataXY
 
     Buffer.WriteLong index
-    Buffer.WriteLong MapNpc(mapnum).Npc(index).x
-    Buffer.WriteLong MapNpc(mapnum).Npc(index).y
-    Buffer.WriteLong MapNpc(mapnum).Npc(index).Dir
+    Buffer.WriteLong MapNpc(mapNum).Npc(index).x
+    Buffer.WriteLong MapNpc(mapNum).Npc(index).y
+    Buffer.WriteLong MapNpc(mapNum).Npc(index).Dir
     Buffer.WriteByte ImpactedDir
 
-    SendDataToMap mapnum, Buffer.ToArray()
+    SendDataToMap mapNum, Buffer.ToArray()
 
     Buffer.Flush: Set Buffer = Nothing
 End Sub
@@ -449,7 +449,7 @@ Public Sub SendDataToParty(ByVal partynum As Long, ByRef Data() As Byte)
     Next
 End Sub
 
-Public Sub SendBlood(ByVal mapnum As Long, ByVal x As Long, ByVal y As Long)
+Public Sub SendBlood(ByVal mapNum As Long, ByVal x As Long, ByVal y As Long)
     Dim Buffer As clsBuffer
     
     Set Buffer = New clsBuffer
@@ -457,7 +457,7 @@ Public Sub SendBlood(ByVal mapnum As Long, ByVal x As Long, ByVal y As Long)
     Buffer.WriteLong x
     Buffer.WriteLong y
     
-    SendDataToMap mapnum, Buffer.ToArray()
+    SendDataToMap mapNum, Buffer.ToArray()
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
@@ -555,7 +555,7 @@ Public Sub SendStartTutorial(ByVal index As Long)
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Public Sub SendProjectile(ByVal mapnum As Long, ByVal ProjectileSlot As Long, Optional ByVal IsDirectional As Boolean = False)
+Public Sub SendProjectile(ByVal mapNum As Long, ByVal ProjectileSlot As Long, Optional ByVal IsDirectional As Boolean = False)
     Dim Buffer As clsBuffer
     Dim i As Long
     Set Buffer = New clsBuffer
@@ -577,6 +577,7 @@ Public Sub SendProjectile(ByVal mapnum As Long, ByVal ProjectileSlot As Long, Op
         Buffer.WriteLong .y
         Buffer.WriteLong .tX
         Buffer.WriteLong .tY
+        Buffer.WriteLong .spellNum
         Buffer.WriteByte IsDirectional
         For i = 1 To 4
             Buffer.WriteLong .ProjectileOffset(i).x
@@ -584,7 +585,7 @@ Public Sub SendProjectile(ByVal mapnum As Long, ByVal ProjectileSlot As Long, Op
         Next
     End With
     
-    SendDataToMap mapnum, Buffer.ToArray()
+    SendDataToMap mapNum, Buffer.ToArray()
     Set Buffer = Nothing
 End Sub
 

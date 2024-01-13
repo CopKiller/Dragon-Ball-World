@@ -392,7 +392,7 @@ Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As 
         TempPlayer(index).spellBuffer.tType = 0
         
         Call SendClearSpellBufferTo(index)
-        Call ClearPlayerFrameToMapBut(i)
+        Call ClearPlayerFrameToMapBut(index)
     End If
     
     ' check directions

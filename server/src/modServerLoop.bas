@@ -13,7 +13,7 @@ Sub ServerLoop()
         tick = GetTickCount
         ElapsedTime = tick - FrameTime
         FrameTime = tick
-        
+
         If tick > tmr25 Then
             ' loops
             For i = 1 To Player_HighIndex
@@ -26,10 +26,10 @@ Sub ServerLoop()
                             TempPlayer(i).spellBuffer.Timer = 0
                             TempPlayer(i).spellBuffer.Target = 0
                             TempPlayer(i).spellBuffer.tType = 0
-                            
+
                             Call ClearPlayerFrameToMapBut(i)
-                            If TempPlayer(i).ProjectileCustomType <> ProjectileTypeEnum.None Then
-                                SendPlayerConjureProjectileCustomToMapBut i, None, 0
+                            If TempPlayer(i).ConjureAnimProjectileType = ProjectileTypeEnum.GenkiDama Then
+                                SendConjureAnimationToMapBut i, None, 0
                             End If
                         End If
                     End If
@@ -57,12 +57,23 @@ Sub ServerLoop()
                     UpdatePlayerFood i
                 End If
             Next
+
             ' update entity logic
             UpdateMapEntities
             ' update label
             frmServer.lblCPS.Caption = "CPS: " & Format$(GameCPS, "#,###,###,###")
             tmr25 = GetTickCount + 25
         End If
+        
+        ' draw projectiles on map
+       ' If tick > tmr100 Then
+            For i = 1 To MapProjectile_HighIndex
+                If MapProjectile(i).Owner > 0 Then
+                    CheckProjectile i
+                End If
+            Next
+         '   tmr100 = GetTickCount + 100
+       ' End If
 
         ' Check for disconnections every half second
         If tick > tmr500 Then
@@ -74,25 +85,18 @@ Sub ServerLoop()
             UpdateMapLogic
             tmr500 = GetTickCount + 500
         End If
-        
-        ' draw projectiles on map
-        For i = 1 To MapProjectile_HighIndex
-            If MapProjectile(i).Owner > 0 Then
-                CheckProjectile i
-            End If
-        Next
 
         If tick > tmr1000 Then
             ' check if shutting down
             If isShuttingDown Then
                 Call HandleShutdown
             End If
-            
+
             ' Verificar se o jogador tem alguma task com tempo!
             For i = 1 To Player_HighIndex
                 Call CheckPlayerTaskTimer(i)
             Next i
-            
+
             ' reset timer
             tmr1000 = GetTickCount + 1000
         End If
@@ -111,7 +115,7 @@ Sub ServerLoop()
 
         If Not CPSUnlock Then Sleep 1
         DoEvents
-        
+
         ' Calculate CPS
         If TickCPS < tick Then
             GameCPS = CPS
@@ -158,8 +162,8 @@ Dim mapnum As Long, i As Long, tick As Long, x1 As Long, y1 As Long, x As Long, 
         
         '  Close the doors
         If tick > TempTile(mapnum).DoorTimer + 5000 Then
-            For x1 = 0 To Map(mapnum).MapData.MaxX
-                For y1 = 0 To Map(mapnum).MapData.MaxY
+            For x1 = 0 To Map(mapnum).MapData.maxX
+                For y1 = 0 To Map(mapnum).MapData.maxY
                     If Map(mapnum).TileData.Tile(x1, y1).Type = TILE_TYPE_KEY And TempTile(mapnum).DoorOpen(x1, y1) = YES Then
                         TempTile(mapnum).DoorOpen(x1, y1) = NO
                         SendMapKeyToMap mapnum, x1, y1, 0

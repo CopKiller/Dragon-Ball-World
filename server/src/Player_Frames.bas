@@ -4,20 +4,21 @@ Option Explicit
 Public Enum ProjectileTypeEnum
     None = 0
     KiBall
-    GekiDama
+    GenkiDama
+    IsTrap
     
     ProjectileTypeCount
 End Enum
 
 Function GetPlayerFrame(ByVal index As Long) As Long
 
-    If index > MAX_PLAYERS Then Exit Function
+    If index > MAX_PLAYERS Or index <= 0 Then Exit Function
     GetPlayerFrame = TempPlayer(index).PlayerFrame
 End Function
 
 Sub SetPlayerFrame(ByVal index As Long, ByVal frameValue As Long)
 
-    If index > MAX_PLAYERS Then Exit Sub
+    If index > MAX_PLAYERS Or index <= 0 Then Exit Sub
     TempPlayer(index).PlayerFrame = frameValue
 End Sub
 
@@ -75,19 +76,19 @@ Sub ClearPlayerFrameToMapBut(ByVal index As Long)
     Buffer.Flush: Set Buffer = Nothing
 End Sub
 
-Sub SendPlayerConjureProjectileCustomToMapBut(ByVal index As Long, _
+Sub SendConjureAnimationToMapBut(ByVal index As Long, _
                                               ByVal projectileType As ProjectileTypeEnum, _
                                               ByVal projectileNum As Long)
     Dim Buffer As clsBuffer
     
-    TempPlayer(index).ProjectileCustomType = projectileType
-    TempPlayer(index).ProjectileCustomNum = projectileNum
+    TempPlayer(index).ConjureAnimProjectileType = projectileType
+    TempPlayer(index).ConjureAnimProjectileNum = projectileNum
 
     Set Buffer = New clsBuffer
     Buffer.WriteLong SPlayerConjureProjectileCustom
     Buffer.WriteLong index
-    Buffer.WriteLong TempPlayer(index).ProjectileCustomType
-    Buffer.WriteLong TempPlayer(index).ProjectileCustomNum
+    Buffer.WriteLong TempPlayer(index).ConjureAnimProjectileType
+    Buffer.WriteLong TempPlayer(index).ConjureAnimProjectileNum
     SendDataToMapBut index, GetPlayerMap(index), Buffer.ToArray()
     Buffer.Flush: Set Buffer = Nothing
 

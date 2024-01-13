@@ -118,7 +118,6 @@ Public Type TempPlayerRec
     TargetType As Byte
     Target As Long
     SpellCastType As Long
-    Projectile(1 To MAX_PROJECTILE_PLAYER) As ProjectileRec
     GettingMap As Byte
     SpellCD(1 To MAX_PLAYER_SPELLS) As Long
     InShop As Long
@@ -161,8 +160,8 @@ Public Type TempPlayerRec
     
     PlayerFrame As Byte
     
-    ProjectileCustomType As Byte
-    ProjectileCustomNum As Long
+    ConjureAnimProjectileType As Byte
+    ConjureAnimProjectileNum As Long
 End Type
 
 Private Type ClassRec

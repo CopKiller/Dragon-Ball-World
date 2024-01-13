@@ -133,8 +133,8 @@ Sub SpawnMapItems(ByVal mapnum As Long)
     End If
 
     ' Spawn what we have
-    For x = 0 To Map(mapnum).MapData.MaxX
-        For y = 0 To Map(mapnum).MapData.MaxY
+    For x = 0 To Map(mapnum).MapData.maxX
+        For y = 0 To Map(mapnum).MapData.maxY
 
             ' Check if the tile type is an item or a saved tile incase someone drops something
             If (Map(mapnum).TileData.Tile(x, y).Type = TILE_TYPE_ITEM) Then
@@ -183,8 +183,8 @@ Public Sub SpawnNpc(ByVal mapNpcNum As Long, ByVal mapnum As Long)
             .spellBuffer.tType = 0
         
             'Check if theres a spawn tile for the specific npc
-            For x = 0 To Map(mapnum).MapData.MaxX
-                For y = 0 To Map(mapnum).MapData.MaxY
+            For x = 0 To Map(mapnum).MapData.maxX
+                For y = 0 To Map(mapnum).MapData.maxY
                     If Map(mapnum).TileData.Tile(x, y).Type = TILE_TYPE_NPCSPAWN Then
                         If Map(mapnum).TileData.Tile(x, y).Data1 = mapNpcNum Then
                             .x = x
@@ -201,11 +201,11 @@ Public Sub SpawnNpc(ByVal mapNpcNum As Long, ByVal mapnum As Long)
         
                 ' Well try 100 times to randomly place the sprite
                 For i = 1 To 100
-                    x = Random(0, Map(mapnum).MapData.MaxX)
-                    y = Random(0, Map(mapnum).MapData.MaxY)
+                    x = Random(0, Map(mapnum).MapData.maxX)
+                    y = Random(0, Map(mapnum).MapData.maxY)
         
-                    If x > Map(mapnum).MapData.MaxX Then x = Map(mapnum).MapData.MaxX
-                    If y > Map(mapnum).MapData.MaxY Then y = Map(mapnum).MapData.MaxY
+                    If x > Map(mapnum).MapData.maxX Then x = Map(mapnum).MapData.maxX
+                    If y > Map(mapnum).MapData.maxY Then y = Map(mapnum).MapData.maxY
         
                     ' Check if the tile is walkable
                     If NpcTileIsOpen(mapnum, x, y) Then
@@ -222,8 +222,8 @@ Public Sub SpawnNpc(ByVal mapNpcNum As Long, ByVal mapnum As Long)
             ' Didn't spawn, so now we'll just try to find a free tile
             If Not Spawned Then
     
-                For x = 0 To Map(mapnum).MapData.MaxX
-                    For y = 0 To Map(mapnum).MapData.MaxY
+                For x = 0 To Map(mapnum).MapData.maxX
+                    For y = 0 To Map(mapnum).MapData.maxY
     
                         If NpcTileIsOpen(mapnum, x, y) Then
                             .x = x
@@ -374,7 +374,7 @@ Function CanNpcMove(ByVal mapnum As Long, ByVal mapNpcNum As Long, ByVal Dir As 
         Case DIR_DOWN
 
             ' Check to make sure not outside of boundries
-            If y < Map(mapnum).MapData.MaxY Then
+            If y < Map(mapnum).MapData.maxY Then
                 n = Map(mapnum).TileData.Tile(x, y + 1).Type
 
                 ' Check to make sure that the tile is walkable
@@ -452,7 +452,7 @@ Function CanNpcMove(ByVal mapnum As Long, ByVal mapNpcNum As Long, ByVal Dir As 
         Case DIR_RIGHT
 
             ' Check to make sure not outside of boundries
-            If x < Map(mapnum).MapData.MaxX Then
+            If x < Map(mapnum).MapData.maxX Then
                 n = Map(mapnum).TileData.Tile(x + 1, y).Type
 
                 ' Check to make sure that the tile is walkable
@@ -530,7 +530,7 @@ Function CanNpcMove(ByVal mapnum As Long, ByVal mapNpcNum As Long, ByVal Dir As 
 '#######################################################################################################################
         Case DIR_UP_RIGHT
             ' Check to make sure not outside of boundries
-            If y > 0 And x < Map(mapnum).MapData.MaxX Then
+            If y > 0 And x < Map(mapnum).MapData.maxX Then
                 n = Map(mapnum).TileData.Tile(x + 1, y - 1).Type
 
                 ' Check to make sure that the tile is walkable
@@ -570,7 +570,7 @@ Function CanNpcMove(ByVal mapnum As Long, ByVal mapNpcNum As Long, ByVal Dir As 
         Case DIR_DOWN_LEFT
 
             ' Check to make sure not outside of boundries
-            If y < Map(mapnum).MapData.MaxY And x > 0 Then
+            If y < Map(mapnum).MapData.maxY And x > 0 Then
                 n = Map(mapnum).TileData.Tile(x - 1, y + 1).Type
 
                 ' Check to make sure that the tile is walkable
@@ -610,7 +610,7 @@ Function CanNpcMove(ByVal mapnum As Long, ByVal mapNpcNum As Long, ByVal Dir As 
         Case DIR_DOWN_RIGHT
 
             ' Check to make sure not outside of boundries
-            If y < Map(mapnum).MapData.MaxY And x < Map(mapnum).MapData.MaxX Then
+            If y < Map(mapnum).MapData.maxY And x < Map(mapnum).MapData.maxX Then
                 n = Map(mapnum).TileData.Tile(x + 1, y + 1).Type
 
                 ' Check to make sure that the tile is walkable
@@ -741,10 +741,10 @@ Sub ClearTempTile(ByVal mapnum As Long)
     Dim y As Long
     Dim x As Long
     TempTile(mapnum).DoorTimer = 0
-    ReDim TempTile(mapnum).DoorOpen(0 To Map(mapnum).MapData.MaxX, 0 To Map(mapnum).MapData.MaxY)
+    ReDim TempTile(mapnum).DoorOpen(0 To Map(mapnum).MapData.maxX, 0 To Map(mapnum).MapData.maxY)
 
-    For x = 0 To Map(mapnum).MapData.MaxX
-        For y = 0 To Map(mapnum).MapData.MaxY
+    For x = 0 To Map(mapnum).MapData.maxX
+        For y = 0 To Map(mapnum).MapData.maxY
             TempTile(mapnum).DoorOpen(x, y) = NO
         Next
     Next
@@ -755,8 +755,8 @@ Public Sub CacheResources(ByVal mapnum As Long)
     Dim x As Long, y As Long, Resource_Count As Long
     Resource_Count = 0
 
-    For x = 0 To Map(mapnum).MapData.MaxX
-        For y = 0 To Map(mapnum).MapData.MaxY
+    For x = 0 To Map(mapnum).MapData.maxX
+        For y = 0 To Map(mapnum).MapData.maxY
 
             If Map(mapnum).TileData.Tile(x, y).Type = TILE_TYPE_RESOURCE Then
                 Resource_Count = Resource_Count + 1
@@ -1297,184 +1297,6 @@ Public Function hasProficiency(ByVal index As Long, ByVal proficiency As Long) A
     End Select
     hasProficiency = False
 End Function
-
-Public Sub CheckProjectile(ByVal i As Long)
-    Dim Angle As Long, x As Long, y As Long, n As Long
-    Dim Attacker As Long, spellNum As Long
-    Dim BaseDamage As Long, Damage As Long
-
-    If i < 0 Or i > MAX_PROJECTILE_MAP Then Exit Sub
-    If MapProjectile(i).OwnerType = TARGET_TYPE_PLAYER Then
-        If Not IsPlaying(MapProjectile(i).Owner) Then: Call ClearProjectile(i): Exit Sub
-    ElseIf MapProjectile(i).OwnerType = TARGET_TYPE_NPC Then
-        If MapNpc(MapProjectile(i).mapnum).Npc(MapProjectile(i).Owner).Num = 0 Then: Call ClearProjectile(i): Exit Sub
-    End If
-
-    Attacker = MapProjectile(i).Owner
-    spellNum = MapProjectile(i).spellNum
-    BaseDamage = Spell(spellNum).Vital
-    Damage = BaseDamage + Int(GetPlayerStat(Attacker, Intelligence) / 3)
-
-    ' ****** Create Particle ******
-    With MapProjectile(i)
-        If .Graphic > 0 Then
-            If .Speed < 5000 Then
-
-                ' ****** Update Position ******
-                Angle = DegreeToRadian * Engine_GetAngle(.x, .y, .tX, .tY)
-                .x = .x + (Sin(Angle) * ElapsedTime * (.Speed / 1000))
-                .y = .y - (Cos(Angle) * ElapsedTime * (.Speed / 1000))
-
-                If Spell(spellNum).IsAoE Then
-                    Select Case MapProjectile(i).direction
-                    Case DIR_UP
-                        .xTargetAoE = .x - (Int(Spell(MapProjectile(i).spellNum).DirectionAoE(DIR_UP + 1).x / 2) * PIC_X)
-                        .yTargetAoE = .y
-                    Case DIR_DOWN
-                        .xTargetAoE = .x - (Int(Spell(MapProjectile(i).spellNum).DirectionAoE(DIR_DOWN + 1).x / 2) * PIC_X)
-                        .yTargetAoE = .y
-                    Case DIR_LEFT, DIR_UP_LEFT, DIR_DOWN_LEFT
-                        .xTargetAoE = .x
-                        .yTargetAoE = .y - (Int(Spell(MapProjectile(i).spellNum).DirectionAoE(DIR_LEFT + 1).y / 2) * PIC_Y)
-                    Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
-                        .xTargetAoE = .x
-                        .yTargetAoE = .y - (Int(Spell(MapProjectile(i).spellNum).DirectionAoE(DIR_RIGHT + 1).y / 2) * PIC_Y)
-                    End Select
-                End If
-            End If
-        End If
-    End With
-
-    ' ****** Erase Projectile ******    Seperate Loop For Erasing
-    If MapProjectile(i).OwnerType = TARGET_TYPE_PLAYER Then
-        ' VERIFICA TYLE_BLOCK e TYLE_RESOURCE
-        For x = 0 To Map(GetPlayerMap(Attacker)).MapData.MaxX
-            For y = 0 To Map(GetPlayerMap(Attacker)).MapData.MaxY
-                If Map(GetPlayerMap(Attacker)).TileData.Tile(x, y).Type = TILE_TYPE_BLOCKED Or Map(GetPlayerMap(Attacker)).TileData.Tile(x, y).Type = TILE_TYPE_RESOURCE Then
-                    If Abs(MapProjectile(i).x - (x * PIC_X)) < 20 Then
-                        If Abs(MapProjectile(i).y - (y * PIC_Y)) < 20 Then
-                            Call ClearProjectile(i)
-                            Exit Sub
-                        End If
-                    End If
-                End If
-            Next y
-        Next x
-
-        If Not Spell(MapProjectile(i).spellNum).IsAoE Then
-            ' VERIFICA PLAYER NO CAMINHO
-            For n = 1 To Player_HighIndex
-                If IsPlaying(n) Then
-                    If n <> Attacker Then
-                        If Abs(MapProjectile(i).x - (GetPlayerX(n) * PIC_X)) < 20 Then
-                            If Abs(MapProjectile(i).y - (GetPlayerY(n) * PIC_Y)) < 20 Then
-                                If CanPlayerAttackPlayer(Attacker, n, True) Then
-                                    If MapProjectile(i).Speed <> 6000 Then
-                                        If Spell(spellNum).Projectile.ImpactRange > 0 Then
-                                            Call MakeImpact(n, Spell(spellNum).Projectile.ImpactRange, TARGET_TYPE_PLAYER, GetPlayerMap(Attacker), Attacker, False)
-                                        End If
-                                        PlayerAttackPlayer Attacker, n, Damage, spellNum
-                                        Call ClearProjectile(i)
-                                        Exit Sub
-                                    Else
-                                        If tick > MapProjectile(i).Duration Then
-                                            If Spell(spellNum).Projectile.ImpactRange > 0 Then
-                                                Call MakeImpact(n, Spell(spellNum).Projectile.ImpactRange, TARGET_TYPE_PLAYER, GetPlayerMap(Attacker), Attacker, False)
-                                            End If
-                                            PlayerAttackPlayer Attacker, n, Damage, spellNum
-                                            MapProjectile(i).Duration = tick + 1000
-                                        End If
-                                    End If
-                                Else
-                                    If MapProjectile(i).Speed <> 6000 Then
-                                        Call ClearProjectile(i)
-                                        Exit Sub
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Next
-
-            ' VERIFICA NPC NO CAMINHO
-            For n = 1 To MAX_MAP_NPCS
-                If MapNpc(GetPlayerMap(Attacker)).Npc(n).Num <> 0 Then
-                    If Abs(MapProjectile(i).x - (MapNpc(GetPlayerMap(Attacker)).Npc(n).x * PIC_X)) < 20 Then
-                        If Abs(MapProjectile(i).y - (MapNpc(GetPlayerMap(Attacker)).Npc(n).y * PIC_Y)) < 20 Then
-                            If CanPlayerAttackNpc(Attacker, n, True) Then
-                                If MapProjectile(i).Speed <> 6000 Then
-                                    If Spell(spellNum).Projectile.ImpactRange > 0 Then
-                                        Call MakeImpact(n, Spell(spellNum).Projectile.ImpactRange, TARGET_TYPE_NPC, GetPlayerMap(Attacker), Attacker, False)
-                                    End If
-                                    PlayerAttackNpc Attacker, n, Damage, spellNum
-                                    Call ClearProjectile(i)
-                                    Exit Sub
-                                Else
-                                    If tick > MapProjectile(i).Duration Then
-                                        If Spell(spellNum).Projectile.ImpactRange > 0 Then
-                                            Call MakeImpact(n, Spell(spellNum).Projectile.ImpactRange, TARGET_TYPE_NPC, GetPlayerMap(Attacker), Attacker, False)
-                                        End If
-                                        PlayerAttackNpc Attacker, n, Damage, spellNum
-                                        MapProjectile(i).Duration = tick + 1000
-                                    End If
-                                End If
-                            Else
-                                If MapProjectile(i).Speed <> 6000 Then
-                                    Call ClearProjectile(i)
-                                    Exit Sub
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Next
-        Else    ' SE É DANO EM AREA If Not Spell(MapProjectile(i).spellNum).IsAoE Then
-            ' VERIFICA NPC NO CAMINHO
-            For n = 1 To MAX_MAP_NPCS
-                If MapNpc(GetPlayerMap(Attacker)).Npc(n).Num <> 0 Then
-                    If Abs((MapNpc(GetPlayerMap(Attacker)).Npc(n).x * PIC_X) - MapProjectile(i).x) < (20 * Spell(MapProjectile(i).spellNum).DirectionAoE(MapProjectile(i).direction + 1).x) Then
-                        If Abs((MapNpc(GetPlayerMap(Attacker)).Npc(n).y * PIC_Y) - MapProjectile(i).y) < (20 * Spell(MapProjectile(i).spellNum).DirectionAoE(MapProjectile(i).direction + 1).y) Then
-                            If CanPlayerAttackNpc(Attacker, n, True) Then
-                                If Spell(MapProjectile(i).spellNum).Projectile.RecuringDamage Then
-                                    If tick > MapProjectile(i).AttackTimer(n) Then
-                                        If Spell(spellNum).Projectile.ImpactRange > 0 Then
-                                            Call MakeImpact(n, Spell(spellNum).Projectile.ImpactRange, TARGET_TYPE_NPC, GetPlayerMap(Attacker), Attacker, False)
-                                        End If
-                                        PlayerAttackNpc Attacker, n, Damage, spellNum
-                                        MapProjectile(i).AttackTimer(n) = tick + MapProjectile(i).Speed
-                                        'Call PlayerMsg(Attacker, "ID: " & N, White)
-                                    End If
-                                Else
-                                    ' FALTA IMPLEMENTAR
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Next
-        End If
-
-        ' VERIFICA SE CHEGOU AO ALVO
-        If Abs(MapProjectile(i).x - MapProjectile(i).tX) < 20 Then
-            If Abs(MapProjectile(i).y - MapProjectile(i).tY) < 20 Then
-                If MapProjectile(i).Speed <> 6000 Then
-                    Call ClearProjectile(i)
-                    Exit Sub
-                End If
-            End If
-        End If
-
-        ' VERIFICAR SE É UMA TRAP E O TEMPO DE SPAWN ACABOU
-        If MapProjectile(i).Speed >= 5000 Then
-            If tick >= MapProjectile(i).Duration Then
-                Call ClearProjectile(i)
-                Exit Sub
-            End If
-        End If
-
-    End If
-End Sub
 
 Function SecondsToHMS(ByRef Segundos As Long) As String
     Dim HR As Long, ms As Long, Ss As Long, MM As Long

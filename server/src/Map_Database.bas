@@ -1,18 +1,20 @@
 Attribute VB_Name = "Map_Database"
+Option Explicit
+
 ' **********
 ' ** Maps **
 ' **********
-Public Sub SaveMap(ByVal mapnum As Long)
+Public Sub SaveMap(ByVal MapNum As Long)
     Dim filename As String, f As Long, x As Long, y As Long, i As Long
     
     ' save map data
-    filename = App.Path & "\data\maps\map" & mapnum & ".ini"
+    filename = App.Path & "\data\maps\map" & MapNum & ".ini"
     
     ' if it exists then kill the ini
     If FileExist(filename) Then Kill filename
     
     ' General
-    With Map(mapnum).MapData
+    With Map(MapNum).MapData
         PutVar filename, "General", "Name", .Name
         PutVar filename, "General", "Music", .Music
         PutVar filename, "General", "Moral", Val(.Moral)
@@ -45,10 +47,10 @@ Public Sub SaveMap(ByVal mapnum As Long)
     End With
     
     ' dump tile data
-    filename = App.Path & "\data\maps\map" & mapnum & ".dat"
+    filename = App.Path & "\data\maps\map" & MapNum & ".dat"
     f = FreeFile
     
-    With Map(mapnum)
+    With Map(MapNum)
         Open filename For Binary As #f
             For x = 0 To .MapData.MaxX
                 For y = 0 To .MapData.MaxY
@@ -95,14 +97,14 @@ Public Sub CheckMaps()
 
 End Sub
 
-Public Sub LoadMap(mapnum As Long)
+Public Sub LoadMap(MapNum As Long)
     Dim filename As String, i As Long, f As Long, x As Long, y As Long
     
     ' load map data
-    filename = App.Path & "\data\maps\map" & mapnum & ".ini"
+    filename = App.Path & "\data\maps\map" & MapNum & ".ini"
     
     ' General
-    With Map(mapnum).MapData
+    With Map(MapNum).MapData
         .Name = GetVar(filename, "General", "Name")
         .Music = GetVar(filename, "General", "Music")
         .Moral = Val(GetVar(filename, "General", "Moral"))
@@ -135,13 +137,13 @@ Public Sub LoadMap(mapnum As Long)
     End With
         
     ' dump tile data
-    filename = App.Path & "\data\maps\map" & mapnum & ".dat"
+    filename = App.Path & "\data\maps\map" & MapNum & ".dat"
     f = FreeFile
     
     ' redim the map
-    ReDim Map(mapnum).TileData.Tile(0 To Map(mapnum).MapData.MaxX, 0 To Map(mapnum).MapData.MaxY) As TileRec
+    ReDim Map(MapNum).TileData.Tile(0 To Map(MapNum).MapData.MaxX, 0 To Map(MapNum).MapData.MaxY) As TileRec
     
-    With Map(mapnum)
+    With Map(MapNum)
         Open filename For Binary As #f
             For x = 0 To .MapData.MaxX
                 For y = 0 To .MapData.MaxY
@@ -165,28 +167,28 @@ Public Sub LoadMap(mapnum As Long)
 End Sub
 
 Public Sub LoadMaps()
-    Dim filename As String, mapnum As Long
+    Dim filename As String, MapNum As Long
 
     Call CheckMaps
 
-    For mapnum = 1 To MAX_MAPS
-        LoadMap mapnum
-        ClearTempTile mapnum
-        CacheResources mapnum
+    For MapNum = 1 To MAX_MAPS
+        LoadMap MapNum
+        ClearTempTile MapNum
+        CacheResources MapNum
         DoEvents
     Next
 End Sub
 
-Public Sub ClearMap(ByVal mapnum As Long)
-    Map(mapnum) = EmptyMap
-    Map(mapnum).MapData.Name = vbNullString
-    Map(mapnum).MapData.MaxX = MAX_MAPX
-    Map(mapnum).MapData.MaxY = MAX_MAPY
-    ReDim Map(mapnum).TileData.Tile(0 To Map(mapnum).MapData.MaxX, 0 To Map(mapnum).MapData.MaxY)
+Public Sub ClearMap(ByVal MapNum As Long)
+    Map(MapNum) = EmptyMap
+    Map(MapNum).MapData.Name = vbNullString
+    Map(MapNum).MapData.MaxX = MAX_MAPX
+    Map(MapNum).MapData.MaxY = MAX_MAPY
+    ReDim Map(MapNum).TileData.Tile(0 To Map(MapNum).MapData.MaxX, 0 To Map(MapNum).MapData.MaxY)
     ' Reset the values for if a player is on the map or not
-    PlayersOnMap(mapnum) = NO
+    PlayersOnMap(MapNum) = NO
     ' Reset the map cache array for this map.
-    MapCache(mapnum).Data = vbNullString
+    MapCache(MapNum).Data = vbNullString
 End Sub
 
 Public Sub ClearMaps()
@@ -197,9 +199,9 @@ Public Sub ClearMaps()
     Next
 End Sub
 
-Public Sub ClearMapItem(ByVal Index As Long, ByVal mapnum As Long)
-    MapItem(mapnum, Index) = EmptyMapItem
-    MapItem(mapnum, Index).playerName = vbNullString
+Public Sub ClearMapItem(ByVal index As Long, ByVal MapNum As Long)
+    MapItem(MapNum, index) = EmptyMapItem
+    MapItem(MapNum, index).playerName = vbNullString
 End Sub
 
 Public Sub ClearMapItems()
@@ -214,8 +216,8 @@ Public Sub ClearMapItems()
 
 End Sub
 
-Public Sub ClearMapNpc(ByVal Index As Long, ByVal mapnum As Long)
-    MapNpc(mapnum) = EmptyMapNpc
+Public Sub ClearMapNpc(ByVal index As Long, ByVal MapNum As Long)
+    MapNpc(MapNum) = EmptyMapNpc
 End Sub
 
 Public Sub ClearMapNpcs()
@@ -230,38 +232,40 @@ Public Sub ClearMapNpcs()
 
 End Sub
 
-Public Sub GetMapCRC32(mapnum As Long)
+Public Sub GetMapCRC32(MapNum As Long)
     Dim Data() As Byte, filename As String, f As Long
     ' map data
-    filename = App.Path & "\data\maps\map" & mapnum & ".ini"
+    filename = App.Path & "\data\maps\map" & MapNum & ".ini"
     If FileExist(filename) Then
         f = FreeFile
         Open filename For Binary As #f
         Data = Space$(LOF(f))
         Get #f, , Data
         Close #f
-        MapCRC32(mapnum).MapDataCRC = CRC32(Data)
+        MapCRC32(MapNum).MapDataCRC = CRC32(Data)
     Else
-        MapCRC32(mapnum).MapDataCRC = 0
+        MapCRC32(MapNum).MapDataCRC = 0
     End If
     ' clear
     Erase Data
     ' tile data
-    filename = App.Path & "\data\maps\map" & mapnum & ".dat"
+    filename = App.Path & "\data\maps\map" & MapNum & ".dat"
     If FileExist(filename) Then
         f = FreeFile
         Open filename For Binary As #f
         Data = Space$(LOF(f))
         Get #f, , Data
         Close #f
-        MapCRC32(mapnum).MapTileCRC = CRC32(Data)
+        MapCRC32(MapNum).MapTileCRC = CRC32(Data)
     Else
-        MapCRC32(mapnum).MapTileCRC = 0
+        MapCRC32(MapNum).MapTileCRC = 0
     End If
 End Sub
 
-Public Sub ClearProjectile(IndexProjectile As Long)
+Public Sub ClearProjectile(ByVal IndexProjectile As Long)
+    Dim i As Long
+    
     If IndexProjectile < 0 Or IndexProjectile > MAX_PROJECTILE_MAP Then Exit Sub
     MapProjectile(IndexProjectile) = EmptyMapProjectile
+    
 End Sub
-
