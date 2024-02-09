@@ -30,9 +30,9 @@ Begin VB.Form frmMain
    Begin VB.CommandButton cmdAttWindow 
       Caption         =   "Atualizar Janela"
       Height          =   195
-      Left            =   6360
+      Left            =   960
       TabIndex        =   1
-      Top             =   0
+      Top             =   120
       Visible         =   0   'False
       Width           =   2055
    End
@@ -79,9 +79,9 @@ Private Sub cmdAttWindow_Click()
     Dim windowIndex As Long
     
     'Nome da janela para obter o índice da janela no processamento
-    WindowName = "winNpcChat"
+    WindowName = "winNewChar"
     'Nome da sub de criação da janela
-    callProcedure = GetAddress(AddressOf CreateWindow_NpcChat)
+    callProcedure = GetAddress(AddressOf CreateWindow_NewChar)
     
     'Obtem o indice da janela
     windowIndex = GetWindowIndex(WindowName)
@@ -108,6 +108,8 @@ Private Sub cmdAttWindow_Click()
     
     ' Desativa a abordagem de evitar uma sobrecarga de redimensionamento
     windowUpdated = False
+    
+    Windows(windowIndex).Window.visible = True
 End Sub
 
 ' Form

@@ -268,6 +268,8 @@ Public Sub LoadTextures()
     TextureBlank = LoadTextureFile(App.Path & PathGraphics & "blank")
     TextureWeather = LoadTextureFile(App.Path & PathGraphics & "weather")
     TextureWhite = LoadTextureFile(App.Path & PathGraphics & "white")
+    
+    Call InitMapPng
 End Sub
 
 Public Function LoadTextureFiles(ByRef Counter As Long, ByVal Path As String) As Long()
@@ -298,8 +300,9 @@ Public Function LoadTextureFile(ByVal Path As String, Optional ByVal Unload As B
     Path = Path & GFX_EXT
     
     If dir$(Path) = vbNullString And Not Ignore Then
-        Call MsgBox("" & Path & """ could not be found.")
-        End
+        'Call MsgBox("" & Path & """ could not be found.")
+        'End
+        Exit Function
     End If
     
     If dir$(Path) = vbNullString Then
@@ -2147,7 +2150,7 @@ Public Sub DrawResource(ByVal Resource_num As Long)
     For i = 1 To MAX_QUESTS
         'check if the npc is the next task to any quest: [?] symbol
         If Trim$(Quest(i).Name) <> "" Then
-            If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
+            If Player(MyIndex).PlayerQuest(i).Status = QUEST_STARTED Then
                 If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Resource = Resource_master Then
                     X = ConvertMapX(MapResource(Resource_num).X * PIC_X) + (mTexture(TextureGUI(6)).Width / 2)
                     Y = ConvertMapY(MapResource(Resource_num).Y * PIC_Y) + 32
@@ -2251,7 +2254,7 @@ Public Sub DrawItem(ByVal ItemNum As Long)
     For i = 1 To MAX_QUESTS
         'check if the npc is the next task to any quest: [?] symbol
         If Trim$(Quest(i).Name) <> "" Then
-            If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
+            If Player(MyIndex).PlayerQuest(i).Status = QUEST_STARTED Then
                 If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Item = MapItem(ItemNum).Num Then
                     textX = 16 + ConvertMapX(MapItem(ItemNum).X * PIC_X) - (mTexture(TextureGUI(9)).Width / 2)
                     textY = ConvertMapY(MapItem(ItemNum).Y * PIC_Y) - 20
@@ -2550,7 +2553,7 @@ End Sub
 Public Sub Render_Graphics()
     Dim X As Long, Y As Long, i As Long, bgColour As Long
 
-    On Error GoTo errhandler
+    'On Error GoTo errhandler
 
 retry:
 
@@ -2589,6 +2592,9 @@ retry:
             Next
         Next
     End If
+
+    ' Draw Ground tiles png
+    DrawGround GetPlayerMap(MyIndex)
 
     ' render lower tiles
     If CountTileset > 0 Then
@@ -2683,7 +2689,7 @@ retry:
         ' draw projectiles on map
         For i = 1 To LastProjectile
             If MapProjectile(i).Graphic > 0 Then
-                If Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.KiBall Or Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.GenkiDama Then
+                If Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.KiBall Then
                     If Int(MapProjectile(i).Y / PIC_Y) = Y Then
                         Call DrawProjectile(i)
                     End If
@@ -2692,7 +2698,8 @@ retry:
         Next
     Next Y
 
-
+    ' Draw fringe tiles png
+    DrawFringe GetPlayerMap(MyIndex)
 
     ' render out upper tiles
     If CountTileset > 0 Then
@@ -2704,6 +2711,15 @@ retry:
             Next
         Next
     End If
+
+    ' draw projectiles on map
+    For i = 1 To LastProjectile
+        If MapProjectile(i).Graphic > 0 Then
+            If Spell(MapProjectile(i).spellnum).Projectile.projectileType = ProjectileTypeEnum.GenkiDama Then
+                Call DrawProjectile(i)
+            End If
+        End If
+    Next
 
     ' render fog
     DrawWeather
@@ -2830,7 +2846,7 @@ End Sub
 
 Public Sub Render_Menu()
 
-    On Error GoTo errhandler
+    'On Error GoTo errhandler
 
 retry:
 

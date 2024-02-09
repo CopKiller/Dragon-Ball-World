@@ -204,7 +204,7 @@ Public Sub logoutGame()
     Unload frmEditor_Shop
     Unload frmEditor_Spell
     Unload frmEditor_Conv
-    Unload frmeditor_quests
+    Unload frmEditor_Quest
     ' clear chat
     For i = 1 To ChatLines
         Chat(i).text = vbNullString

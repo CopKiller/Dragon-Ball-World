@@ -310,8 +310,8 @@ Sub PlayerWarp(ByVal index As Long, ByVal mapnum As Long, ByVal x As Long, ByVal
     End If
 
     ' Check if you are out of bounds
-    If x > Map(mapnum).MapData.MaxX Then x = Map(mapnum).MapData.MaxX
-    If y > Map(mapnum).MapData.MaxY Then y = Map(mapnum).MapData.MaxY
+    If x > Map(mapnum).MapData.maxX Then x = Map(mapnum).MapData.maxX
+    If y > Map(mapnum).MapData.maxY Then y = Map(mapnum).MapData.maxY
     If x < 0 Then x = 0
     If y < 0 Then y = 0
     
@@ -321,8 +321,8 @@ Sub PlayerWarp(ByVal index As Long, ByVal mapnum As Long, ByVal x As Long, ByVal
     End If
     
     ' clear target
-    TempPlayer(index).Target = 0
-    TempPlayer(index).TargetType = TARGET_TYPE_NONE
+    TempPlayer(index).target = 0
+    TempPlayer(index).targetType = TARGET_TYPE_NONE
     SendTarget index
 
     ' Save old map to send erase player data to
@@ -387,7 +387,7 @@ Public Sub PlayerMove(ByVal index As Long, ByVal Dir As Long, ByVal movement As 
     If TempPlayer(index).spellBuffer.Spell > 0 Then
         SendCancelAnimation index
         TempPlayer(index).spellBuffer.Spell = 0
-        TempPlayer(index).spellBuffer.Target = 0
+        TempPlayer(index).spellBuffer.target = 0
         TempPlayer(index).spellBuffer.Timer = 0
         TempPlayer(index).spellBuffer.tType = 0
         
@@ -545,23 +545,23 @@ Public Sub ForcePlayerMove(ByVal index As Long, ByVal movement As Long, ByVal di
         Case DIR_UP
             If GetPlayerY(index) = 0 Then Exit Sub
         Case DIR_DOWN
-            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.MaxY Then Exit Sub
+            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.maxY Then Exit Sub
         Case DIR_LEFT
             If GetPlayerX(index) = 0 Then Exit Sub
         Case DIR_RIGHT
-            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.MaxX Then Exit Sub
+            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.maxX Then Exit Sub
         Case DIR_UP_LEFT
             If GetPlayerY(index) = 0 Then Exit Sub
             If GetPlayerX(index) = 0 Then Exit Sub
         Case DIR_UP_RIGHT
             If GetPlayerY(index) = 0 Then Exit Sub
-            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.MaxX Then Exit Sub
+            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.maxX Then Exit Sub
         Case DIR_DOWN_LEFT
-            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.MaxY Then Exit Sub
+            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.maxY Then Exit Sub
             If GetPlayerX(index) = 0 Then Exit Sub
         Case DIR_DOWN_RIGHT
-            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.MaxY Then Exit Sub
-            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.MaxX Then Exit Sub
+            If GetPlayerY(index) = Map(GetPlayerMap(index)).MapData.maxY Then Exit Sub
+            If GetPlayerX(index) = Map(GetPlayerMap(index)).MapData.maxX Then Exit Sub
     End Select
     
     PlayerMove index, direction, movement, True
@@ -987,7 +987,7 @@ Sub OnDeath(ByVal index As Long)
     ' Clear spell casting
     TempPlayer(index).spellBuffer.Spell = 0
     TempPlayer(index).spellBuffer.Timer = 0
-    TempPlayer(index).spellBuffer.Target = 0
+    TempPlayer(index).spellBuffer.target = 0
     TempPlayer(index).spellBuffer.tType = 0
     Call SendClearSpellBufferTo(index)
     
@@ -1331,7 +1331,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
                 If Item(ItemNum).AddEXP > 0 Then
                     SetPlayerExp index, GetPlayerExp(index) + Item(ItemNum).AddEXP
                     CheckPlayerLevelUp index
-                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddEXP & " EXP", White, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, exp
+                    SendActionMsg GetPlayerMap(index), "+" & Item(ItemNum).AddEXP & " EXP", White, ACTIONMSG_SCROLL, GetPlayerX(index) * 32, GetPlayerY(index) * 32, fonts.exp
                     SendEXP index
                 End If
                 Call SendAnimation(GetPlayerMap(index), Item(ItemNum).Animation, 0, 0, TARGET_TYPE_PLAYER, index)
@@ -1380,7 +1380,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
 
                     Case DIR_DOWN
 
-                        If GetPlayerY(index) < Map(GetPlayerMap(index)).MapData.MaxY Then
+                        If GetPlayerY(index) < Map(GetPlayerMap(index)).MapData.maxY Then
                             x = GetPlayerX(index)
                             y = GetPlayerY(index) + 1
                         Else
@@ -1398,7 +1398,7 @@ Public Sub UseItem(ByVal index As Long, ByVal invNum As Long)
 
                     Case DIR_RIGHT, DIR_UP_RIGHT, DIR_DOWN_RIGHT
 
-                        If GetPlayerX(index) < Map(GetPlayerMap(index)).MapData.MaxX Then
+                        If GetPlayerX(index) < Map(GetPlayerMap(index)).MapData.maxX Then
                             x = GetPlayerX(index) + 1
                             y = GetPlayerY(index)
                         Else

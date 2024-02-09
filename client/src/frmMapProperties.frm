@@ -80,7 +80,7 @@ Begin VB.Form frmEditor_MapProperties
       Height          =   2775
       Left            =   2280
       TabIndex        =   35
-      Top             =   4680
+      Top             =   5040
       Width           =   4215
       Begin VB.HScrollBar scrlRed 
          Height          =   255
@@ -233,7 +233,7 @@ Begin VB.Form frmEditor_MapProperties
    End
    Begin VB.Frame Frame3 
       Caption         =   "Music"
-      Height          =   3255
+      Height          =   3495
       Left            =   4440
       TabIndex        =   27
       Top             =   1440
@@ -251,7 +251,7 @@ Begin VB.Form frmEditor_MapProperties
          Height          =   255
          Left            =   120
          TabIndex        =   30
-         Top             =   2880
+         Top             =   3000
          Width           =   1815
       End
       Begin VB.ListBox lstMusic 
@@ -461,11 +461,35 @@ Begin VB.Form frmEditor_MapProperties
    End
    Begin VB.Frame fraNPCs 
       Caption         =   "NPCs"
-      Height          =   3255
+      Height          =   3495
       Left            =   2280
       TabIndex        =   4
       Top             =   1440
       Width           =   2055
+      Begin VB.CommandButton Command3 
+         Caption         =   "Clear"
+         Height          =   255
+         Left            =   1320
+         TabIndex        =   57
+         Top             =   3120
+         Width           =   615
+      End
+      Begin VB.CommandButton Command2 
+         Caption         =   "Paste"
+         Height          =   255
+         Left            =   720
+         TabIndex        =   56
+         Top             =   3120
+         Width           =   615
+      End
+      Begin VB.CommandButton Command1 
+         Caption         =   "Copy"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   55
+         Top             =   3120
+         Width           =   615
+      End
       Begin VB.ListBox lstNpcs 
          Height          =   2400
          Left            =   120
@@ -522,6 +546,8 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private NpcIndexCopy As Long
+
 Private Sub cmdPlay_Click()
     Stop_Music
     Play_Music lstMusic.list(lstMusic.ListIndex)
@@ -532,19 +558,19 @@ Private Sub cmdStop_Click()
 End Sub
 
 Private Sub cmdOk_Click()
-    Dim x As Long, x2 As Long
-    Dim y As Long, y2 As Long
+    Dim X As Long, X2 As Long
+    Dim Y As Long, Y2 As Long
     Dim tempArr() As TileRec
 
-    If Not IsNumeric(txtMaxX.text) Then txtMaxX.text = map.MapData.MaxX
+    If Not IsNumeric(txtMaxX.text) Then txtMaxX.text = Map.MapData.maxX
     If Val(txtMaxX.text) < 1 Then txtMaxX.text = 1
     If Val(txtMaxX.text) > MAX_BYTE Then txtMaxX.text = MAX_BYTE
-    If Not IsNumeric(txtMaxY.text) Then txtMaxY.text = map.MapData.MaxY
+    If Not IsNumeric(txtMaxY.text) Then txtMaxY.text = Map.MapData.maxY
     If Val(txtMaxY.text) < 1 Then txtMaxY.text = 1
     If Val(txtMaxY.text) > MAX_BYTE Then txtMaxY.text = MAX_BYTE
 
-    With map.MapData
-        .name = Trim$(txtName.text)
+    With Map.MapData
+        .Name = Trim$(txtName.text)
 
         If lstMusic.ListIndex >= 0 Then
             .Music = lstMusic.list(lstMusic.ListIndex)
@@ -562,34 +588,34 @@ Private Sub cmdOk_Click()
         .BootY = Val(txtBootY.text)
         
         .Weather = CmbWeather.ListIndex
-        .WeatherIntensity = scrlWeatherIntensity.value
+        .WeatherIntensity = scrlWeatherIntensity.Value
         
-        .Fog = ScrlFog.value
-        .FogSpeed = ScrlFogSpeed.value
-        .FogOpacity = scrlFogOpacity.value
+        .Fog = ScrlFog.Value
+        .FogSpeed = ScrlFogSpeed.Value
+        .FogOpacity = scrlFogOpacity.Value
         
-        .Red = scrlRed.value
-        .Green = scrlGreen.value
-        .Blue = scrlBlue.value
-        .Alpha = scrlAlpha.value
+        .Red = scrlRed.Value
+        .Green = scrlGreen.Value
+        .Blue = scrlBlue.Value
+        .alpha = scrlAlpha.Value
         
-        .BossNpc = scrlBoss.value
+        .BossNpc = scrlBoss.Value
         ' set the data before changing it
-        tempArr = map.TileData.Tile
-        x2 = map.MapData.MaxX
-        y2 = map.MapData.MaxY
+        tempArr = Map.TileData.Tile
+        X2 = Map.MapData.maxX
+        Y2 = Map.MapData.maxY
         ' change the data
-        .MaxX = Val(txtMaxX.text)
-        .MaxY = Val(txtMaxY.text)
+        .maxX = Val(txtMaxX.text)
+        .maxY = Val(txtMaxY.text)
 
-        If x2 > .MaxX Then x2 = .MaxX
-        If y2 > .MaxY Then y2 = .MaxY
+        If X2 > .maxX Then X2 = .maxX
+        If Y2 > .maxY Then Y2 = .maxY
         ' redim the map size
-        ReDim map.TileData.Tile(0 To .MaxX, 0 To .MaxY)
+        ReDim Map.TileData.Tile(0 To .maxX, 0 To .maxY)
 
-        For x = 0 To x2
-            For y = 0 To y2
-                map.TileData.Tile(x, y) = tempArr(x, y)
+        For X = 0 To X2
+            For Y = 0 To Y2
+                Map.TileData.Tile(X, Y) = tempArr(X, Y)
             Next
         Next
 
@@ -603,6 +629,65 @@ End Sub
 
 Private Sub cmdCancel_Click()
     Unload frmEditor_MapProperties
+End Sub
+
+Private Sub Command1_Click()
+    If Not lstNpcs.ListCount > 0 Then Exit Sub
+
+    NpcIndexCopy = Map.MapData.Npc(lstNpcs.ListIndex + 1)
+End Sub
+
+Private Sub Command2_Click()
+    Dim tmpIndex As Long, X As Long
+    
+    If Not lstNpcs.ListCount > 0 Then Exit Sub
+    
+    Map.MapData.Npc(lstNpcs.ListIndex + 1) = NpcIndexCopy
+    
+    ' re-load the list
+    tmpIndex = lstNpcs.ListIndex
+    If ((lstNpcs.ListIndex + 1)) < MAX_MAP_NPCS Then tmpIndex = tmpIndex + 1
+    
+    lstNpcs.Clear
+
+    For X = 1 To MAX_MAP_NPCS
+
+        If Map.MapData.Npc(X) > 0 Then
+            lstNpcs.AddItem X & ": " & Trim$(Npc(Map.MapData.Npc(X)).Name)
+        Else
+            lstNpcs.AddItem X & ": No NPC"
+        End If
+
+    Next
+
+    lstNpcs.ListIndex = tmpIndex
+End Sub
+
+Private Sub Command3_Click()
+    Dim X As Long, tmpIndex As Long
+
+    If Not lstNpcs.ListCount > 0 Then Exit Sub
+    
+    Map.MapData.Npc(lstNpcs.ListIndex + 1) = 0
+    
+    ' re-load the list
+    tmpIndex = lstNpcs.ListIndex
+    
+    If ((lstNpcs.ListIndex + 1)) < MAX_MAP_NPCS Then tmpIndex = tmpIndex + 1
+    
+    lstNpcs.Clear
+
+    For X = 1 To MAX_MAP_NPCS
+
+        If Map.MapData.Npc(X) > 0 Then
+            lstNpcs.AddItem X & ": " & Trim$(Npc(Map.MapData.Npc(X)).Name)
+        Else
+            lstNpcs.AddItem X & ": No NPC"
+        End If
+
+    Next
+
+    lstNpcs.ListIndex = tmpIndex
 End Sub
 
 Private Sub Form_Load()
@@ -626,13 +711,13 @@ Private Sub lstNpcs_Click()
     ' set the combo box properly
     tmpString = Split(lstNpcs.list(lstNpcs.ListIndex))
     NpcNum = CLng(Left$(tmpString(0), Len(tmpString(0)) - 1))
-    cmbNpc.ListIndex = map.MapData.Npc(NpcNum)
+    cmbNpc.ListIndex = Map.MapData.Npc(NpcNum)
 End Sub
 
 Private Sub cmbNpc_Click()
     Dim tmpString() As String
     Dim NpcNum As Long
-    Dim x As Long, tmpIndex As Long
+    Dim X As Long, tmpIndex As Long
 
     ' exit out if needed
     If Not cmbNpc.ListCount > 0 Then Exit Sub
@@ -643,21 +728,21 @@ Private Sub cmbNpc_Click()
     ' make sure it's not a clear
     If Not cmbNpc.list(cmbNpc.ListIndex) = "No NPC" Then
         NpcNum = CLng(Left$(tmpString(0), Len(tmpString(0)) - 1))
-        map.MapData.Npc(lstNpcs.ListIndex + 1) = NpcNum
+        Map.MapData.Npc(lstNpcs.ListIndex + 1) = NpcNum
     Else
-        map.MapData.Npc(lstNpcs.ListIndex + 1) = 0
+        Map.MapData.Npc(lstNpcs.ListIndex + 1) = 0
     End If
 
     ' re-load the list
     tmpIndex = lstNpcs.ListIndex
     lstNpcs.Clear
 
-    For x = 1 To MAX_MAP_NPCS
+    For X = 1 To MAX_MAP_NPCS
 
-        If map.MapData.Npc(x) > 0 Then
-            lstNpcs.AddItem x & ": " & Trim$(Npc(map.MapData.Npc(x)).name)
+        If Map.MapData.Npc(X) > 0 Then
+            lstNpcs.AddItem X & ": " & Trim$(Npc(Map.MapData.Npc(X)).Name)
         Else
-            lstNpcs.AddItem x & ": No NPC"
+            lstNpcs.AddItem X & ": No NPC"
         End If
 
     Next
@@ -666,17 +751,17 @@ Private Sub cmbNpc_Click()
 End Sub
 
 Private Sub scrlAlpha_Change()
-    lblA.caption = "Alpha: " & scrlAlpha.value
+    lblA.caption = "Alpha: " & scrlAlpha.Value
 End Sub
 
 Private Sub scrlBlue_Change()
-    lblB.caption = "Blue: " & scrlBlue.value
+    lblB.caption = "Blue: " & scrlBlue.Value
 End Sub
 
 Private Sub scrlBoss_Change()
 
-    If scrlBoss.value > 0 Then
-        lblBoss.caption = "Boss Npc: " & Trim$(Npc(map.MapData.Npc(scrlBoss.value)).name)
+    If scrlBoss.Value > 0 Then
+        lblBoss.caption = "Boss Npc: " & Trim$(Npc(Map.MapData.Npc(scrlBoss.Value)).Name)
     Else
         lblBoss.caption = "Boss Npc: None"
     End If
@@ -684,29 +769,29 @@ Private Sub scrlBoss_Change()
 End Sub
 
 Private Sub ScrlFog_Change()
-    If ScrlFog.value = 0 Then
+    If ScrlFog.Value = 0 Then
         lblFog.caption = "Fog: None."
     Else
-        lblFog.caption = "Fog: " & ScrlFog.value
+        lblFog.caption = "Fog: " & ScrlFog.Value
     End If
 End Sub
 
 Private Sub scrlFogOpacity_Change()
-    lblFogOpacity.caption = "Fog Opacity: " & scrlFogOpacity.value
+    lblFogOpacity.caption = "Fog Opacity: " & scrlFogOpacity.Value
 End Sub
 
 Private Sub ScrlFogSpeed_Change()
-    lblFogSpeed.caption = "Fog Speed: " & ScrlFogSpeed.value
+    lblFogSpeed.caption = "Fog Speed: " & ScrlFogSpeed.Value
 End Sub
 
 Private Sub scrlGreen_Change()
-    lblG.caption = "Green: " & scrlGreen.value
+    lblG.caption = "Green: " & scrlGreen.Value
 End Sub
 
 Private Sub scrlRed_Change()
-    lblR.caption = "Red: " & scrlRed.value
+    lblR.caption = "Red: " & scrlRed.Value
 End Sub
 
 Private Sub scrlWeatherIntensity_Change()
-    lblWeatherIntensity.caption = "Intensity: " & scrlWeatherIntensity.value
+    lblWeatherIntensity.caption = "Intensity: " & scrlWeatherIntensity.Value
 End Sub

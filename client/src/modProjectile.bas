@@ -223,13 +223,13 @@ Clear:
 End Sub
 
 
-Private Function CheckProjectileFrontEntityOrMapLimits(ByVal ProjectileIndex As Long) As Boolean
+Private Function CheckProjectileFrontEntityOrMapLimits(ByVal projectileIndex As Long) As Boolean
 
     Dim X As Long, Y As Long, rangeX As Long, rangeY As Long, minX As Long, minY As Long, maxX As Long, maxY As Long
     
     CheckProjectileFrontEntityOrMapLimits = True
 
-    With MapProjectile(ProjectileIndex)
+    With MapProjectile(projectileIndex)
 
         ' Obter posição do projetil e converter em grid
         X = .X / PIC_X
@@ -267,7 +267,11 @@ Private Function CheckProjectileFrontEntityOrMapLimits(ByVal ProjectileIndex As 
                     If Y >= 0 And Y <= Map.MapData.maxY Then
                         Select Case Map.TileData.Tile(X, Y).Type
                         Case TILE_TYPE_BLOCKED, TILE_TYPE_RESOURCE
-                            CheckProjectileFrontEntityOrMapLimits = False
+                            If .Duration > 0 Then
+                                SetProjectileEndRouteAndWaitRescuringDuration projectileIndex
+                            Else
+                                CheckProjectileFrontEntityOrMapLimits = False
+                            End If
                             Exit Function
                         End Select
                     End If
@@ -279,13 +283,13 @@ Private Function CheckProjectileFrontEntityOrMapLimits(ByVal ProjectileIndex As 
     End With
 End Function
 
-Private Function ProcessProjectileHasPlayerInRange(ByVal ProjectileIndex As Long) As Boolean
+Private Function ProcessProjectileHasPlayerInRange(ByVal projectileIndex As Long) As Boolean
     Dim X As Long, Y As Long, rangeX As Long, rangeY As Long
     Dim i As Long, ImpactRange As Long, AttackerIndex As Long
 
     ProcessProjectileHasPlayerInRange = True
 
-    With MapProjectile(ProjectileIndex)
+    With MapProjectile(projectileIndex)
 
         ' Caso seja um projétil com RescuringDamage, a limpeza nunca poderá ser feita por aqui, então saia da função
         If Spell(.spellnum).Projectile.RecuringDamage Then
@@ -326,13 +330,13 @@ Private Function ProcessProjectileHasPlayerInRange(ByVal ProjectileIndex As Long
     End With
 End Function
 
-Private Function ProcessProjectileHasNpcInRange(ByVal ProjectileIndex As Long) As Boolean
+Private Function ProcessProjectileHasNpcInRange(ByVal projectileIndex As Long) As Boolean
     Dim X As Long, Y As Long, rangeX As Long, rangeY As Long
     Dim N As Long, ImpactRange As Long, AttackerIndex As Long
 
     ProcessProjectileHasNpcInRange = True
 
-    With MapProjectile(ProjectileIndex)
+    With MapProjectile(projectileIndex)
     
         ' Caso seja um projétil com RescuringDamage, a limpeza nunca poderá ser feita por aqui, então saia da função
         If Spell(.spellnum).Projectile.RecuringDamage Then
@@ -368,7 +372,7 @@ Private Function ProcessProjectileHasNpcInRange(ByVal ProjectileIndex As Long) A
     End With
 End Function
 
-Private Function CheckProjectileEndRoute(ByVal ProjectileIndex As Long) As Boolean
+Private Function CheckProjectileEndRoute(ByVal projectileIndex As Long) As Boolean
     Dim TargetType As Long, target As Long
 
     ' Caso seja uma projectile com Rescuring Damage ativado, com o value de .duration > 0
@@ -377,11 +381,11 @@ Private Function CheckProjectileEndRoute(ByVal ProjectileIndex As Long) As Boole
 
     CheckProjectileEndRoute = True
 
-    With MapProjectile(ProjectileIndex)
+    With MapProjectile(projectileIndex)
         ' Verifica se chegou ao fim da rota
         If Spell(.spellnum).Projectile.projectileType = ProjectileTypeEnum.GenkiDama Or Spell(.spellnum).Projectile.projectileType = ProjectileTypeEnum.KiBall Then
-            If isInRangeX(0, (MapProjectile(ProjectileIndex).X / PIC_X), (MapProjectile(ProjectileIndex).tx / PIC_X)) Then
-                If isInRangeY(0, (MapProjectile(ProjectileIndex).Y / PIC_Y), (MapProjectile(ProjectileIndex).ty / PIC_Y)) Then
+            If isInRangeX(0, (MapProjectile(projectileIndex).X / PIC_X), (MapProjectile(projectileIndex).tx / PIC_X)) Then
+                If isInRangeY(0, (MapProjectile(projectileIndex).Y / PIC_Y), (MapProjectile(projectileIndex).ty / PIC_Y)) Then
 
                     If Spell(.spellnum).Projectile.RecuringDamage Then
                         If Spell(.spellnum).Projectile.Duration > 0 Then
@@ -405,6 +409,13 @@ Private Function CheckProjectileEndRoute(ByVal ProjectileIndex As Long) As Boole
         End If
     End With
 End Function
+
+Private Sub SetProjectileEndRouteAndWaitRescuringDuration(ByVal projectileIndex As Long)
+    With MapProjectile(projectileIndex)
+        .ty = .Y
+        .tx = .X
+    End With
+End Sub
 
 Public Sub ProcessProjectileCurAnimation(ByVal i As Long)
     If MapProjectile(i).Graphic > 0 Then

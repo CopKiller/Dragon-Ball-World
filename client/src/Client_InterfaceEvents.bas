@@ -347,9 +347,9 @@ Public Sub ClearRegisterTexts()
     End With
 End Sub
 Public Sub RenCaptcha()
-    Dim n As Long
-    n = Int(Rnd * (CountCaptcha - 1)) + 1
-    GlobalCaptcha = n
+    Dim N As Long
+    N = Int(Rnd * (CountCaptcha - 1)) + 1
+    GlobalCaptcha = N
 End Sub
 Public Sub btnSendRegister_Click()
     Dim user As String, Pass As String, pass2 As String, Code As String, Captcha As String
@@ -449,8 +449,8 @@ Dim Xo As Long, Yo As Long, imageFace As Long, imageChar As Long, X As Long, i A
                 If Not CharSprite(i) > CountChar And Not CharSprite(i) > CountFace Then
                     imageFace = TextureFace(CharSprite(i))
                     imageChar = TextureChar(CharSprite(i))
-                    RenderTexture imageFace, X, Yo + 56, 0, 0, 94, 94, 94, 94
-                    RenderTexture imageChar, X - 1, Yo + 117, 32, 0, 32, 32, 32, 32
+                    RenderTexture imageFace, X, Yo + 76, 0, 0, 94, 94, 94, 94
+                    RenderTexture imageChar, X - 1, Yo + 137, 32, 0, 32, 32, 32, 32
                 End If
             End If
         End If
@@ -537,7 +537,7 @@ Dim imageFace As Long, Xo As Long, Yo As Long
     Xo = Windows(GetWindowIndex("winClasses")).Window.Left
     Yo = Windows(GetWindowIndex("winClasses")).Window.Top
     
-    Max_Classes = 3
+    'Max_Classes = 3
     
     If newCharClass = 0 Then newCharClass = 1
 
@@ -546,12 +546,12 @@ Dim imageFace As Long, Xo As Long, Yo As Long
             imageFace = TextureGUI(52)
         Case 2 ' Wizard
             imageFace = TextureGUI(53)
-        Case 3 ' Whisperer
-            imageFace = TextureGUI(54)
+        'Case 3 ' Whisperer
+          '  imageFace = TextureGUI(54)
     End Select
     
     ' render face
-    RenderTexture imageFace, Xo + 14, Yo - 41, 0, 0, 256, 256, 256, 256
+    RenderTexture imageFace, Xo, Yo - 10, 0, 0, 256, 256, 256, 256
 End Sub
 
 Public Sub Classes_DrawText()
@@ -563,21 +563,21 @@ Dim image As Long, text As String, Xo As Long, Yo As Long, textArray() As String
 
     Select Case newCharClass
         Case 1 ' Warrior
-            text = "The way of a warrior has never been an easy one. Skilled use of a sword is not something learnt overnight. Being able to take a decent amount of hits is important for these characters and as such they weigh a lot of importance on endurance and strength."
+            text = "Eu sou o Goku, o guerreiro que protege a Terra dos inimigos mais poderosos. Eu sempre busco superar os meus limites e enfrentar novos desafios. Eu luto com honra, coragem e amizade. Voce esta pronto para se juntar a mim nesta aventura?"
         Case 2 ' Wizard
-            text = "Wizards are often mistrusted characters who have mastered the practise of using their own spirit to create elemental entities. Generally seen as playful and almost childish because of the huge amounts of pleasure they take from setting things on fire."
-        Case 3 ' Whisperer
-            text = "The art of healing is one which comes with tremendous amounts of pressure and guilt. Constantly being put under high-pressure situations where their abilities could mean the difference between life and death leads many Whisperers to insanity."
+            text = "Eu sou o Piccolo, o namekuseijin aliado da Terra. Eu tenho forca e estrategia. Eu treinei o Gohan e valorizo os amigos. Voce quer lutar comigo?"
+       ' Case 3 ' Whisperer
+         '   text = "The art of healing is one which comes with tremendous amounts of pressure and guilt. Constantly being put under high-pressure situations where their abilities could mean the difference between life and death leads many Whisperers to insanity."
     End Select
     
     ' wrap text
     WordWrap_Array text, 200, textArray()
     ' render text
     Count = UBound(textArray)
-    Y = Yo + 60
+    Y = Yo + 80
     For i = 1 To Count
-        X = Xo + 132 + (200 \ 2) - (TextWidth(font(Fonts.rockwell_15), textArray(i)) \ 2)
-        RenderText font(Fonts.rockwell_15), textArray(i), X, Y, White
+        X = Xo + 132 + (200 \ 2) - (TextWidth(font(fonts.rockwell_15), textArray(i)) \ 2)
+        RenderText font(fonts.rockwell_15), textArray(i), X, Y, White
         Y = Y + 14
 
     Next
@@ -630,9 +630,9 @@ Dim imageFace As Long, imageChar As Long, Xo As Long, Yo As Long
     End If
     
     ' render face
-    RenderTexture imageFace, Xo + 166, Yo + 56, 0, 0, 94, 94, 94, 94
+    RenderTexture imageFace, Xo + 166, Yo + 76, 0, 0, 98, 98, 94, 94
     ' render char
-    RenderTexture imageChar, Xo + 166, Yo + 116, 32, 0, 32, 32, 32, 32
+    RenderTexture imageChar, Xo + 166, Yo + 136, 0, 0, 32, 32, 32, 32
 End Sub
 
 Public Sub btnNewChar_Left()
@@ -668,12 +668,12 @@ Dim spriteCount As Long
 End Sub
 
 Public Sub chkNewChar_Male()
-    newCharSprite = 1
+    newCharSprite = 0
     newCharGender = SEX_MALE
 End Sub
 
 Public Sub chkNewChar_Female()
-    newCharSprite = 1
+    newCharSprite = 0
     newCharGender = SEX_FEMALE
 End Sub
 
@@ -681,7 +681,7 @@ Public Sub btnNewChar_Cancel()
     Windows(GetWindowIndex("winNewChar")).Controls(GetControlIndex("winNewChar", "txtName")).text = vbNullString
     Windows(GetWindowIndex("winNewChar")).Controls(GetControlIndex("winNewChar", "chkMale")).Value = 1
     Windows(GetWindowIndex("winNewChar")).Controls(GetControlIndex("winNewChar", "chkFemale")).Value = 0
-    newCharSprite = 1
+    newCharSprite = 0
     newCharGender = SEX_MALE
     HideWindows
     ShowWindow GetWindowIndex("winClasses")
@@ -804,18 +804,18 @@ Public Sub btnMenu_Bank()
 End Sub
 
 Public Sub Bank_MouseMove()
-    Dim itemNum As Long, X As Long, Y As Long, i As Long
+    Dim ItemNum As Long, X As Long, Y As Long, i As Long
 
     ' exit out early if dragging
     If DragBox.Type <> partNone Then Exit Sub
 
 
-    itemNum = IsBankItem(Windows(GetWindowIndex("winBank")).Window.Left, Windows(GetWindowIndex("winBank")).Window.Top)
+    ItemNum = IsBankItem(Windows(GetWindowIndex("winBank")).Window.Left, Windows(GetWindowIndex("winBank")).Window.Top)
 
-    If itemNum > 0 Then
+    If ItemNum > 0 Then
 
         ' make sure we're not dragging the item
-        If DragBox.Type = PartItem And DragBox.Value = itemNum Then Exit Sub
+        If DragBox.Type = PartItem And DragBox.Value = ItemNum Then Exit Sub
         ' calc position
         X = Windows(GetWindowIndex("winBank")).Window.Left - Windows(GetWindowIndex("winDescription")).Window.Width
         Y = Windows(GetWindowIndex("winBank")).Window.Top - 4
@@ -827,7 +827,7 @@ Public Sub Bank_MouseMove()
             X = Windows(GetWindowIndex("winBank")).Window.Left + Windows(GetWindowIndex("winBank")).Window.Width
         End If
 
-        ShowItemDesc X, Y, Bank.Item(itemNum).Num, False
+        ShowItemDesc X, Y, Bank.Item(ItemNum).Num, False
 
     End If
 End Sub
@@ -933,14 +933,14 @@ End Sub
 
 Public Sub Inventory_DblClick()
 
-Dim itemNum As Long, i As Long
+Dim ItemNum As Long, i As Long
 
     If InTrade > 0 Then Exit Sub
 
-    itemNum = IsItem(Windows(GetWindowIndex("winInventory")).Window.Left, Windows(GetWindowIndex("winInventory")).Window.Top)
+    ItemNum = IsItem(Windows(GetWindowIndex("winInventory")).Window.Left, Windows(GetWindowIndex("winInventory")).Window.Top)
     
-    If itemNum Then
-        SendUseItem itemNum
+    If ItemNum Then
+        SendUseItem ItemNum
     End If
     
     ' show desc. if needed
@@ -948,19 +948,19 @@ Dim itemNum As Long, i As Long
 End Sub
 
 Public Sub Inventory_MouseMove()
-Dim itemNum As Long, X As Long, Y As Long, i As Long
+Dim ItemNum As Long, X As Long, Y As Long, i As Long
 
     ' exit out early if dragging
     If DragBox.Type <> partNone Then Exit Sub
 
 
-    itemNum = IsItem(Windows(GetWindowIndex("winInventory")).Window.Left, Windows(GetWindowIndex("winInventory")).Window.Top)
+    ItemNum = IsItem(Windows(GetWindowIndex("winInventory")).Window.Left, Windows(GetWindowIndex("winInventory")).Window.Top)
     
-    If itemNum Then
+    If ItemNum Then
         ' exit out if we're offering that item
         If InTrade > 0 Then
             For i = 1 To MAX_INV
-                If TradeYourOffer(i).Num = itemNum Then
+                If TradeYourOffer(i).Num = ItemNum Then
                     ' is currency?
                     If Item(GetPlayerInvItemNum(MyIndex, TradeYourOffer(i).Num)).Type = ITEM_TYPE_CURRENCY Then
 
@@ -975,7 +975,7 @@ Dim itemNum As Long, X As Long, Y As Long, i As Long
             Next
         End If
         ' make sure we're not dragging the item
-        If DragBox.Type = PartItem And DragBox.Value = itemNum Then Exit Sub
+        If DragBox.Type = PartItem And DragBox.Value = ItemNum Then Exit Sub
         ' calc position
         X = Windows(GetWindowIndex("winInventory")).Window.Left - Windows(GetWindowIndex("winDescription")).Window.Width
         Y = Windows(GetWindowIndex("winInventory")).Window.Top - 4
@@ -986,7 +986,7 @@ Dim itemNum As Long, X As Long, Y As Long, i As Long
             X = Windows(GetWindowIndex("winInventory")).Window.Left + Windows(GetWindowIndex("winInventory")).Window.Width
         End If
         ' go go go
-        ShowInvDesc X, Y, itemNum
+        ShowInvDesc X, Y, ItemNum
     End If
 End Sub
 
@@ -995,12 +995,12 @@ End Sub
 ' ###############
 
 Public Sub Character_MouseDown()
-Dim itemNum As Long
+Dim ItemNum As Long
     
-    itemNum = IsEqItem(Windows(GetWindowIndex("winCharacter")).Window.Left, Windows(GetWindowIndex("winCharacter")).Window.Top)
+    ItemNum = IsEqItem(Windows(GetWindowIndex("winCharacter")).Window.Left, Windows(GetWindowIndex("winCharacter")).Window.Top)
     
-    If itemNum Then
-        SendUnequip itemNum
+    If ItemNum Then
+        SendUnequip ItemNum
     End If
     
     ' show desc. if needed
@@ -1008,15 +1008,15 @@ Dim itemNum As Long
 End Sub
 
 Public Sub Character_MouseMove()
-Dim itemNum As Long, X As Long, Y As Long
+Dim ItemNum As Long, X As Long, Y As Long
 
     ' exit out early if dragging
     If DragBox.Type <> partNone Then Exit Sub
 
 
-    itemNum = IsEqItem(Windows(GetWindowIndex("winCharacter")).Window.Left, Windows(GetWindowIndex("winCharacter")).Window.Top)
+    ItemNum = IsEqItem(Windows(GetWindowIndex("winCharacter")).Window.Left, Windows(GetWindowIndex("winCharacter")).Window.Top)
     
-    If itemNum Then
+    If ItemNum Then
         ' calc position
         X = Windows(GetWindowIndex("winCharacter")).Window.Left - Windows(GetWindowIndex("winDescription")).Window.Width
         Y = Windows(GetWindowIndex("winCharacter")).Window.Top - 4
@@ -1027,7 +1027,7 @@ Dim itemNum As Long, X As Long, Y As Long
             X = Windows(GetWindowIndex("winCharacter")).Window.Left + Windows(GetWindowIndex("winCharacter")).Window.Width
         End If
         ' go go go
-        ShowEqDesc X, Y, itemNum
+        ShowEqDesc X, Y, ItemNum
 
     End If
 End Sub
@@ -1096,7 +1096,7 @@ Public Sub Description_OnDraw()
     Y = 18
     Count = UBound(descText)
     For i = 1 To Count
-        RenderText font(Fonts.verdana_12), descText(i).text, Xo + 141 - (TextWidth(font(Fonts.verdana_12), descText(i).text) \ 2), Yo + Y, descText(i).colour
+        RenderText font(fonts.verdana_12), descText(i).text, Xo + 141 - (TextWidth(font(fonts.verdana_12), descText(i).text) \ 2), Yo + Y, descText(i).colour
         Y = Y + 12
     Next
     
@@ -1869,7 +1869,7 @@ Dim shopNum As Long
 End Sub
 
 Public Sub Shop_MouseMove()
-Dim shopSlot As Long, itemNum As Long, X As Long, Y As Long
+Dim shopSlot As Long, ItemNum As Long, X As Long, Y As Long
 
 
     If InShop = 0 Then Exit Sub
@@ -1889,15 +1889,15 @@ Dim shopSlot As Long, itemNum As Long, X As Long, Y As Long
         ' selling/buying
         If Not shopIsSelling Then
             ' get the itemnum
-            itemNum = Shop(InShop).TradeItem(shopSlot).Item
-            If itemNum = 0 Then Exit Sub
-            ShowShopDesc X, Y, itemNum
+            ItemNum = Shop(InShop).TradeItem(shopSlot).Item
+            If ItemNum = 0 Then Exit Sub
+            ShowShopDesc X, Y, ItemNum
 
         Else
             ' get the itemnum
-            itemNum = GetPlayerInvItemNum(MyIndex, shopSlot)
-            If itemNum = 0 Then Exit Sub
-            ShowShopDesc X, Y, itemNum
+            ItemNum = GetPlayerInvItemNum(MyIndex, shopSlot)
+            If ItemNum = 0 Then Exit Sub
+            ShowShopDesc X, Y, ItemNum
 
         End If
     End If
@@ -1946,32 +1946,32 @@ Sub btnTrade_Accept()
 End Sub
 
 Sub TradeMouseDown_Your()
-Dim Xo As Long, Yo As Long, itemNum As Long
+Dim Xo As Long, Yo As Long, ItemNum As Long
     Xo = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picYour")).Left
     Yo = Windows(GetWindowIndex("winTrade")).Window.Top + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picYour")).Top
-    itemNum = IsTrade(Xo, Yo)
+    ItemNum = IsTrade(Xo, Yo)
     
     ' make sure it exists
-    If itemNum > 0 Then
-        If TradeYourOffer(itemNum).Num = 0 Then Exit Sub
-        If GetPlayerInvItemNum(MyIndex, TradeYourOffer(itemNum).Num) = 0 Then Exit Sub
+    If ItemNum > 0 Then
+        If TradeYourOffer(ItemNum).Num = 0 Then Exit Sub
+        If GetPlayerInvItemNum(MyIndex, TradeYourOffer(ItemNum).Num) = 0 Then Exit Sub
         
         ' unoffer the item
-        UntradeItem itemNum
+        UntradeItem ItemNum
     End If
 End Sub
 
 Sub TradeMouseMove_Your()
-Dim Xo As Long, Yo As Long, itemNum As Long, X As Long, Y As Long
+Dim Xo As Long, Yo As Long, ItemNum As Long, X As Long, Y As Long
     Xo = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picYour")).Left
     Yo = Windows(GetWindowIndex("winTrade")).Window.Top + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picYour")).Top
 
-    itemNum = IsTrade(Xo, Yo)
+    ItemNum = IsTrade(Xo, Yo)
     
     ' make sure it exists
-    If itemNum > 0 Then
-        If TradeYourOffer(itemNum).Num = 0 Then Exit Sub
-        If GetPlayerInvItemNum(MyIndex, TradeYourOffer(itemNum).Num) = 0 Then Exit Sub
+    If ItemNum > 0 Then
+        If TradeYourOffer(ItemNum).Num = 0 Then Exit Sub
+        If GetPlayerInvItemNum(MyIndex, TradeYourOffer(ItemNum).Num) = 0 Then Exit Sub
         
 
         X = Windows(GetWindowIndex("winTrade")).Window.Left - Windows(GetWindowIndex("winDescription")).Window.Width
@@ -1983,21 +1983,21 @@ Dim Xo As Long, Yo As Long, itemNum As Long, X As Long, Y As Long
             X = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Window.Width
         End If
         ' go go go
-        ShowItemDesc X, Y, GetPlayerInvItemNum(MyIndex, TradeYourOffer(itemNum).Num), False
+        ShowItemDesc X, Y, GetPlayerInvItemNum(MyIndex, TradeYourOffer(ItemNum).Num), False
 
     End If
 End Sub
 
 Sub TradeMouseMove_Their()
-Dim Xo As Long, Yo As Long, itemNum As Long, X As Long, Y As Long
+Dim Xo As Long, Yo As Long, ItemNum As Long, X As Long, Y As Long
     Xo = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picTheir")).Left
     Yo = Windows(GetWindowIndex("winTrade")).Window.Top + Windows(GetWindowIndex("winTrade")).Controls(GetControlIndex("winTrade", "picTheir")).Top
 
-    itemNum = IsTrade(Xo, Yo)
+    ItemNum = IsTrade(Xo, Yo)
     
     ' make sure it exists
-    If itemNum > 0 Then
-        If TradeTheirOffer(itemNum).Num = 0 Then Exit Sub
+    If ItemNum > 0 Then
+        If TradeTheirOffer(ItemNum).Num = 0 Then Exit Sub
         
         ' calc position
         X = Windows(GetWindowIndex("winTrade")).Window.Left - Windows(GetWindowIndex("winDescription")).Window.Width
@@ -2009,7 +2009,7 @@ Dim Xo As Long, Yo As Long, itemNum As Long, X As Long, Y As Long
             X = Windows(GetWindowIndex("winTrade")).Window.Left + Windows(GetWindowIndex("winTrade")).Window.Width
         End If
         ' go go go
-        ShowItemDesc X, Y, TradeTheirOffer(itemNum).Num, False
+        ShowItemDesc X, Y, TradeTheirOffer(ItemNum).Num, False
 
     End If
 End Sub

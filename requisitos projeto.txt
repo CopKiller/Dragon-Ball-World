@@ -1,0 +1,21 @@
+Adicionar classes iniciais
+
+criação de personagem
+
+Importar os mapas
+
+quests iniciais
+
+items iniciais
+
+npcs iniciais
+
+evento automático do Pilaf com 7 mapas
+requisito nível 5 em diante.
+intervalo de 2 em 2 horas.
+
+Ver o problema da fonte dando erro no actionmsg
+
+Auto updater
+
+dificuldade de up nível hard

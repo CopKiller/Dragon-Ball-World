@@ -172,14 +172,14 @@ Public Sub SpawnNpc(ByVal mapNpcNum As Long, ByVal mapnum As Long)
     
         With MapNpc(mapnum).Npc(mapNpcNum)
             .Num = npcNum
-            .Target = 0
-            .TargetType = 0 ' clear
+            .target = 0
+            .targetType = 0 ' clear
             .Vital(Vitals.HP) = GetNpcMaxVital(npcNum, Vitals.HP)
             .Vital(Vitals.MP) = GetNpcMaxVital(npcNum, Vitals.MP)
             .Dir = Int(Rnd * 4)
             .spellBuffer.Spell = 0
             .spellBuffer.Timer = 0
-            .spellBuffer.Target = 0
+            .spellBuffer.target = 0
             .spellBuffer.tType = 0
         
             'Check if theres a spawn tile for the specific npc
@@ -1246,7 +1246,7 @@ Dim multiplier As Long, partynum As Long, expBonus As Long
         ' give the exp
         Call SetPlayerExp(index, GetPlayerExp(index) + exp)
         SendEXP index
-        SendActionMsg GetPlayerMap(index), "+" & exp & " EXP", White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), exp
+        SendActionMsg GetPlayerMap(index), "+" & exp & " EXP", White, 1, (GetPlayerX(index) * 32), (GetPlayerY(index) * 32), fonts.exp
         ' check if we've leveled
         CheckPlayerLevelUp index
     Else

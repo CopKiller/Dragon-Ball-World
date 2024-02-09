@@ -84,6 +84,7 @@ Module=Quest_Window; src\Quest_Window.bas
 Module=modAnimated; src\modAnimated.bas
 Module=Client_Frames; src\Client_Frames.bas
 Module=modProjectile; src\modProjectile.bas
+Module=modMapPng; src\modRenderMapPng.bas
 IconForm="frmMain"
 Startup="Sub Main"
 HelpFile=""

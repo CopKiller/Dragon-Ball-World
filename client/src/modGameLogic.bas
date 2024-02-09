@@ -3213,7 +3213,7 @@ End Function
 Public Sub ShowClasses()
     HideWindows
     newCharClass = 1
-    newCharSprite = 1
+    newCharSprite = 0
     newCharGender = SEX_MALE
     Windows(GetWindowIndex("winClasses")).Controls(GetControlIndex("winClasses", "lblClassName")).text = Trim$(Class(newCharClass).Name)
     Windows(GetWindowIndex("winNewChar")).Controls(GetControlIndex("winNewChar", "txtName")).text = vbNullString

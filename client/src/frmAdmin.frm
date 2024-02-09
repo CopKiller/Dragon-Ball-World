@@ -30,6 +30,15 @@ Begin VB.Form frmAdmin
       TabIndex        =   20
       Top             =   120
       Width           =   2175
+      Begin VB.CommandButton cmdAttWindow 
+         Caption         =   "Atualizar Janela"
+         Height          =   195
+         Left            =   0
+         TabIndex        =   30
+         Top             =   4320
+         Visible         =   0   'False
+         Width           =   2055
+      End
       Begin VB.CommandButton CmdQuest 
          Caption         =   "Quest's"
          Height          =   375
