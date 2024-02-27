@@ -183,7 +183,7 @@ End Function
 
 Function CalculateSoundVolume(SoundX As Long, SoundY As Long) As Byte
 Dim X1 As Long, X2 As Long, Y1 As Long, Y2 As Long, distance As Double, volume As Long
-    If InGame = False Then CalculateSoundVolume = 150: Exit Function
+    If GameState <> GameStateEnum.InGame Then CalculateSoundVolume = 150: Exit Function
     If INIT_SOUND = False Then Exit Function
     If Options.sound = 0 Then Exit Function
     
@@ -257,8 +257,8 @@ If Options.sound = 0 Then Exit Sub
         MapSounds(MapSoundCount).Channel = FSOUND_PlaySound(FSOUND_FREE, MapSounds(MapSoundCount).SoundHandle)
         FSOUND_SetVolume MapSounds(MapSoundCount).Channel, CalculateSoundVolume(MapSounds(MapSoundCount).X, MapSounds(MapSoundCount).Y)
     End If
-    For X = 0 To Map.MapData.MaxX
-        For Y = 0 To Map.MapData.MaxY
+    For X = 0 To Map.MapData.maxX
+        For Y = 0 To Map.MapData.maxY
             If Map.TileData.Tile(X, Y).Type = TILE_TYPE_SOUND Then
                 MapSoundCount = MapSoundCount + 1
                 ReDim Preserve MapSounds(MapSoundCount)

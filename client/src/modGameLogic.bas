@@ -1,386 +1,6 @@
 Attribute VB_Name = "modGameLogic"
 Option Explicit
 
-Public Sub GameLoop()
-    Dim i As Long, X As Long, Y As Long
-    Dim barDifference As Long
-    On Error GoTo retry
-
-    ' *** Start GameLoop ***
-    Do While InGame
-retry:
-        Loops = 0
-        ' *** Start GameLoop ***
-        Do While InGame And frmMain.WindowState <> vbMinimized And Loops < MAX_FRAME_SKIP
-            Tick = getTime                            ' Set the inital tick
-            ElapsedTime = Tick - FrameTime                 ' Set the time difference for time-based movement
-            FrameTime = Tick                               ' Set the time second loop time to the first.
-
-            If Thread = False Then
-                GameLooptmr = Tick + 25
-            End If
-
-            ' handle input
-            If GetForegroundWindow() = frmMain.hWnd Then
-                HandleMouseInput
-            End If
-
-            ' * Check surface timers *
-            ' Sprites
-            If tmr10000 < Tick Then
-                ' check ping
-                Call GetPing
-                tmr10000 = Tick + 10000
-            End If
-
-           ' If tmr100 < Tick Then
-                For i = 1 To LastProjectile
-                    Call ProcessProjectile(i)
-                Next i
-              '  tmr100 = Tick + 50
-           ' End If
-
-            If tmr25 < Tick Then
-                InGame = IsConnected
-                Call CheckKeys    ' Check to make sure they aren't trying to auto do anything
-
-                If GetForegroundWindow() = frmMain.hWnd Then
-                    Call CheckInputKeys    ' Check which keys were pressed
-                End If
-
-                ' check if we need to end the CD icon
-                If CountSpellicon > 0 Then
-                    For i = 1 To MAX_PLAYER_SPELLS
-                        If PlayerSpells(i).Spell > 0 Then
-                            If SpellCD(i) > 0 Then
-                                If SpellCD(i) + (Spell(PlayerSpells(i).Spell).CDTime * 1000) < Tick Then
-                                    SpellCD(i) = 0
-                                End If
-                            End If
-                        End If
-                    Next
-                End If
-
-                ' check if we need to unlock the player's spell casting restriction
-                If SpellBuffer > 0 Then
-                    If SpellBufferTimer + (Spell(PlayerSpells(SpellBuffer).Spell).CastTime * 1000) < Tick Then
-                        SpellBuffer = 0
-                        SpellBufferTimer = 0
-                        ClearPlayerFrame MyIndex
-
-                        Player(MyIndex).ConjureAnimProjectileType = ProjectileTypeEnum.None
-                        Player(MyIndex).ConjureAnimProjectileNum = 0
-                    End If
-                End If
-
-                If CanMoveNow Then
-                    Call ProcessPlayerActions
-                End If
-
-                For i = 1 To MAX_BYTE
-                    CheckAnimInstance i
-                Next
-
-                ' appear tile logic
-                AppearTileFadeLogic
-                CheckAppearTiles
-
-                tmr25 = Tick + 25
-            End If
-
-            ' targetting
-            If targetTmr < Tick Then
-                If tabDown Then
-                    FindNearestTarget
-                End If
-
-                targetTmr = Tick + 50
-            End If
-
-            ' chat timer
-            If chatTmr < Tick Then
-                ' scrolling
-                If ChatButtonUp Then
-                    ScrollChatBox 0
-                End If
-
-                If ChatButtonDown Then
-                    ScrollChatBox 1
-                End If
-
-                ' remove messages
-                If chatLastRemove + CHAT_DIFFERENCE_TIMER < getTime Then
-                    ' remove timed out messages from chat
-                    For i = Chat_HighIndex To 1 Step -1
-                        If Len(Chat(i).text) > 0 Then
-                            If Chat(i).visible Then
-                                If Chat(i).timer + CHAT_TIMER < Tick Then
-                                    Chat(i).visible = False
-                                    chatLastRemove = getTime
-                                    Exit For
-                                End If
-                            End If
-                        End If
-                    Next
-                End If
-
-                chatTmr = Tick + 50
-            End If
-
-            If tmr45 <= Tick Then
-                For i = 1 To LastProjectile
-                    Call ProcessProjectileCurAnimation(i)
-                Next
-
-                tmr45 = Tick + 45
-            End If
-
-            ' fog scrolling
-            If fogTmr < Tick Then
-                If CurrentFogSpeed > 0 Then
-                    ' move
-                    fogOffsetX = fogOffsetX - 1
-                    fogOffsetY = fogOffsetY - 1
-
-                    ' reset
-                    If fogOffsetX < -256 Then fogOffsetX = 0
-                    If fogOffsetY < -256 Then fogOffsetY = 0
-
-                    ' reset timer
-                    fogTmr = Tick + 255 - CurrentFogSpeed
-                End If
-            End If
-
-            ' elastic bars
-            If barTmr < Tick Then
-                SetBarWidth BarWidth_GuiHP_Max, BarWidth_GuiHP
-                SetBarWidth BarWidth_GuiSP_Max, BarWidth_GuiSP
-                SetBarWidth BarWidth_GuiEXP_Max, BarWidth_GuiEXP
-                For i = 1 To MAX_MAP_NPCS
-                    If MapNpc(i).Num > 0 Then
-                        SetBarWidth BarWidth_NpcHP_Max(i), BarWidth_NpcHP(i)
-                    End If
-                Next
-
-                For i = 1 To Player_HighIndex
-                    If IsPlaying(i) And GetPlayerMap(i) = GetPlayerMap(MyIndex) Then
-                        SetBarWidth BarWidth_PlayerHP_Max(i), BarWidth_PlayerHP(i)
-                    End If
-                Next
-
-                ' reset timer
-                barTmr = Tick + 10
-            End If
-
-            ' Animations!
-            If mapTimer < Tick Then
-
-                ' animate waterfalls
-                Select Case waterfallFrame
-
-                Case 0
-                    waterfallFrame = 1
-
-                Case 1
-                    waterfallFrame = 2
-
-                Case 2
-                    waterfallFrame = 0
-                End Select
-
-                ' animate autotiles
-                Select Case autoTileFrame
-
-                Case 0
-                    autoTileFrame = 1
-
-                Case 1
-                    autoTileFrame = 2
-
-                Case 2
-                    autoTileFrame = 0
-                End Select
-
-                ' animate textbox
-                If chatShowLine = "|" Then
-                    chatShowLine = vbNullString
-                Else
-                    chatShowLine = "|"
-                End If
-
-                ' re-set timer
-                mapTimer = Tick + 500
-            End If
-
-            Call ProcessWeather
-
-            ' Process input before rendering, otherwise input will be behind by 1 frame
-            If WalkTimer < Tick Then
-
-                For i = 1 To Player_HighIndex
-
-                    If IsPlaying(i) Then
-                        Call ProcessMovement(i)
-                    End If
-
-                Next i
-
-                ' Process npc movements (actually move them)
-                For i = 1 To Npc_HighIndex
-
-                    If Map.MapData.Npc(i) > 0 Then
-                        Call ProcessNpcMovement(i)
-                    End If
-
-                Next i
-
-                WalkTimer = Tick + 30    ' edit this value to change WalkTimer
-            End If
-
-            ' *********************
-            ' ** Render Graphics **
-            ' *********************
-            If Thread = False Then
-                Call Render_Graphics
-                Call UpdateSounds
-
-                If Options.FPSLock And FPS > 60 Then
-                    Tick = Tick + SKIP_TICKS
-                    Loops = Loops + 1
-                End If
-
-                ' Calculate fps
-                If TickFPS <= Tick Then
-                    GameFPS = FPS
-                    TickFPS = Tick + 1000
-                    FPS = 0
-                Else
-                    FPS = FPS + 1
-                End If
-
-                If Options.FPSLock And FPS > 60 Then
-                    Sleep SKIP_TICKS
-                End If
-            End If
-
-            DoEvents
-
-            If Thread And GameLooptmr > Tick Then
-                Thread = False
-                Exit Sub
-            End If
-
-        Loop
-        ' Mute everything but still keep everything playing
-        If frmMain.WindowState = vbMinimized Then
-            Stop_Music
-        End If
-
-        Sleep MAX_FRAME_SKIP
-        DoEvents
-    Loop
-
-    If InGame Then GoTo retry
-
-    If isLogging Then
-        isLogging = False
-        MenuLoop
-        GettingMap = True
-        Stop_Music
-        Play_Music MenuMusic
-    Else
-        ' Shutdown the game
-        Call SetStatus("Destroying game data.")
-        Call DestroyGame
-    End If
-
-End Sub
-
-Public Sub MenuLoop()
-    Dim FrameTime As Long, Tick As Long, TickFPS As Long, FPS As Long, tmr500 As Long, fadeTmr As Long
-
-    ' *** Start MenuLoop ***
-    Do While inMenu
-retry:
-        Loops = 0
-        ' *** Start GameLoop ***
-        Do While inMenu And frmMain.WindowState <> vbMinimized And Loops < MAX_FRAME_SKIP
-            Tick = getTime                            ' Set the inital tick
-            ElapsedTime = Tick - FrameTime                 ' Set the time difference for time-based movement
-            FrameTime = Tick                               ' Set the time second loop time to the first.
-    
-            ' handle input
-            If GetForegroundWindow() = frmMain.hWnd Then
-                HandleMouseInput
-            End If
-            
-            ' Animations!
-            If tmr500 < Tick Then
-                ' animate textbox
-                If chatShowLine = "|" Then
-                    chatShowLine = vbNullString
-                Else
-                    chatShowLine = "|"
-                End If
-    
-                ' re-set timer
-                tmr500 = Tick + 500
-            End If
-            
-            ' trailer
-            If videoPlaying Then VideoLoop
-            
-            ' fading
-            If fadeTmr < Tick Then
-                If Not videoPlaying Then
-                    If fadeAlpha > 5 Then
-                        ' lower fade
-                        fadeAlpha = fadeAlpha - 5
-                    Else
-                        fadeAlpha = 0
-                    End If
-                End If
-                fadeTmr = Tick + 1
-            End If
-    
-            ' *********************
-            ' ** Render Graphics **
-            ' *********************
-            Call Render_Menu
-            
-            If Options.FPSLock And FPS > 60 Then
-                Tick = Tick + SKIP_TICKS
-                Loops = Loops + 1
-            End If
-            
-            ' Calculate fps
-            If TickFPS <= Tick Then
-                GameFPS = FPS
-                TickFPS = Tick + 1000
-                FPS = 0
-            Else
-                FPS = FPS + 1
-            End If
-            
-            If Options.FPSLock And FPS > 60 Then
-                Sleep SKIP_TICKS
-            End If
-            
-            DoEvents
-    
-        Loop
-        
-        ' Mute everything but still keep everything playing
-        If frmMain.WindowState = vbMinimized Then
-            Stop_Music
-        End If
-        
-        Sleep MAX_FRAME_SKIP
-        DoEvents
-    Loop
-
-End Sub
-
 Public Sub ProcessMovement(ByVal Index As Long)
     Dim MovementSpeed As Long
     
@@ -436,52 +56,60 @@ Public Sub ProcessMovement(ByVal Index As Long)
     Select Case Player(Index).Moving
         Case MOVING_WALKING
         ' Set the first step movement
-        If Player(Index).Step = 0 Then Player(Index).Step = 2
+        If Player(Index).Step = 0 Then Player(Index).Step = 3
     
         If GetPlayerDir(Index) = DIR_RIGHT Or GetPlayerDir(Index) = DIR_DOWN Or GetPlayerDir(Index) = DIR_DOWN_RIGHT Then
             If (Player(Index).xOffset >= 0) And (Player(Index).yOffset >= 0) Then
                 Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 2 Then
-                    Player(Index).Step = 3
+                Player(Index).Steptimer = getTime
+                If Player(Index).Step = 3 Then
+                    Player(Index).Step = 4
+                ElseIf Player(Index).Step = 4 Then
+                    Player(Index).Step = 5
                 Else
-                    Player(Index).Step = 2
+                    Player(Index).Step = 6
                 End If
             End If
         Else
             If (Player(Index).xOffset <= 0) And (Player(Index).yOffset <= 0) Then
                 Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 2 Then
-                    Player(Index).Step = 3
+                Player(Index).Steptimer = getTime
+                If Player(Index).Step = 3 Then
+                    Player(Index).Step = 4
+                ElseIf Player(Index).Step = 4 Then
+                    Player(Index).Step = 5
                 Else
-                    Player(Index).Step = 2
+                    Player(Index).Step = 6
                 End If
             End If
         End If
         
         Case MOVING_RUNNING
         ' Set the first step movement
-        If Player(Index).Step = 0 Then Player(Index).Step = 2
+        If Player(Index).Step = 0 Then Player(Index).Step = 5
     
         If GetPlayerDir(Index) = DIR_RIGHT Or GetPlayerDir(Index) = DIR_DOWN Or GetPlayerDir(Index) = DIR_DOWN_RIGHT Then
             If (Player(Index).xOffset >= 0) And (Player(Index).yOffset >= 0) Then
                 Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 4 Then
+                Player(Index).Steptimer = getTime
+                If Player(Index).Step = 3 Then
+                    Player(Index).Step = 4
+                ElseIf Player(Index).Step = 4 Then
                     Player(Index).Step = 5
                 Else
-                    Player(Index).Step = 4
+                    Player(Index).Step = 6
                 End If
             End If
         Else
             If (Player(Index).xOffset <= 0) And (Player(Index).yOffset <= 0) Then
                 Player(Index).Moving = 0
-                Player(Index).StepTimer = getTime
-                If Player(Index).Step = 4 Then
+                Player(Index).Steptimer = getTime
+                If Player(Index).Step = 3 Then
+                    Player(Index).Step = 4
+                ElseIf Player(Index).Step = 4 Then
                     Player(Index).Step = 5
                 Else
-                    Player(Index).Step = 4
+                    Player(Index).Step = 6
                 End If
             End If
         End If
@@ -592,7 +220,7 @@ Sub CheckMapGetItem()
     Dim buffer As New clsBuffer, tmpIndex As Long, i As Long, X As Long
     Set buffer = New clsBuffer
 
-    If getTime > Player(MyIndex).MapGetTimer + 250 Then
+    If getTime > Player(MyIndex).MapGettimer + 250 Then
 
         ' find out if we want to pick it up
         For i = 1 To MAX_MAP_ITEMS
@@ -633,7 +261,7 @@ Sub CheckMapGetItem()
         Next
 
         ' nevermind, pick it up
-        Player(MyIndex).MapGetTimer = getTime
+        Player(MyIndex).MapGettimer = getTime
         buffer.WriteLong CMapGetItem
         SendData buffer.ToArray()
     End If
@@ -657,15 +285,14 @@ Public Sub CheckAttack()
             attackspeed = 1000
         End If
 
-        If Player(MyIndex).AttackTimer + attackspeed < getTime Then
+        If Player(MyIndex).Attacktimer + attackspeed < getTime Then
             If Player(MyIndex).Attacking = 0 Then
             
                 With Player(MyIndex)
-                    .AttackMode = 8
-                    .AttackModeTimer = getTime
+                    .AttackMode = 14
+                    .AttackModetimer = getTime
                     .Attacking = 1
-                    .AttackTimer = getTime
-                    '.StepTimer = getTime
+                    .Attacktimer = getTime
                 End With
                 
                 Set buffer = New clsBuffer
@@ -1465,7 +1092,7 @@ Public Sub CastSpell(ByVal spellSlot As Long)
     End If
 
     If PlayerSpells(spellSlot).Spell > 0 Then
-        If getTime > Player(MyIndex).AttackTimer + 1000 Then
+        If getTime > Player(MyIndex).Attacktimer + 1000 Then
             If Player(MyIndex).Moving = 0 Then
                 Set buffer = New clsBuffer
                 buffer.WriteLong CCast
@@ -1473,7 +1100,7 @@ Public Sub CastSpell(ByVal spellSlot As Long)
                 SendData buffer.ToArray()
                 buffer.Flush: Set buffer = Nothing
                 SpellBuffer = spellSlot
-                SpellBufferTimer = getTime
+                SpellBuffertimer = getTime
 
                 If Spell(PlayerSpells(spellSlot).Spell).CastFrame > 0 Then
                     Call SetPlayerFrame(MyIndex, Spell(PlayerSpells(spellSlot).Spell).CastFrame)
@@ -1512,7 +1139,7 @@ End Sub
 
 Public Sub DevMsg(ByVal text As String, ByVal Color As Byte)
 
-    If InGame Then
+    If GameState = GameStateEnum.InGame Then
         If GetPlayerAccess(MyIndex) > ADMIN_DEVELOPER Then
             Call AddText(text, Color)
         End If
@@ -1584,12 +1211,13 @@ Public Sub CreateActionMsg(ByVal message As String, ByVal Color As Integer, ByVa
         .message = message
         .Color = Color
         .Type = MsgType
-        .Created = getTime
+        .Created = YES
         .Scroll = 1
         .X = X
         .Y = Y
         .alpha = 255
         .fonte = fonte
+        .timer = Tick
     End With
 
     If ActionMsg(ActionMsgIndex).Type = ACTIONMsgSCROLL Then
@@ -1692,8 +1320,8 @@ Public Function GetBankItemNum(ByVal BankSlot As Long) As Long
     GetBankItemNum = Bank.Item(BankSlot).Num
 End Function
 
-Public Sub SetBankItemNum(ByVal BankSlot As Long, ByVal ItemNum As Long)
-    Bank.Item(BankSlot).Num = ItemNum
+Public Sub SetBankItemNum(ByVal BankSlot As Long, ByVal itemNum As Long)
+    Bank.Item(BankSlot).Num = itemNum
 End Sub
 
 Public Function GetBankItemValue(ByVal BankSlot As Long) As Long
@@ -1870,7 +1498,7 @@ Dim Value As Long, diaInput As String
 
             Case TypeLOOTITEM
                 ' send the packet
-                Player(MyIndex).MapGetTimer = getTime
+                Player(MyIndex).MapGettimer = getTime
                 buffer.WriteLong CMapGetItem
                 SendData buffer.ToArray()
 
@@ -3247,10 +2875,10 @@ Public Sub ShowInvDesc(X As Long, Y As Long, invNum As Long)
     End If
 End Sub
 
-Public Sub ShowShopDesc(X As Long, Y As Long, ItemNum As Long)
-    If ItemNum <= 0 Or ItemNum > MAX_ITEMS Then Exit Sub
+Public Sub ShowShopDesc(X As Long, Y As Long, itemNum As Long)
+    If itemNum <= 0 Or itemNum > MAX_ITEMS Then Exit Sub
     ' show
-    ShowItemDesc X, Y, ItemNum, False
+    ShowItemDesc X, Y, itemNum, False
 End Sub
 
 Public Sub ShowEqDesc(X As Long, Y As Long, eqNum As Long)
@@ -3431,13 +3059,13 @@ Public Sub ResetControlsWinDesc()
     Windows(GetWindowIndex("winDescription")).Controls(GetControlIndex("winDescription", "lblDescription")).text = ""
 End Sub
 
-Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Boolean)
+Public Sub ShowItemDesc(X As Long, Y As Long, itemNum As Long, SoulBound As Boolean)
     Dim colour As Long, theName As String, className As String, levelTxt As String, i As Long
     
     Call ResetControlsWinDesc
     ' set globals
     descType = 1 ' inventory
-    descItem = ItemNum
+    descItem = itemNum
     
     ' set position
     Windows(GetWindowIndex("winDescription")).Window.Left = X
@@ -3462,12 +3090,12 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Bool
     With Windows(GetWindowIndex("winDescription"))
         ' name
         If Not SoulBound Then
-            theName = Trim$(Item(ItemNum).Name)
+            theName = Trim$(Item(itemNum).Name)
         Else
-            theName = "(SB) " & Trim$(Item(ItemNum).Name)
+            theName = "(SB) " & Trim$(Item(itemNum).Name)
         End If
         .Controls(GetControlIndex("winDescription", "lblName")).text = theName
-        Select Case Item(ItemNum).Rarity
+        Select Case Item(itemNum).Rarity
             Case 0 ' white
                 colour = White
             Case 1 ' green
@@ -3483,34 +3111,34 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Bool
         End Select
         .Controls(GetControlIndex("winDescription", "lblName")).textColour = colour
         ' class req
-        If Item(ItemNum).ClassReq > 0 Then
-            className = Trim$(Class(Item(ItemNum).ClassReq).Name)
+        If Item(itemNum).ClassReq > 0 Then
+            className = Trim$(Class(Item(itemNum).ClassReq).Name)
             ' do we match it?
-            If GetPlayerClass(MyIndex) = Item(ItemNum).ClassReq Then
+            If GetPlayerClass(MyIndex) = Item(itemNum).ClassReq Then
                 colour = Green
             Else
                 colour = BrightRed
             End If
-        ElseIf Item(ItemNum).proficiency > 0 Then
-            Select Case Item(ItemNum).proficiency
+        ElseIf Item(itemNum).proficiency > 0 Then
+            Select Case Item(itemNum).proficiency
                 Case 1 ' Sword/Armour
-                    If Item(ItemNum).Type >= ITEM_TYPE_ARMOR And Item(ItemNum).Type <= ITEM_TYPE_FEET Then
+                    If Item(itemNum).Type >= ITEM_TYPE_ARMOR And Item(itemNum).Type <= ITEM_TYPE_FEET Then
                         className = "Heavy Armour"
-                    ElseIf Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
+                    ElseIf Item(itemNum).Type = ITEM_TYPE_WEAPON Then
                         className = "Heavy Weapon"
                     End If
-                    If hasProficiency(MyIndex, Item(ItemNum).proficiency) Then
+                    If hasProficiency(MyIndex, Item(itemNum).proficiency) Then
                         colour = Green
                     Else
                         colour = BrightRed
                     End If
                 Case 2 ' Staff/Cloth
-                    If Item(ItemNum).Type >= ITEM_TYPE_ARMOR And Item(ItemNum).Type <= ITEM_TYPE_FEET Then
+                    If Item(itemNum).Type >= ITEM_TYPE_ARMOR And Item(itemNum).Type <= ITEM_TYPE_FEET Then
                         className = "Cloth Armour"
-                    ElseIf Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
+                    ElseIf Item(itemNum).Type = ITEM_TYPE_WEAPON Then
                         className = "Light Weapon"
                     End If
-                    If hasProficiency(MyIndex, Item(ItemNum).proficiency) Then
+                    If hasProficiency(MyIndex, Item(itemNum).proficiency) Then
                         colour = Green
                     Else
                         colour = BrightRed
@@ -3523,10 +3151,10 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Bool
         .Controls(GetControlIndex("winDescription", "lblClass")).text = className
         .Controls(GetControlIndex("winDescription", "lblClass")).textColour = colour
         ' level
-        If Item(ItemNum).LevelReq > 0 Then
-            levelTxt = "Level " & Item(ItemNum).LevelReq
+        If Item(itemNum).LevelReq > 0 Then
+            levelTxt = "Level " & Item(itemNum).LevelReq
             ' do we match it?
-            If GetPlayerLevel(MyIndex) >= Item(ItemNum).LevelReq Then
+            If GetPlayerLevel(MyIndex) >= Item(itemNum).LevelReq Then
                 colour = Green
             Else
                 colour = BrightRed
@@ -3543,7 +3171,7 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Bool
     ReDim descText(1 To 1) As TextColourRec
     
     ' go through the rest of the text
-    Select Case Item(ItemNum).Type
+    Select Case Item(itemNum).Type
         Case ITEM_TYPE_NONE
             AddDescInfo "No type"
         Case ITEM_TYPE_WEAPON
@@ -3571,79 +3199,79 @@ Public Sub ShowItemDesc(X As Long, Y As Long, ItemNum As Long, SoulBound As Bool
     End Select
     
     ' more info
-    Select Case Item(ItemNum).Type
+    Select Case Item(itemNum).Type
         Case ITEM_TYPE_NONE, ITEM_TYPE_KEY, ITEM_TYPE_CURRENCY
             ' binding
-            If Item(ItemNum).BindType = 1 Then
+            If Item(itemNum).BindType = 1 Then
                 AddDescInfo "Bind on Pickup"
-            ElseIf Item(ItemNum).BindType = 2 Then
+            ElseIf Item(itemNum).BindType = 2 Then
                 AddDescInfo "Bind on Equip"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_WEAPON, ITEM_TYPE_ARMOR, ITEM_TYPE_HELMET, ITEM_TYPE_SHIELD, ITEM_TYPE_PANTS, ITEM_TYPE_FEET
             ' damage/defence
-            If Item(ItemNum).Type = ITEM_TYPE_WEAPON Then
-                AddDescInfo "Damage: " & Item(ItemNum).Data2
+            If Item(itemNum).Type = ITEM_TYPE_WEAPON Then
+                AddDescInfo "Damage: " & Item(itemNum).Data2
                 ' speed
-                AddDescInfo "Speed: " & (Item(ItemNum).Speed / 1000) & "s"
+                AddDescInfo "Speed: " & (Item(itemNum).Speed / 1000) & "s"
             Else
-                If Item(ItemNum).Data2 > 0 Then
-                    AddDescInfo "Defence: " & Item(ItemNum).Data2
+                If Item(itemNum).Data2 > 0 Then
+                    AddDescInfo "Defence: " & Item(itemNum).Data2
                 End If
             End If
             ' binding
-            If Item(ItemNum).BindType = 1 Then
+            If Item(itemNum).BindType = 1 Then
                 AddDescInfo "Bind on Pickup"
-            ElseIf Item(ItemNum).BindType = 2 Then
+            ElseIf Item(itemNum).BindType = 2 Then
                 AddDescInfo "Bind on Equip"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
             ' stat bonuses
-            If Item(ItemNum).Add_Stat(Stats.Strength) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Strength) & " Str"
+            If Item(itemNum).Add_Stat(Stats.Strength) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Strength) & " Str"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Endurance) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Endurance) & " End"
+            If Item(itemNum).Add_Stat(Stats.Endurance) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Endurance) & " End"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Intelligence) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Intelligence) & " Int"
+            If Item(itemNum).Add_Stat(Stats.Intelligence) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Intelligence) & " Int"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Agility) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Agility) & " Agi"
+            If Item(itemNum).Add_Stat(Stats.Agility) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Agility) & " Agi"
             End If
-            If Item(ItemNum).Add_Stat(Stats.Willpower) > 0 Then
-                AddDescInfo "+" & Item(ItemNum).Add_Stat(Stats.Willpower) & " Will"
+            If Item(itemNum).Add_Stat(Stats.Willpower) > 0 Then
+                AddDescInfo "+" & Item(itemNum).Add_Stat(Stats.Willpower) & " Will"
             End If
         Case ITEM_TYPE_CONSUME
-            If Item(ItemNum).CastSpell > 0 Then
+            If Item(itemNum).CastSpell > 0 Then
                 AddDescInfo "Casts Spell"
             End If
-            If Item(ItemNum).AddHP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddHP & " HP"
+            If Item(itemNum).AddHP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddHP & " HP"
             End If
-            If Item(ItemNum).AddMP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddMP & " SP"
+            If Item(itemNum).AddMP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddMP & " SP"
             End If
-            If Item(ItemNum).AddEXP > 0 Then
-                AddDescInfo "+" & Item(ItemNum).AddEXP & " EXP"
+            If Item(itemNum).AddEXP > 0 Then
+                AddDescInfo "+" & Item(itemNum).AddEXP & " EXP"
             End If
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_SPELL
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
         Case ITEM_TYPE_FOOD
-            If Item(ItemNum).HPorSP = 2 Then
-                AddDescInfo "Heal: " & (Item(ItemNum).FoodPerTick * Item(ItemNum).FoodTickCount) & " SP"
+            If Item(itemNum).HPorSP = 2 Then
+                AddDescInfo "Heal: " & (Item(itemNum).FoodPerTick * Item(itemNum).FoodTickCount) & " SP"
             Else
-                AddDescInfo "Heal: " & (Item(ItemNum).FoodPerTick * Item(ItemNum).FoodTickCount) & " HP"
+                AddDescInfo "Heal: " & (Item(itemNum).FoodPerTick * Item(itemNum).FoodTickCount) & " HP"
             End If
             ' time
-            AddDescInfo "Time: " & (Item(ItemNum).FoodInterval * (Item(ItemNum).FoodTickCount / 1000)) & "s"
+            AddDescInfo "Time: " & (Item(itemNum).FoodInterval * (Item(itemNum).FoodTickCount / 1000)) & "s"
             ' price
-            AddDescInfo "Value: " & Item(ItemNum).Price & "g"
+            AddDescInfo "Value: " & Item(itemNum).Price & "g"
     End Select
 End Sub
 
@@ -3973,7 +3601,7 @@ Dim resolution As Byte, Width As Long, Height As Long
         Do Until ScreenFit(resolution) Or resolution > RES_COUNT
             ScreenFit resolution
             resolution = resolution + 1
-            DoEvents
+            GoPeekMessage
         Loop
         ' right resolution
         If resolution > RES_COUNT Then resolution = RES_COUNT
@@ -4073,9 +3701,9 @@ Sub Resize(ByVal Width As Long, ByVal Height As Long)
     frmMain.Top = (Screen.Height - frmMain.Height) \ 2
     
     '//Inicializar opções administrativas
-    Call HandleDeveloperOptions
+    'Call HandleDeveloperOptions
     
-    DoEvents
+    GoPeekMessage
 End Sub
 
 Sub ResizeGUI()
@@ -4233,13 +3861,13 @@ Sub SetOptionsScreen()
     End With
 End Sub
 
-Function HasItem(ByVal ItemNum As Long) As Long
+Function HasItem(ByVal itemNum As Long) As Long
     Dim i As Long
 
     For i = 1 To MAX_INV
         ' Check to see if the player has the item
-        If GetPlayerInvItemNum(MyIndex, i) = ItemNum Then
-            If Item(ItemNum).Type = ITEM_TYPE_CURRENCY Then
+        If GetPlayerInvItemNum(MyIndex, i) = itemNum Then
+            If Item(itemNum).Type = ITEM_TYPE_CURRENCY Then
                 HasItem = GetPlayerInvItemValue(MyIndex, i)
             Else
                 HasItem = 1

@@ -3,11 +3,11 @@ Option Explicit
 
 'item animated
 Private StepItem As Byte
-Private ItemTmr As Currency
+Private Itemtmr As Long
 
 'quest objetives animated
 Private StepQuestObj As Byte
-Private QuestObjTmr As Currency
+Private QuestObjtmr As Long
 
 Public Enum Animated
     AnimTextureItem = 1
@@ -20,10 +20,10 @@ Public Sub RenderTexture_Animated(Texture As Long, ByVal X As Long, ByVal Y As L
                                   Optional ByVal degrees As Single = 0, Optional ByVal Shadow As Byte = 0)
 
     If AnimType = AnimTextureItem Then
-        If ItemTmr <= getTime Then
+        If Itemtmr <= getTime Then
             If StepItem < 4 Then
                 StepItem = StepItem + 1
-                ItemTmr = getTime + 200
+                Itemtmr = getTime + 200
             Else
                 StepItem = 0
             End If
@@ -39,10 +39,10 @@ Public Sub RenderTexture_Animated(Texture As Long, ByVal X As Long, ByVal Y As L
     End If
 
     If AnimType = AnimTextureQuestObj Then
-        If QuestObjTmr <= getTime Then
+        If QuestObjtmr <= getTime Then
             If StepQuestObj < 4 Then
                 StepQuestObj = StepQuestObj + 1
-                QuestObjTmr = getTime + 100
+                QuestObjtmr = getTime + 100
             Else
                 StepQuestObj = 0
             End If

@@ -427,10 +427,10 @@ Public Sub PlayerAttackNpc(ByVal Attacker As Long, ByVal mapNpcNum As Long, ByVa
         For i = 1 To Player_HighIndex
             If IsPlaying(i) And IsConnected(i) Then
                 If Player(i).Map = mapnum Then
-                    If TempPlayer(i).targetType = TARGET_TYPE_NPC Then
-                        If TempPlayer(i).target = mapNpcNum Then
-                            TempPlayer(i).target = 0
-                            TempPlayer(i).targetType = TARGET_TYPE_NONE
+                    If TempPlayer(i).TargetType = TARGET_TYPE_NPC Then
+                        If TempPlayer(i).Target = mapNpcNum Then
+                            TempPlayer(i).Target = 0
+                            TempPlayer(i).TargetType = TARGET_TYPE_NONE
                             SendTarget i
                         End If
                     End If
@@ -456,15 +456,15 @@ Public Sub PlayerAttackNpc(ByVal Attacker As Long, ByVal mapNpcNum As Long, ByVa
         End If
 
         ' Set the NPC target to the player
-        MapNpc(mapnum).Npc(mapNpcNum).targetType = 1 ' player
-        MapNpc(mapnum).Npc(mapNpcNum).target = Attacker
+        MapNpc(mapnum).Npc(mapNpcNum).TargetType = 1 ' player
+        MapNpc(mapnum).Npc(mapNpcNum).Target = Attacker
 
         ' Now check for guard ai and if so have all onmap guards come after'm
         If Npc(MapNpc(mapnum).Npc(mapNpcNum).Num).Behaviour = NPC_BEHAVIOUR_GUARD Then
             For i = 1 To MAX_MAP_NPCS
                 If MapNpc(mapnum).Npc(i).Num = MapNpc(mapnum).Npc(mapNpcNum).Num Then
-                    MapNpc(mapnum).Npc(i).target = Attacker
-                    MapNpc(mapnum).Npc(i).targetType = 1 ' player
+                    MapNpc(mapnum).Npc(i).Target = Attacker
+                    MapNpc(mapnum).Npc(i).TargetType = 1 ' player
                 End If
             Next
         End If
@@ -485,7 +485,7 @@ Public Sub PlayerAttackNpc(ByVal Attacker As Long, ByVal mapNpcNum As Long, ByVa
         SendMapNpcVitals mapnum, mapNpcNum
         
         ' set the player's target if they don't have one
-        If TempPlayer(Attacker).target = 0 Then
+        If TempPlayer(Attacker).Target = 0 Then
            ' TempPlayer(Attacker).TargetType = TARGET_TYPE_NPC
           '  TempPlayer(Attacker).Target = mapNpcNum
           '  SendTarget Attacker
@@ -709,10 +709,10 @@ Sub PlayerAttackPlayer(ByVal Attacker As Long, ByVal Victim As Long, ByVal Damag
         For i = 1 To Player_HighIndex
             If IsPlaying(i) And IsConnected(i) Then
                 If Player(i).Map = GetPlayerMap(Attacker) Then
-                    If TempPlayer(i).target = TARGET_TYPE_PLAYER Then
-                        If TempPlayer(i).target = Victim Then
-                            TempPlayer(i).target = 0
-                            TempPlayer(i).targetType = TARGET_TYPE_NONE
+                    If TempPlayer(i).Target = TARGET_TYPE_PLAYER Then
+                        If TempPlayer(i).Target = Victim Then
+                            TempPlayer(i).Target = 0
+                            TempPlayer(i).TargetType = TARGET_TYPE_NONE
                             SendTarget i
                         End If
                     End If
@@ -763,9 +763,9 @@ Sub PlayerAttackPlayer(ByVal Attacker As Long, ByVal Victim As Long, ByVal Damag
         End If
         
         ' change target if need be
-        If TempPlayer(Attacker).target = 0 Then
-            TempPlayer(Attacker).targetType = TARGET_TYPE_PLAYER
-            TempPlayer(Attacker).target = Victim
+        If TempPlayer(Attacker).Target = 0 Then
+            TempPlayer(Attacker).TargetType = TARGET_TYPE_PLAYER
+            TempPlayer(Attacker).Target = Victim
             SendTarget Attacker
         End If
     End If
@@ -779,7 +779,7 @@ End Sub
 ' ############
 Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
     Dim spellNum As Long, mpCost As Long, LevelReq As Long, mapnum As Long, ClassReq As Long
-    Dim AccessReq As Long, Range As Long, HasBuffered As Boolean, targetType As Byte, target As Long
+    Dim AccessReq As Long, Range As Long, HasBuffered As Boolean, TargetType As Byte, Target As Long
     Dim PlayerProjectileSlot As Long, ProjectileSlot As Long
     
     ' Prevent subscript out of range
@@ -866,8 +866,8 @@ Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
         End If
     End If
     
-    targetType = TempPlayer(index).targetType
-    target = TempPlayer(index).target
+    TargetType = TempPlayer(index).TargetType
+    Target = TempPlayer(index).Target
     Range = Spell(spellNum).Range
     HasBuffered = False
     
@@ -876,32 +876,32 @@ Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
             HasBuffered = True
         Case 2, 3 ' targeted & targeted AOE
             ' check if have target
-            If Not target > 0 Then
+            If Not Target > 0 Then
                 PlayerMsg index, "You do not have a target.", BrightRed
             End If
-            If targetType = TARGET_TYPE_PLAYER Then
+            If TargetType = TARGET_TYPE_PLAYER Then
                 ' if have target, check in range
-                If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), GetPlayerX(target), GetPlayerY(target)) Then
+                If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), GetPlayerX(Target), GetPlayerY(Target)) Then
                     PlayerMsg index, "Target not in range.", BrightRed
                 Else
                     ' go through spell types
                     If Spell(spellNum).Type <> SPELL_TYPE_DAMAGEHP And Spell(spellNum).Type <> SPELL_TYPE_DAMAGEMP Then
                         HasBuffered = True
                     Else
-                        If CanPlayerAttackPlayer(index, target, True) Then
+                        If CanPlayerAttackPlayer(index, Target, True) Then
                             HasBuffered = True
                         End If
                     End If
                 End If
-            ElseIf targetType = TARGET_TYPE_NPC Then
+            ElseIf TargetType = TARGET_TYPE_NPC Then
                 ' if beneficial magic then self-cast it instead
                 If Spell(spellNum).Type = SPELL_TYPE_HEALHP Or Spell(spellNum).Type = SPELL_TYPE_HEALMP Then
-                    target = index
-                    targetType = TARGET_TYPE_PLAYER
+                    Target = index
+                    TargetType = TARGET_TYPE_PLAYER
                     HasBuffered = True
                 Else
                     ' if have target, check in range
-                    If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), MapNpc(mapnum).Npc(target).x, MapNpc(mapnum).Npc(target).y) Then
+                    If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), MapNpc(mapnum).Npc(Target).x, MapNpc(mapnum).Npc(Target).y) Then
                         PlayerMsg index, "Target not in range.", BrightRed
                         HasBuffered = False
                     Else
@@ -909,7 +909,7 @@ Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
                         If Spell(spellNum).Type <> SPELL_TYPE_DAMAGEHP And Spell(spellNum).Type <> SPELL_TYPE_DAMAGEMP Then
                             HasBuffered = True
                         Else
-                            If CanPlayerAttackNpc(index, target, True) Then
+                            If CanPlayerAttackNpc(index, Target, True) Then
                                 HasBuffered = True
                             End If
                         End If
@@ -922,8 +922,8 @@ Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
         SendAnimation mapnum, Spell(spellNum).CastAnim, 0, 0, TARGET_TYPE_PLAYER, index, 1
         TempPlayer(index).spellBuffer.Spell = spellSlot
         TempPlayer(index).spellBuffer.Timer = GetTickCount
-        TempPlayer(index).spellBuffer.target = target
-        TempPlayer(index).spellBuffer.tType = targetType
+        TempPlayer(index).spellBuffer.Target = Target
+        TempPlayer(index).spellBuffer.tType = TargetType
         
         If Spell(spellNum).CastFrame > 0 Then
             TempPlayer(index).PlayerFrame = Spell(spellNum).CastFrame
@@ -940,7 +940,7 @@ Public Sub BufferSpell(ByVal index As Long, ByVal spellSlot As Long)
     End If
 End Sub
 
-Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal target As Long, ByVal targetType As Byte)
+Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal Target As Long, ByVal TargetType As Byte)
     Dim spellNum As Long, mpCost As Long, LevelReq As Long
     Dim mapnum As Long, Vital As Long, DidCast As Boolean, ClassReq As Long
     Dim AccessReq As Long, i As Long, AoE As Long, Range As Long
@@ -1039,15 +1039,15 @@ Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal target 
                 x = GetPlayerX(index)
                 y = GetPlayerY(index)
             ElseIf SpellCastType = 3 Then
-                If targetType = 0 Then Exit Sub
-                If target = 0 Then Exit Sub
+                If TargetType = 0 Then Exit Sub
+                If Target = 0 Then Exit Sub
                 
-                If targetType = TARGET_TYPE_PLAYER Then
-                    x = GetPlayerX(target)
-                    y = GetPlayerY(target)
+                If TargetType = TARGET_TYPE_PLAYER Then
+                    x = GetPlayerX(Target)
+                    y = GetPlayerY(Target)
                 Else
-                    x = MapNpc(mapnum).Npc(target).x
-                    y = MapNpc(mapnum).Npc(target).y
+                    x = MapNpc(mapnum).Npc(Target).x
+                    y = MapNpc(mapnum).Npc(Target).y
                 End If
                 
                 If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), x, y) Then
@@ -1122,15 +1122,15 @@ Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal target 
                     End If
             End Select
         Case 2 ' targetted
-            If targetType = 0 Then Exit Sub
-            If target = 0 Then Exit Sub
+            If TargetType = 0 Then Exit Sub
+            If Target = 0 Then Exit Sub
             
-            If targetType = TARGET_TYPE_PLAYER Then
-                x = GetPlayerX(target)
-                y = GetPlayerY(target)
+            If TargetType = TARGET_TYPE_PLAYER Then
+                x = GetPlayerX(Target)
+                y = GetPlayerY(Target)
             Else
-                x = MapNpc(mapnum).Npc(target).x
-                y = MapNpc(mapnum).Npc(target).y
+                x = MapNpc(mapnum).Npc(Target).x
+                y = MapNpc(mapnum).Npc(Target).y
             End If
                 
             If Not isInRange(Range, GetPlayerX(index), GetPlayerY(index), x, y) Then
@@ -1141,19 +1141,19 @@ Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal target 
             
             Select Case Spell(spellNum).Type
                 Case SPELL_TYPE_DAMAGEHP
-                    If targetType = TARGET_TYPE_PLAYER Then
-                        If CanPlayerAttackPlayer(index, target, True) Then
+                    If TargetType = TARGET_TYPE_PLAYER Then
+                        If CanPlayerAttackPlayer(index, Target, True) Then
                             If Vital > 0 Then
-                                SendAnimation mapnum, Spell(spellNum).SpellAnim, 0, 0, TARGET_TYPE_PLAYER, target
-                                PlayerAttackPlayer index, target, Vital, spellNum
+                                SendAnimation mapnum, Spell(spellNum).SpellAnim, 0, 0, TARGET_TYPE_PLAYER, Target
+                                PlayerAttackPlayer index, Target, Vital, spellNum
                                 DidCast = True
                             End If
                         End If
                     Else
-                        If CanPlayerAttackNpc(index, target, True) Then
+                        If CanPlayerAttackNpc(index, Target, True) Then
                             If Vital > 0 Then
-                                SendAnimation mapnum, Spell(spellNum).SpellAnim, 0, 0, TARGET_TYPE_NPC, target
-                                PlayerAttackNpc index, target, Vital, spellNum
+                                SendAnimation mapnum, Spell(spellNum).SpellAnim, 0, 0, TARGET_TYPE_NPC, Target
+                                PlayerAttackNpc index, Target, Vital, spellNum
                                 DidCast = True
                             End If
                         End If
@@ -1171,24 +1171,24 @@ Public Sub CastSpell(ByVal index As Long, ByVal spellSlot As Long, ByVal target 
                         increment = True
                     End If
                     
-                    If targetType = TARGET_TYPE_PLAYER Then
+                    If TargetType = TARGET_TYPE_PLAYER Then
                         If Spell(spellNum).Type = SPELL_TYPE_DAMAGEMP Then
-                            If CanPlayerAttackPlayer(index, target, True) Then
-                                SpellPlayer_Effect vitalType, increment, target, Vital, spellNum
+                            If CanPlayerAttackPlayer(index, Target, True) Then
+                                SpellPlayer_Effect vitalType, increment, Target, Vital, spellNum
                                 DidCast = True
                             End If
                         Else
-                            SpellPlayer_Effect vitalType, increment, target, Vital, spellNum
+                            SpellPlayer_Effect vitalType, increment, Target, Vital, spellNum
                             DidCast = True
                         End If
                     Else
                         If Spell(spellNum).Type = SPELL_TYPE_DAMAGEMP Then
-                            If CanPlayerAttackNpc(index, target, True) Then
-                                SpellNpc_Effect vitalType, increment, target, Vital, spellNum, mapnum
+                            If CanPlayerAttackNpc(index, Target, True) Then
+                                SpellNpc_Effect vitalType, increment, Target, Vital, spellNum, mapnum
                                 DidCast = True
                             End If
                         Else
-                            SpellNpc_Effect vitalType, increment, target, Vital, spellNum, mapnum
+                            SpellNpc_Effect vitalType, increment, Target, Vital, spellNum, mapnum
                             DidCast = True
                         End If
                     End If
@@ -1277,7 +1277,7 @@ Public Sub SpellPlayer_Effect(ByVal Vital As Byte, ByVal increment As Boolean, B
 End Sub
 
 Public Sub SpellPlayer_Projectile(ByVal index As Long, spellNum As Long, mapnum As Long)
-    Dim targetType As Byte, target As Long, Range As Byte, i As Long, j As Long, DirectionsAoE(1 To 4) As XYRec
+    Dim TargetType As Byte, Target As Long, Range As Byte, i As Long, j As Long, DirectionsAoE(1 To 4) As XYRec
     Dim xT As Long, yT As Long, Rotate As Long
 
     'Get the next open projectile slot
@@ -1293,8 +1293,8 @@ Public Sub SpellPlayer_Projectile(ByVal index As Long, spellNum As Long, mapnum 
 
     Loop While MapProjectile(ProjectileIndex).Graphic > 0
 
-    targetType = TempPlayer(index).targetType
-    target = TempPlayer(index).target
+    TargetType = TempPlayer(index).TargetType
+    Target = TempPlayer(index).Target
     Range = Spell(spellNum).Range
 
     With MapProjectile(ProjectileIndex)
@@ -1308,12 +1308,12 @@ Public Sub SpellPlayer_Projectile(ByVal index As Long, spellNum As Long, mapnum 
         Case ProjectileTypeEnum.KiBall, ProjectileTypeEnum.GenkiDama
 
             ' SE TEMOS UM ALVO
-            If target > 0 Then
-                If targetType = TARGET_TYPE_NPC Then
+            If Target > 0 Then
+                If TargetType = TARGET_TYPE_NPC Then
                     ' SE ESTÁ FORA DA ALCANCE
-                    If Not isInRange(Range, .x, .y, MapNpc(mapnum).Npc(target).x, MapNpc(mapnum).Npc(target).y) Then
-                        yT = MapNpc(mapnum).Npc(target).y
-                        xT = MapNpc(mapnum).Npc(target).x
+                    If Not isInRange(Range, .x / PIC_X, .y / PIC_Y, MapNpc(mapnum).Npc(Target).x, MapNpc(mapnum).Npc(Target).y) Then
+                        yT = MapNpc(mapnum).Npc(Target).y
+                        xT = MapNpc(mapnum).Npc(Target).x
                         Do
                             ' Up left
                             If GetPlayerY(index) < yT And GetPlayerX(index) < xT Then
@@ -1346,8 +1346,8 @@ Public Sub SpellPlayer_Projectile(ByVal index As Long, spellNum As Long, mapnum 
                         .tY = yT * PIC_Y
 
                     Else    ' SE ESTÁ DENTRO DO ALCANCE
-                        .tX = MapNpc(mapnum).Npc(TempPlayer(index).target).x * PIC_X
-                        .tY = MapNpc(mapnum).Npc(TempPlayer(index).target).y * PIC_Y
+                        .tX = MapNpc(mapnum).Npc(TempPlayer(index).Target).x * PIC_X
+                        .tY = MapNpc(mapnum).Npc(TempPlayer(index).Target).y * PIC_Y
                     End If
                 End If
             Else    ' SE NÃO TEMOS UM ALVO DEFINIR O ALVO NO ALCANCE MÁXIMO
@@ -1575,11 +1575,11 @@ Public Sub StunPlayer(ByVal index As Long, ByVal spellNum As Long)
     End If
 End Sub
 
-Sub MakeImpact(ByVal index As Long, ByVal ImpactValue As Byte, ByVal targetType As Byte, Optional ByVal mapnum As Long, Optional ByVal Attacker As Long, Optional ByVal NpcToPlayer As Boolean)
+Sub MakeImpact(ByVal index As Long, ByVal ImpactValue As Byte, ByVal TargetType As Byte, Optional ByVal mapnum As Long, Optional ByVal Attacker As Long, Optional ByVal NpcToPlayer As Boolean)
     Dim i As Long, x As Long, y As Long, Dir As Byte
     Dim XDif, YDif As Long
 
-    If targetType = TARGET_TYPE_PLAYER Then
+    If TargetType = TARGET_TYPE_PLAYER Then
         x = Player(index).x
         y = Player(index).y
 
@@ -1624,7 +1624,7 @@ Sub MakeImpact(ByVal index As Long, ByVal ImpactValue As Byte, ByVal targetType 
         SendPlayerXYToMap index, Dir + 1
     End If
 
-    If targetType = TARGET_TYPE_NPC Then
+    If TargetType = TARGET_TYPE_NPC Then
         If index < 1 Then Exit Sub
         x = MapNpc(mapnum).Npc(index).x
         y = MapNpc(mapnum).Npc(index).y

@@ -5,10 +5,6 @@ Public Declare Function Compress Lib "zlib.dll" Alias "compress" (dest As Any, d
 Public Declare Function uncompress Lib "zlib.dll" (dest As Any, destLen As Any, src As Any, ByVal srcLen As Long) As Long
 ' in development? [turn off music]
 Public Const inDevelopment As Boolean = True
-'Loop
-Public Const TICKS_PER_SECOND As Long = 60
-Public Const SKIP_TICKS = 1000 / TICKS_PER_SECOND
-Public Const MAX_FRAME_SKIP = 5
 ' Version constants
 Public Const CLIENT_MAJOR As Byte = 1
 Public Const CLIENT_MINOR As Byte = 8
@@ -151,7 +147,10 @@ Public Const GAME_NAME As String = "Crystalshire"
 Public Const GAME_WEBSITE As String = "http://www.crystalshire.com"
 ' String constants
 Public Const NAME_LENGTH As Byte = 20
+Public Const ACCOUNT_LENGTH As Byte = 12
+Public Const EMAIL_LENGTH As Byte = 25
 Public Const DESC_LENGTH As Byte = 150
+Public Const CAPTCHA_LENGTH As Byte = 10
 ' Sex constants
 Public Const SEX_MALE As Byte = 0
 Public Const SEX_FEMALE As Byte = 1

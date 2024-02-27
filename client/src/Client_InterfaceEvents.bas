@@ -72,7 +72,7 @@ Public Sub HandleMouseInput()
                 Windows(i).Controls(X).state = Normal
             Next
         Next
-        If InGame Then
+        If GameState = GameStateEnum.InGame Then
             If entState = EntityStates.MouseDown Then
                 ' Handle events
                 If currMouseX >= 0 And currMouseX <= frmMain.ScaleWidth Then
@@ -720,7 +720,7 @@ End Sub
 Public Sub btnEscMenu_Exit()
     HideWindow GetWindowIndex("winBlank")
     HideWindow GetWindowIndex("winEscMenu")
-    DestroyGame
+    AppRunning = False
 End Sub
 
 ' ##########
@@ -1596,7 +1596,7 @@ Dim i As Long, Value As Long, Width As Long, Height As Long, message As Boolean,
         Else
             AddText "Music tured on.", BrightGreen
             ' play music
-            If InGame Then musicFile = Trim$(Map.MapData.Music) Else musicFile = Trim$(MenuMusic)
+            If GameState = GameStateEnum.InGame Then musicFile = Trim$(Map.MapData.Music) Else musicFile = Trim$(MenuMusic)
             If Not musicFile = "None." Then
                 Play_Music musicFile
             Else
@@ -1624,12 +1624,12 @@ Dim i As Long, Value As Long, Width As Long, Height As Long, message As Boolean,
         Options.NoAuto = Value
         ' let them know
         If Value = 0 Then
-            If InGame Then
+            If GameState = GameStateEnum.InGame Then
                 AddText "Autotiles turned on.", BrightGreen
                 initAutotiles
             End If
         Else
-            If InGame Then
+            If GameState = GameStateEnum.InGame Then
                 AddText "Autotiles turned off.", BrightGreen
                 initAutotiles
             End If
@@ -1670,7 +1670,7 @@ Dim i As Long, Value As Long, Width As Long, Height As Long, message As Boolean,
     ' save options
     SaveOptions
     ' let them know
-    If InGame Then
+    If GameState = GameStateEnum.InGame Then
         If message Then AddText "Some changes will take effect next time you load the game.", BrightGreen
     End If
     ' close

@@ -7,6 +7,9 @@ Public Declare Sub ZeroMemory Lib "kernel32.dll" Alias "RtlZeroMemory" (Destinat
 
 Public Sub Main()
 Dim i As Long
+
+    AppRunning = True
+    
     InitCRC32
     ' Check if the directory is there, if its not make it
     ChkDir App.Path & "\data files\", "graphics"
@@ -34,11 +37,11 @@ Dim i As Long
         frmMain.caption = frmMain.caption
     End If
     frmMain.Show
-    InitDX8 frmMain.hWnd
-    DoEvents
+    InitDX8 frmMain.hwnd
+    GoPeekMessage
     
     Set GDIToken = New cGDIpToken
-    If GDIToken.Token = 0& Then MsgBox "GDI+ failed to load, exiting game!": DestroyGame
+    If GDIToken.Token = 0& Then MsgBox "GDI+ failed to load, exiting game!": AppRunning = False
     
     LoadTextures
     LoadFonts
@@ -82,7 +85,7 @@ Dim i As Long
     SetStatus vbNullString
     ' show the main menu
     frmMain.Show
-    inMenu = True
+    GameState = GameStateEnum.inMenu
     ' show login window
     ShowWindow GetWindowIndex("winLogin")
     inSmallChat = True
@@ -100,7 +103,7 @@ Dim i As Long
     
     Call ClearAllGameData
     
-    Call MenuLoop
+    Call AppLoop
 End Sub
 
 Public Sub HandleDeveloperOptions()
@@ -175,7 +178,8 @@ End Sub
 Public Sub logoutGame()
     Dim i As Long
     isLogging = True
-    InGame = False
+    
+    GameState = GameStateEnum.inMenu
 
     DestroyTCP
 
@@ -186,7 +190,7 @@ Public Sub logoutGame()
 
 
     SpellBuffer = 0
-    SpellBufferTimer = 0
+    SpellBuffertimer = 0
 
     ' destroy temp values
     DragInvSlotNum = 0
@@ -212,8 +216,7 @@ Public Sub logoutGame()
 
     Call ClearAllGameData
 
-    inMenu = True
-    MenuLoop
+    GameState = GameStateEnum.inMenu
 End Sub
 
 Sub GameInit()
@@ -237,6 +240,7 @@ Sub GameInit()
 End Sub
 
 Public Sub DestroyGame()
+    AppRunning = False
     StopIntro
     Call DestroyTCP
     ' destroy music & sound engines

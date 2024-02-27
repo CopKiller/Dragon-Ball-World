@@ -44,6 +44,6 @@ Public Sub InitMapPng()
     For i = 1 To MAX_MAPS
         TexGround(i) = LoadTextureFile(App.Path & Path_Ground & i)
         TexFringe(i) = LoadTextureFile(App.Path & Path_Fringe & i)
-        DoEvents
+        GoPeekMessage
     Next i
 End Sub

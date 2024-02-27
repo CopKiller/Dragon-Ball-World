@@ -56,14 +56,10 @@ Begin VB.Form frmServer
       TabCaption(0)   =   "Console"
       TabPicture(0)   =   "frmServer.frx":1708A
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "lblCPS"
-      Tab(0).Control(0).Enabled=   0   'False
-      Tab(0).Control(1)=   "lblCpsLock"
-      Tab(0).Control(1).Enabled=   0   'False
-      Tab(0).Control(2)=   "txtText"
-      Tab(0).Control(2).Enabled=   0   'False
-      Tab(0).Control(3)=   "txtChat"
-      Tab(0).Control(3).Enabled=   0   'False
+      Tab(0).Control(0)=   "txtChat"
+      Tab(0).Control(1)=   "txtText"
+      Tab(0).Control(2)=   "lblCpsLock"
+      Tab(0).Control(3)=   "lblCPS"
       Tab(0).ControlCount=   4
       TabCaption(1)   =   "Players"
       TabPicture(1)   =   "frmServer.frx":170A6
@@ -308,12 +304,12 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub Command1_Click()
-    Dim I As Long
+    Dim i As Long
     Call LoadQuests
     Call TextAdd("All Quests reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendQuests I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendQuests i
         End If
     Next
 End Sub
@@ -331,24 +327,24 @@ End Sub
 ' ********************
 ' ** Winsock object **
 ' ********************
-Private Sub Socket_ConnectionRequest(Index As Integer, ByVal RequestID As Long)
-    Call AcceptConnection(Index, RequestID)
+Private Sub Socket_ConnectionRequest(index As Integer, ByVal RequestID As Long)
+    Call AcceptConnection(index, RequestID)
 End Sub
 
-Private Sub Socket_Accept(Index As Integer, SocketId As Integer)
-    Call AcceptConnection(Index, SocketId)
+Private Sub Socket_Accept(index As Integer, SocketId As Integer)
+    Call AcceptConnection(index, SocketId)
 End Sub
 
-Private Sub Socket_DataArrival(Index As Integer, ByVal bytesTotal As Long)
+Private Sub Socket_DataArrival(index As Integer, ByVal bytesTotal As Long)
 
-    If IsConnected(Index) Then
-        Call IncomingData(Index, bytesTotal)
+    If IsConnected(index) Then
+        Call IncomingData(index, bytesTotal)
     End If
 
 End Sub
 
-Private Sub Socket_Close(Index As Integer)
-    Call CloseSocket(Index)
+Private Sub Socket_Close(index As Integer)
+    Call CloseSocket(index)
 End Sub
 
 ' ********************
@@ -366,89 +362,89 @@ Private Sub cmdExit_Click()
 End Sub
 
 Private Sub cmdReloadClasses_Click()
-Dim I As Long
+Dim i As Long
     Call LoadClasses
     Call TextAdd("All classes reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendClasses I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendClasses i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadItems_Click()
-Dim I As Long
+Dim i As Long
     Call LoadItems
     Call TextAdd("All items reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendItems I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendItems i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadMaps_Click()
-Dim I As Long
+Dim i As Long
     Call LoadMaps
     Call TextAdd("All maps reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            PlayerWarp I, GetPlayerMap(I), GetPlayerX(I), GetPlayerY(I)
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            PlayerWarp i, GetPlayerMap(i), GetPlayerX(i), GetPlayerY(i)
         End If
     Next
 End Sub
 
 Private Sub cmdReloadNPCs_Click()
-Dim I As Long
+Dim i As Long
     Call LoadNpcs
     Call TextAdd("All npcs reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendNpcs I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendNpcs i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadShops_Click()
-Dim I As Long
+Dim i As Long
     Call LoadShops
     Call TextAdd("All shops reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendShops I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendShops i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadSpells_Click()
-Dim I As Long
+Dim i As Long
     Call LoadSpells
     Call TextAdd("All spells reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendSpells I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendSpells i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadResources_Click()
-Dim I As Long
+Dim i As Long
     Call LoadResources
     Call TextAdd("All Resources reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendResources I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendResources i
         End If
     Next
 End Sub
 
 Private Sub cmdReloadAnimations_Click()
-Dim I As Long
+Dim i As Long
     Call LoadAnimations
     Call TextAdd("All Animations reloaded.")
-    For I = 1 To Player_HighIndex
-        If IsPlaying(I) Then
-            SendAnimations I
+    For i = 1 To Player_HighIndex
+        If IsPlaying(i) Then
+            SendAnimations i
         End If
     Next
 End Sub
@@ -492,7 +488,7 @@ Private Sub lvwInfo_ColumnClick(ByVal ColumnHeader As MSComctlLib.ColumnHeader)
         lvwInfo.SortOrder = lvwAscending
     End If
 
-    lvwInfo.SortKey = ColumnHeader.Index - 1
+    lvwInfo.SortKey = ColumnHeader.index - 1
     lvwInfo.Sorted = True
 End Sub
 
@@ -515,22 +511,22 @@ Private Sub txtChat_KeyPress(KeyAscii As Integer)
 End Sub
 
 Sub UsersOnline_Start()
-    Dim I As Long
+    Dim i As Long
 
-    For I = 1 To MAX_PLAYERS
-        frmServer.lvwInfo.ListItems.Add (I)
+    For i = 1 To MAX_PLAYERS
+        frmServer.lvwInfo.ListItems.Add (i)
 
-        If I < 10 Then
-            frmServer.lvwInfo.ListItems(I).Text = "00" & I
-        ElseIf I < 100 Then
-            frmServer.lvwInfo.ListItems(I).Text = "0" & I
+        If i < 10 Then
+            frmServer.lvwInfo.ListItems(i).Text = "00" & i
+        ElseIf i < 100 Then
+            frmServer.lvwInfo.ListItems(i).Text = "0" & i
         Else
-            frmServer.lvwInfo.ListItems(I).Text = I
+            frmServer.lvwInfo.ListItems(i).Text = i
         End If
 
-        frmServer.lvwInfo.ListItems(I).SubItems(1) = vbNullString
-        frmServer.lvwInfo.ListItems(I).SubItems(2) = vbNullString
-        frmServer.lvwInfo.ListItems(I).SubItems(3) = vbNullString
+        frmServer.lvwInfo.ListItems(i).SubItems(1) = vbNullString
+        frmServer.lvwInfo.ListItems(i).SubItems(2) = vbNullString
+        frmServer.lvwInfo.ListItems(i).SubItems(3) = vbNullString
     Next
 
 End Sub

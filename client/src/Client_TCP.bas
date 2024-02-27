@@ -41,8 +41,10 @@ Public Sub IncomingData(ByVal DataLength As Long)
     Loop
 
     PlayerBuffer.Trim
-
-    DoEvents
+    
+    If GameState = GameStateEnum.InGame And AppLooptmr <= Tick Then
+        Thread = True
+    End If
 End Sub
 
 Public Function ConnectToServer() As Boolean
@@ -61,7 +63,7 @@ Public Function ConnectToServer() As Boolean
 
     ' Wait until connected or 3 seconds have passed and report the server being down
     Do While (Not IsConnected) And (getTime <= Wait + 3000)
-        DoEvents
+        GoPeekMessage
     Loop
 
     ConnectToServer = IsConnected
@@ -243,8 +245,8 @@ Public Sub SendMap()
     buffer.WriteLong Map.MapData.BootMap
     buffer.WriteByte Map.MapData.BootX
     buffer.WriteByte Map.MapData.BootY
-    buffer.WriteByte Map.MapData.MaxX
-    buffer.WriteByte Map.MapData.MaxY
+    buffer.WriteByte Map.MapData.maxX
+    buffer.WriteByte Map.MapData.maxY
     buffer.WriteLong Map.MapData.Weather
     buffer.WriteLong Map.MapData.WeatherIntensity
     buffer.WriteLong Map.MapData.Fog
@@ -259,8 +261,8 @@ Public Sub SendMap()
         buffer.WriteLong Map.MapData.Npc(i)
     Next
 
-    For X = 0 To Map.MapData.MaxX
-        For Y = 0 To Map.MapData.MaxY
+    For X = 0 To Map.MapData.maxX
+        For Y = 0 To Map.MapData.maxY
             With Map.TileData.Tile(X, Y)
                 For i = 1 To MapLayer.Layer_Count - 1
                     buffer.WriteLong .Layer(i).X
@@ -301,11 +303,11 @@ Public Sub WarpToMe(ByVal Name As String)
     buffer.Flush: Set buffer = Nothing
 End Sub
 
-Public Sub WarpTo(ByVal mapNum As Long)
+Public Sub WarpTo(ByVal MapNum As Long)
     Dim buffer As clsBuffer
     Set buffer = New clsBuffer
     buffer.WriteLong CWarpTo
-    buffer.WriteLong mapNum
+    buffer.WriteLong MapNum
     SendData buffer.ToArray()
     buffer.Flush: Set buffer = Nothing
 End Sub
@@ -363,16 +365,16 @@ Public Sub SendRequestEditItem()
     buffer.Flush: Set buffer = Nothing
 End Sub
 
-Public Sub SendSaveItem(ByVal ItemNum As Long)
+Public Sub SendSaveItem(ByVal itemNum As Long)
     Dim buffer As clsBuffer
     Dim ItemSize As Long
     Dim ItemData() As Byte
     Set buffer = New clsBuffer
-    ItemSize = LenB(Item(ItemNum))
+    ItemSize = LenB(Item(itemNum))
     ReDim ItemData(ItemSize - 1)
-    CopyMemory ItemData(0), ByVal VarPtr(Item(ItemNum)), ItemSize
+    CopyMemory ItemData(0), ByVal VarPtr(Item(itemNum)), ItemSize
     buffer.WriteLong CSaveItem
-    buffer.WriteLong ItemNum
+    buffer.WriteLong itemNum
     buffer.WriteBytes ItemData
     SendData buffer.ToArray()
     buffer.Flush: Set buffer = Nothing
@@ -591,7 +593,7 @@ Public Sub ChangeBankSlots(ByVal oldSlot As Long, ByVal newSlot As Long)
 End Sub
 
 Public Sub AdminWarp(ByVal X As Long, ByVal Y As Long)
-    If X < 0 Or Y < 0 Or X > Map.MapData.MaxX Or Y > Map.MapData.MaxY Then Exit Sub
+    If X < 0 Or Y < 0 Or X > Map.MapData.maxX Or Y > Map.MapData.maxY Then Exit Sub
     Dim buffer As clsBuffer
     Set buffer = New clsBuffer
     buffer.WriteLong CAdminWarp

@@ -90,8 +90,8 @@ Private Type PlayerRec
     Projectile(1 To MAX_PROJECTILE_PLAYER) As Long
     ' Position
     Map As Long
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     dir As Byte
     ' Variables
     Variable(1 To MAX_BYTE) As Long
@@ -104,17 +104,17 @@ Private Type PlayerRec
     
     ' Client use only
     Anim As Long
-    AnimTimer As Long
+    Animtimer As Long
     
     Step As Byte
-    StepTimer As Long
+    Steptimer As Long
     
-    StopTmr As Long
-    EyesTmr As Long
+    Stoptmr As Long
+    Eyestmr As Long
     StepEyes As Byte
     
     AttackMode As Byte
-    AttackModeTimer As Long
+    AttackModetimer As Long
     
     PlayerBlock As Byte
     
@@ -122,11 +122,11 @@ Private Type PlayerRec
     yOffset As Integer
     Moving As Byte
     Attacking As Byte
-    AttackTimer As Long
-    MapGetTimer As Long
+    Attacktimer As Long
+    MapGettimer As Long
     
     ConjureAnimProjectileType As Byte
-    ConjureAnimProjectileNum As Long
+    ConjureAnimProjectileNum As Single
 End Type
 
 Private Type EventCommandRec
@@ -136,8 +136,8 @@ Private Type EventCommandRec
     Channel As Byte
     TargetType As Byte
     target As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Public Type EventPageRec
@@ -174,8 +174,8 @@ End Type
 
 Public Type EventRec
     Name As String
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     pageCount As Long
     EventPage() As EventPageRec
 End Type
@@ -215,8 +215,8 @@ Private Type MapDataRec
 End Type
 
 Private Type TileDataRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     tileSet As Long
 End Type
 
@@ -296,8 +296,8 @@ Private Type MapItemRec
     Num As Long
     Value As Long
     Frame As Byte
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     bound As Boolean
     Gravity As Integer
     yOffset As Integer
@@ -310,18 +310,18 @@ Private Type MapNpcRec
     TargetType As Byte
     Vital(1 To Vitals.Vital_Count - 1) As Long
     Map As Long
-    x As Byte
-    y As Byte
+    X As Byte
+    Y As Byte
     dir As Byte
     ' Client use only
     xOffset As Long
     yOffset As Long
     Moving As Byte
     Attacking As Byte
-    AttackTimer As Long
+    Attacktimer As Long
     Step As Byte
     Anim As Long
-    AnimTimer As Long
+    Animtimer As Long
     
     Impacted As Boolean
     ImpactedDir As Byte
@@ -331,7 +331,7 @@ Private Type TempTileRec
     ' doors... obviously
     DoorOpen As Byte
     DoorFrame As Byte
-    DoorTimer As Long
+    Doortimer As Long
     DoorAnimate As Byte ' 0 = nothing| 1 = opening | 2 = closing
     ' fading appear tiles
     isFading(1 To MapLayer.Layer_Count - 1) As Boolean
@@ -341,16 +341,16 @@ Private Type TempTileRec
 End Type
 
 Public Type MapResourceRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     ResourceState As Byte
 End Type
 
 Private Type BloodRec
     sprite As Long
     timer As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Public Type HotbarRec
@@ -359,8 +359,8 @@ Public Type HotbarRec
 End Type
 
 Public Type PointRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
 
 Public Type QuarterTileRec
@@ -380,7 +380,7 @@ Public Type ChatBubbleRec
     target As Long
     TargetType As Byte
     timer As Long
-    active As Boolean
+    Active As Boolean
 End Type
 
 Public Type TextColourRec
@@ -397,16 +397,16 @@ End Type
 
 Public Type WeatherParticleRec
     Type As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     Velocity As Long
     InUse As Long
 End Type
 
 Public Type ParticulaRec
     Type As Long
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     Movimento As Long
     InUse As Long
     dir As Byte
@@ -420,8 +420,8 @@ Public Type ParticulaRec
 End Type
 
 Public Type MapSoundRec
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
     SoundHandle As Long
     InUse As Boolean
     Channel As Long

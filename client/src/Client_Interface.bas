@@ -387,7 +387,6 @@ Public Sub RenderEntity(winNum As Long, entNum As Long)
             ' textbox
         Case EntityTypes.EntityTextBox
             ' render specific designs
-
             If .design(.state) > 0 Then RenderDesign .design(.state), .Left + Xo, .Top + Yo, .Width, .Height, .alpha
             ' render image
             If .image(.state) > 0 Then RenderTexture .image(.state), .Left + Xo, .Top + Yo, 0, 0, .Width, .Height, .Width, .Height, DX8Colour(White, .alpha)
@@ -954,7 +953,7 @@ Public Sub CreateTextbox(winNum As Long, Name As String, Left As Long, Top As Lo
                          Optional textColour As Long = White, Optional align As Byte = Alignment.AlignLeft, Optional visible As Boolean = True, Optional alpha As Long = 255, Optional image_norm As Long, _
                          Optional image_hover As Long, Optional image_mousedown As Long, Optional design_norm As Long, Optional design_hover As Long, Optional design_mousedown As Long, _
                          Optional entCallBack_norm As Long, Optional entCallBack_hover As Long, Optional entCallBack_mousedown As Long, Optional entCallBack_mousemove As Long, Optional entCallBack_DblClick As Long, _
-                         Optional isActive As Boolean, Optional xOffset As Long, Optional yOffset As Long, Optional isCensor As Boolean, Optional entCallBack_enter As Long)
+                         Optional isActive As Boolean, Optional xOffset As Long, Optional yOffset As Long, Optional isCensor As Boolean, Optional entCallBack_enter As Long, Optional textLength As Long = 3)
     Dim design(0 To EntityStates.StateCount - 1) As Long
     Dim image(0 To EntityStates.StateCount - 1) As Long
     Dim entCallBack(0 To EntityStates.StateCount - 1) As Long
@@ -972,7 +971,7 @@ Public Sub CreateTextbox(winNum As Long, Name As String, Left As Long, Top As Lo
     entCallBack(EntityStates.DoubleClick) = entCallBack_DblClick
     entCallBack(EntityStates.Enter) = entCallBack_enter
     ' create the textbox
-    CreateEntity winNum, zOrder_Con, Name, EntityTextBox, design(), image(), entCallBack(), Left, Top, Width, Height, visible, , , , , text, align, font, textColour, alpha, , xOffset, yOffset, , , , isActive, isCensor
+    CreateEntity winNum, zOrder_Con, Name, EntityTextBox, design(), image(), entCallBack(), Left, Top, Width, Height, visible, , textLength, , , text, align, font, textColour, alpha, , xOffset, yOffset, , , , isActive, isCensor
 End Sub
 
 Public Sub CreatePictureBox(winNum As Long, Name As String, Left As Long, Top As Long, Width As Long, Height As Long, Optional visible As Boolean = True, Optional canDrag As Boolean, _
@@ -1186,8 +1185,8 @@ Public Sub CreateWindow_Login()
     CreateLabel windowCount, "lblPassword", 15, WindowTopBar + 52, 242, , "Password", Default, White, Alignment.alignCentre
 
     ' Textboxes
-    CreateTextbox windowCount, "txtUser", 15, WindowTopBar + 27, 242, 26, Options.Username, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4
-    CreateTextbox windowCount, "txtPass", 15, WindowTopBar + 69, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnLogin_Click)
+    CreateTextbox windowCount, "txtUser", 15, WindowTopBar + 27, 242, 26, Options.Username, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, , , ACCOUNT_LENGTH
+    CreateTextbox windowCount, "txtPass", 15, WindowTopBar + 69, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnLogin_Click), ACCOUNT_LENGTH
     
 
     ' Botões
@@ -1252,11 +1251,11 @@ Public Sub CreateWindow_Register()
     CreateLabel windowCount, "lblCaptcha", 15, (WindowTopBar + 188) - 4, 242, , "Captcha", fonts.Default, White, Alignment.alignCentre
 
     ' Textboxes
-    CreateTextbox windowCount, "txtAccount", 15, WindowTopBar + 27, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click)
-    CreateTextbox windowCount, "txtPass", 15, WindowTopBar + 69, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnSendRegister_Click)
-    CreateTextbox windowCount, "txtPass2", 15, WindowTopBar + 111, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnSendRegister_Click)
-    CreateTextbox windowCount, "txtCode", 15, WindowTopBar + 160, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click)
-    CreateTextbox windowCount, "txtCaptcha", 15, WindowTopBar + 235, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click)
+    CreateTextbox windowCount, "txtAccount", 15, WindowTopBar + 27, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click), ACCOUNT_LENGTH
+    CreateTextbox windowCount, "txtPass", 15, WindowTopBar + 69, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnSendRegister_Click), ACCOUNT_LENGTH
+    CreateTextbox windowCount, "txtPass2", 15, WindowTopBar + 111, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, True, GetAddress(AddressOf btnSendRegister_Click), ACCOUNT_LENGTH
+    CreateTextbox windowCount, "txtCode", 15, WindowTopBar + 160, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click), EMAIL_LENGTH
+    CreateTextbox windowCount, "txtCaptcha", 15, WindowTopBar + 235, 242, 26, vbNullString, fonts.Default, DarkGrey, Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, False, GetAddress(AddressOf btnSendRegister_Click), CAPTCHA_LENGTH
     
 
     ' Captcha
@@ -1356,7 +1355,7 @@ Public Sub CreateWindow_Dialogue()
     CreateButton windowCount, "btnOkay", 15, WindowTopBar + 87, 358, 30, "Confirmar", fonts.Default, , , True, , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf Dialogue_Okay)
     
     ' Input
-    CreateTextbox windowCount, "txtInput", 15, WindowTopBar + 48, 358, 26, , Default, DarkGrey, Alignment.alignCentre, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4
+    CreateTextbox windowCount, "txtInput", 15, WindowTopBar + 48, 358, 26, , Default, DarkGrey, Alignment.alignCentre, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 6, 4, , , NAME_LENGTH
     ' set active control
     SetActiveControl windowCount, GetControlIndex("winDialogue", "txtInput")
 End Sub
@@ -1407,7 +1406,7 @@ Public Sub CreateWindow_NewChar()
     CreatePictureBox windowCount, "picShadow_1", 29, 62, 124, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreateLabel windowCount, "lblName", 29, 59, 124, , "Name", rockwellDec_15, White, Alignment.alignCentre
     ' Textbox
-    CreateTextbox windowCount, "txtName", 29, 75, 124, 19, , fonts.rockwell_15, , Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 5, 3
+    CreateTextbox windowCount, "txtName", 29, 75, 124, 19, , fonts.rockwell_15, , Alignment.AlignLeft, , , , , , DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, DesignTypes.DesignTextInput, , , , , , , 5, 3, , , NAME_LENGTH
     ' Gender
     CreatePictureBox windowCount, "picShadow_2", 29, 105, 124, 9, , , , , , , , DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment, DesignTypes.DesignBlackParchment
     CreateLabel windowCount, "lblGender", 29, 102, 124, , "Gender", rockwellDec_15, White, Alignment.alignCentre
@@ -1653,7 +1652,7 @@ Public Sub CreateWindow_Chat()
     ' Chat button
     CreateButton windowCount, "btnChat", 296, 124 + 16, 48, 20, "Say", rockwellDec_15, , , , , , , , DesignTypes.DesignGreenNormal, DesignTypes.DesignGreenHover, DesignTypes.DesignGreenClick, , , GetAddress(AddressOf btnSay_Click)
     ' Chat Textbox
-    CreateTextbox windowCount, "txtChat", 12, 127 + 16, 286, 25, , fonts.verdana_12
+    CreateTextbox windowCount, "txtChat", 12, 127 + 16, 286, 25, , fonts.verdana_12, , , , , , , , , , , , , , , , , , , , , DESC_LENGTH
     ' buttons
     CreateButton windowCount, "btnUp", 328, 28, 11, 13, , , , , , , TextureGUI(6), TextureGUI(7), TextureGUI(8), , , , , , GetAddress(AddressOf btnChat_Up)
     CreateButton windowCount, "btnDown", 327, 122, 11, 13, , , , , , , TextureGUI(9), TextureGUI(10), TextureGUI(11), , , , , , GetAddress(AddressOf btnChat_Down)

@@ -209,7 +209,6 @@ Public Function getTime() As Single
 
     ' Calculate the difference between the 64-bit times, return as a 32-bit time
     getTime = CurrentTime - GetSystemTimeOffset
-    
 
 End Function
 

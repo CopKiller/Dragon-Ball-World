@@ -54,10 +54,10 @@ End Type
 Public Type TaskTimerRec
     Active As Byte            ' Is Active?
     TimerType As Byte         ' 0=Days; 1=Hours; 2=Minutes; 3=Seconds.
-    Timer As Currency             ' Time with /\
+    timer As Long             ' Time with /\
 
     Teleport As Byte          ' Teleport cannot end task in time.
-    MapNum As Integer         ' Map Number to teleport /\
+    mapnum As Integer         ' Map Number to teleport /\
     ResetType As Byte         ' 0=Resetar Task ; 1=Resetar Quest.
     X As Byte
     Y As Byte
@@ -67,7 +67,7 @@ End Type
 
 Public Type TaskRec
     Order As Byte
-    NPC As Integer
+    Npc As Integer
     Item As Integer
     Map As Integer
     Resource As Integer
@@ -108,7 +108,7 @@ Public Type PlayerQuestRec
     Status As Byte
     ActualTask As Byte
     CurrentCount As Long    'Used to handle the Amount property
-    data As String * 19    ' Salva o now que tem 19 dígitos, pra usar como comparação na hora de iniciar novamente a quest
+    Data As String * 19    ' Salva o now que tem 19 dígitos, pra usar como comparação na hora de iniciar novamente a quest
 
     TaskTimer As TaskTimerRec
 End Type

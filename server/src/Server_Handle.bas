@@ -562,10 +562,10 @@ Sub HandleAdminWarp(ByVal index As Long, ByRef Data() As Byte, ByVal StartAddr A
     If y < 0 Then y = 0
     
     If GetPlayerAccess(index) >= ADMIN_MAPPER Then
-        'PlayerWarp index, GetPlayerMap(index), x, y
-        SetPlayerX index, x
-        SetPlayerY index, y
-        SendPlayerXYToMap index
+        PlayerWarp index, GetPlayerMap(index), x, y
+        'SetPlayerX index, x
+        'SetPlayerY index, y
+        'SendPlayerXYToMap index
     End If
     
     Buffer.Flush: Set Buffer = Nothing

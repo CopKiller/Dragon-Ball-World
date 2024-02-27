@@ -78,12 +78,12 @@ Private Sub cmdAttWindow_Click()
     
     Dim windowIndex As Long
     
-    'Nome da janela para obter o índice da janela no processamento
+    ' Nome da janela para obter o índice da janela, no processamento da atualização
     WindowName = "winNewChar"
-    'Nome da sub de criação da janela
+    ' Nome da sub de criação da janela
     callProcedure = GetAddress(AddressOf CreateWindow_NewChar)
     
-    'Obtem o indice da janela
+    ' Obtem o indice da janela
     windowIndex = GetWindowIndex(WindowName)
     
     ' Notifica que está atualizando uma janela em um método de processamento, para não acrescentar mais redimensionamento
@@ -91,16 +91,16 @@ Private Sub cmdAttWindow_Click()
     controlUpdated = True
     
     With Windows(windowIndex).Window
-        'Dados temporários
+        ' Dados temporários
         tempWindow_Count = windowCount
         tempzOrder_Win = .zOrder
         
         windowCount = windowIndex
-        '//Método elaborado para alterar uma variavel privada no modulo de processamento
+        ' Método elaborado para alterar uma variavel privada no modulo de processamento
         Call SetzOrder_Win(.zOrder)
         
         CallWindowProc callProcedure, 1, bytes, 0, 0
-        '//Método elaborado para alterar uma variavel privada no modulo de processamento
+        ' Método elaborado para alterar uma variavel privada no modulo de processamento
         Call SetzOrder_Win(tempzOrder_Win)
         
         windowCount = tempWindow_Count
@@ -114,7 +114,7 @@ End Sub
 
 ' Form
 Private Sub Form_Unload(Cancel As Integer)
-    DestroyGame
+    Call DestroyGame
 End Sub
 
 Private Sub Form_KeyPress(KeyAscii As Integer)
@@ -122,7 +122,7 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
-    If Not InGame Then Exit Sub
+    If Not GameState = GameStateEnum.InGame Then Exit Sub
 
     Select Case KeyCode
         ' handles screenshot mode

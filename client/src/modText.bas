@@ -388,16 +388,31 @@ Public Function TextHeight(ByRef UseFont As CustomFont) As Long
 End Function
 
 Sub DrawActionMsg(ByVal Index As Integer)
-    Dim X As Long, Y As Long, i As Long, Time As Long
-    Dim LenMsg As Long, colour As Long
+    Dim X As Long, Y As Long, i As Long
+    Dim LenMsg As Long, colour As Long, time As Long
 
     If ActionMsg(Index).message = vbNullString Then Exit Sub
+
+    With ActionMsg(Index)
+        If .alpha <= 0 Then
+            Call ClearActionMsg(Index)
+
+            Exit Sub
+
+        End If
+
+        ' Check if we should be seeing it
+        If .timer + 100 < Tick Then
+            .alpha = .alpha - 2.5
+        End If
+
+    End With
 
     ' how long we want each message to appear
     Select Case ActionMsg(Index).Type
 
     Case ACTIONMsgSTATIC
-        Time = 1500
+        time = 3000
         LenMsg = TextWidth(font(fonts.rockwell_15), Trim$(ActionMsg(Index).message))
 
         If ActionMsg(Index).Y > 0 Then
@@ -409,8 +424,7 @@ Sub DrawActionMsg(ByVal Index As Integer)
         End If
 
     Case ACTIONMsgSCROLL
-        Time = 1500
-
+        time = 3000
         If ActionMsg(Index).Y > 0 Then
             X = ActionMsg(Index).X + Int(PIC_X \ 2) - ((Len(Trim$(ActionMsg(Index).message)) \ 2) * 8)
             Y = ActionMsg(Index).Y - Int(PIC_Y \ 2) - 2 - (ActionMsg(Index).Scroll * 0.3)
@@ -426,8 +440,7 @@ Sub DrawActionMsg(ByVal Index As Integer)
         If ActionMsg(Index).alpha <= 0 Then ClearActionMsg Index: Exit Sub
 
     Case ACTIONMsgSCREEN
-        Time = 3000
-
+        time = 3000
         ' This will kill any action screen messages that there in the system
         For i = MAX_BYTE To 1 Step -1
 
@@ -454,7 +467,7 @@ Sub DrawActionMsg(ByVal Index As Integer)
         X = ConvertMapX(X)
         Y = ConvertMapY(Y)
     End If
-    
+
     Select Case ActionMsg(Index).fonte
     Case health, Damage, energy, EXP, alert
         colour = White
@@ -463,7 +476,11 @@ Sub DrawActionMsg(ByVal Index As Integer)
     End Select
 
     If ActionMsg(Index).Created > 0 Then
-        RenderText font(ActionMsg(Index).fonte), ActionMsg(Index).message, X, Y, colour, ActionMsg(Index).alpha
+        If Tick < ActionMsg(Index).timer + time Then
+            RenderText font(ActionMsg(Index).fonte), ActionMsg(Index).message, X, Y, colour, ActionMsg(Index).alpha
+        Else
+            ClearActionMsg Index
+        End If
     End If
 End Sub
 
@@ -778,7 +795,7 @@ Public Sub DrawNpcName(ByVal Index As Long)
     For i = 1 To MAX_QUESTS
         'check if the npc is the next task to any quest: [?] symbol
         If Trim$(Quest(i).Name) <> "" Then
-            If Player(MyIndex).PlayerQuest(i).status = QUEST_STARTED Then
+            If Player(MyIndex).PlayerQuest(i).Status = QUEST_STARTED Then
                 If Quest(i).Task(Player(MyIndex).PlayerQuest(i).ActualTask).Npc = NpcNum Then
                     If Npc(NpcNum).sprite > 0 Then
                         textX = ConvertMapX(MapNpc(Index).X * PIC_X) + MapNpc(Index).xOffset + (PIC_X \ 2) - (mTexture(TextureGUI(9)).Width / 2)

@@ -85,7 +85,7 @@ End Sub
 Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
     Dim chatText As String, Name As String, i As Long, N As Long, Command() As String, buffer As clsBuffer, tmpNum As Long
 
-    
+
     ' check if we're skipping video
     If KeyAscii = vbKeyEscape Then
         ' hide options screen
@@ -111,11 +111,11 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
             Exit Sub
         End If
     End If
-    
-    If InGame Then
-    chatText = Windows(GetWindowIndex("winChat")).Controls(GetControlIndex("winChat", "txtChat")).text
+
+    If GameState = GameStateEnum.InGame Then
+        chatText = Windows(GetWindowIndex("winChat")).Controls(GetControlIndex("winChat", "txtChat")).text
     End If
-    
+
     ' Do we have an active window
     If activeWindow > 0 Then
         ' make sure it's visible
@@ -126,33 +126,20 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
                 With Windows(activeWindow).Controls(Windows(activeWindow).activeControl)
                     ' Handle input
                     Select Case KeyAscii
-                        Case vbKeyBack
-                            If LenB(.text) > 0 Then
-                                .text = Left$(.text, Len(.text) - 1)
-                            End If
-                        Case vbKeyReturn
-                            ' override for function callbacks
-                            If .entCallBack(EntityStates.Enter) > 0 Then
-                                entCallBack .entCallBack(EntityStates.Enter), activeWindow, Windows(activeWindow).activeControl, 0, 0
-                                Exit Sub
-                            Else
-                                N = 0
-                                For i = Windows(activeWindow).ControlCount To 1 Step -1
-                                    If i > Windows(activeWindow).activeControl Then
-                                        If SetActiveControl(activeWindow, i) Then N = i
-                                    End If
-                                Next
-                                If N = 0 Then
-                                    For i = Windows(activeWindow).ControlCount To 1 Step -1
-                                        SetActiveControl activeWindow, i
-                                    Next
-                                End If
-                            End If
-                        Case vbKeyTab
+                    Case vbKeyBack
+                        If LenB(.text) > 0 Then
+                            .text = Left$(.text, Len(.text) - 1)
+                        End If
+                    Case vbKeyReturn
+                        ' override for function callbacks
+                        If .entCallBack(EntityStates.Enter) > 0 Then
+                            entCallBack .entCallBack(EntityStates.Enter), activeWindow, Windows(activeWindow).activeControl, 0, 0
+                            Exit Sub
+                        Else
                             N = 0
-                            For i = 1 To Windows(activeWindow).ControlCount
+                            For i = Windows(activeWindow).ControlCount To 1 Step -1
                                 If i > Windows(activeWindow).activeControl Then
-                                    If SetActiveControl(activeWindow, i) Then N = i: Exit Sub
+                                    If SetActiveControl(activeWindow, i) Then N = i
                                 End If
                             Next
                             If N = 0 Then
@@ -160,8 +147,23 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
                                     SetActiveControl activeWindow, i
                                 Next
                             End If
-                        Case Else
+                        End If
+                    Case vbKeyTab
+                        N = 0
+                        For i = 1 To Windows(activeWindow).ControlCount
+                            If i > Windows(activeWindow).activeControl Then
+                                If SetActiveControl(activeWindow, i) Then N = i: Exit Sub
+                            End If
+                        Next
+                        If N = 0 Then
+                            For i = Windows(activeWindow).ControlCount To 1 Step -1
+                                SetActiveControl activeWindow, i
+                            Next
+                        End If
+                    Case Else
+                        If Not Len(.text) >= .max Then
                             .text = .text & ChrW$(KeyAscii)
+                        End If
                     End Select
                     ' exit out early - if not chatting
                     If Windows(activeWindow).Window.Name <> "winChat" Then Exit Sub
@@ -171,43 +173,43 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
     End If
 
     ' exit out early if we're not ingame
-    If Not InGame Then Exit Sub
-    
+    If Not GameState = GameStateEnum.InGame Then Exit Sub
+
     Select Case KeyAscii
-        Case vbKeyEscape
-            ' hide options screen
-            HideWindow GetWindowIndex("winOptions")
-            CloseComboMenu
-            ' hide/show chat window
-            If Windows(GetWindowIndex("winChat")).Window.visible Then
-                Windows(GetWindowIndex("winChat")).Controls(GetControlIndex("winChat", "txtChat")).text = vbNullString
-                HideChat
-                inSmallChat = True
-                Exit Sub
-            End If
-            
-            If Windows(GetWindowIndex("winEscMenu")).Window.visible Then
-                ' hide it
-                HideWindow GetWindowIndex("winBlank")
-                HideWindow GetWindowIndex("winEscMenu")
-            Else
-                ' show them
-                ShowWindow GetWindowIndex("winBlank"), True
-                ShowWindow GetWindowIndex("winEscMenu"), True
-            End If
-            ' exit out early
+    Case vbKeyEscape
+        ' hide options screen
+        HideWindow GetWindowIndex("winOptions")
+        CloseComboMenu
+        ' hide/show chat window
+        If Windows(GetWindowIndex("winChat")).Window.visible Then
+            Windows(GetWindowIndex("winChat")).Controls(GetControlIndex("winChat", "txtChat")).text = vbNullString
+            HideChat
+            inSmallChat = True
             Exit Sub
-        Case 105
-            ' hide/show inventory
-            If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Inv
-        Case 99
-            ' hide/show inventory
-            If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Char
-        Case 109
-            ' hide/show skills
-            If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Skills
+        End If
+
+        If Windows(GetWindowIndex("winEscMenu")).Window.visible Then
+            ' hide it
+            HideWindow GetWindowIndex("winBlank")
+            HideWindow GetWindowIndex("winEscMenu")
+        Else
+            ' show them
+            ShowWindow GetWindowIndex("winBlank"), True
+            ShowWindow GetWindowIndex("winEscMenu"), True
+        End If
+        ' exit out early
+        Exit Sub
+    Case 105
+        ' hide/show inventory
+        If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Inv
+    Case 99
+        ' hide/show inventory
+        If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Char
+    Case 109
+        ' hide/show skills
+        If Not Windows(GetWindowIndex("winChat")).Window.visible Then btnMenu_Skills
     End Select
-    
+
     ' handles hotbar
     If inSmallChat Then
         For i = 1 To 9
@@ -225,7 +227,7 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
             inSmallChat = False
             Exit Sub
         End If
-    
+
         ' Broadcast message
         If Left$(chatText, 1) = "'" Then
             chatText = Mid$(chatText, 2, Len(chatText) - 1)
@@ -291,274 +293,274 @@ Public Sub HandleKeyPresses(ByVal KeyAscii As Integer)
 
             Select Case Command(0)
 
-                Case "/help"
-                    Call AddText("Social Commands:", HelpColor)
-                    Call AddText("'msghere = Global Message", HelpColor)
-                    Call AddText("-msghere = Emote Message", HelpColor)
-                    Call AddText("!namehere msghere = Player Message", HelpColor)
-                    Call AddText("Available Commands: /who, /fps, /fpslock, /gui, /maps", HelpColor)
+            Case "/help"
+                Call AddText("Social Commands:", HelpColor)
+                Call AddText("'msghere = Global Message", HelpColor)
+                Call AddText("-msghere = Emote Message", HelpColor)
+                Call AddText("!namehere msghere = Player Message", HelpColor)
+                Call AddText("Available Commands: /who, /fps, /fpslock, /gui, /maps", HelpColor)
 
-                Case "/maps"
-                    ClearMapCache
+            Case "/maps"
+                ClearMapCache
 
-                Case "/gui"
-                    hideGUI = Not hideGUI
+            Case "/gui"
+                hideGUI = Not hideGUI
 
-                Case "/info"
+            Case "/info"
 
-                    ' Checks to make sure we have more than one string in the array
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /info (name)", AlertColor
-                        GoTo continue
-                    End If
+                ' Checks to make sure we have more than one string in the array
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /info (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    If IsNumeric(Command(1)) Then
-                        AddText "Usage: /info (name)", AlertColor
-                        GoTo continue
-                    End If
+                If IsNumeric(Command(1)) Then
+                    AddText "Usage: /info (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    Set buffer = New clsBuffer
-                    buffer.WriteLong CPlayerInfoRequest
-                    buffer.WriteString Command(1)
-                    SendData buffer.ToArray()
-                    buffer.Flush: Set buffer = Nothing
+                Set buffer = New clsBuffer
+                buffer.WriteLong CPlayerInfoRequest
+                buffer.WriteString Command(1)
+                SendData buffer.ToArray()
+                buffer.Flush: Set buffer = Nothing
 
-                    ' Whos Online
-                Case "/who"
-                    SendWhosOnline
+                ' Whos Online
+            Case "/who"
+                SendWhosOnline
 
-                    ' Checking fps
-                Case "/fps"
-                    BFPS = Not BFPS
+                ' Checking fps
+            Case "/fps"
+                BFPS = Not BFPS
 
-                    ' toggle fps lock
-                Case "/fpslock"
-                    Options.FPSLock = Not Options.FPSLock
-                    SaveOptions
+                ' toggle fps lock
+            Case "/fpslock"
+                Options.FPSLock = Not Options.FPSLock
+                SaveOptions
 
-                    ' Request stats
-                Case "/stats"
-                    Set buffer = New clsBuffer
-                    buffer.WriteLong CGetStats
-                    SendData buffer.ToArray()
-                    buffer.Flush: Set buffer = Nothing
+                ' Request stats
+            Case "/stats"
+                Set buffer = New clsBuffer
+                buffer.WriteLong CGetStats
+                SendData buffer.ToArray()
+                buffer.Flush: Set buffer = Nothing
 
-                    ' // Monitor Admin Commands //
-                    ' Kicking a player
-                Case "/kick"
+                ' // Monitor Admin Commands //
+                ' Kicking a player
+            Case "/kick"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MONITOR Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /kick (name)", AlertColor
-                        GoTo continue
-                    End If
+                If GetPlayerAccess(MyIndex) < ADMIN_MONITOR Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /kick (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    If IsNumeric(Command(1)) Then
-                        AddText "Usage: /kick (name)", AlertColor
-                        GoTo continue
-                    End If
+                If IsNumeric(Command(1)) Then
+                    AddText "Usage: /kick (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    SendKick Command(1)
+                SendKick Command(1)
 
-                    ' // Mapper Admin Commands //
-                    ' Location
-                Case "/loc"
+                ' // Mapper Admin Commands //
+                ' Location
+            Case "/loc"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    BLoc = Not BLoc
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                BLoc = Not BLoc
 
-                    ' Map Editor
-                Case "/editmap"
+                ' Map Editor
+            Case "/editmap"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    SendRequestEditMap
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                SendRequestEditMap
 
-                    ' Warping to a player
-                Case "/warpmeto"
+                ' Warping to a player
+            Case "/warpmeto"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /warpmeto (name)", AlertColor
-                        GoTo continue
-                    End If
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /warpmeto (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    If IsNumeric(Command(1)) Then
-                        AddText "Usage: /warpmeto (name)", AlertColor
-                        GoTo continue
-                    End If
+                If IsNumeric(Command(1)) Then
+                    AddText "Usage: /warpmeto (name)", AlertColor
+                    GoTo continue
+                End If
 
+                GettingMap = True
+                WarpMeTo Command(1)
+
+                ' Warping a player to you
+            Case "/warptome"
+
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /warptome (name)", AlertColor
+                    GoTo continue
+                End If
+
+                If IsNumeric(Command(1)) Then
+                    AddText "Usage: /warptome (name)", AlertColor
+                    GoTo continue
+                End If
+
+                WarpToMe Command(1)
+
+                ' Warping to a map
+            Case "/warpto"
+
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /warpto (map #)", AlertColor
+                    GoTo continue
+                End If
+
+                If Not IsNumeric(Command(1)) Then
+                    AddText "Usage: /warpto (map #)", AlertColor
+                    GoTo continue
+                End If
+
+                N = CLng(Command(1))
+
+                ' Check to make sure its a valid map #
+                If N > 0 And N <= MAX_MAPS Then
                     GettingMap = True
-                    WarpMeTo Command(1)
+                    Call WarpTo(N)
+                Else
+                    Call AddText("Invalid map number.", Red)
+                End If
 
-                    ' Warping a player to you
-                Case "/warptome"
+                ' Setting sprite
+            Case "/setsprite"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /warptome (name)", AlertColor
-                        GoTo continue
-                    End If
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /setsprite (sprite #)", AlertColor
+                    GoTo continue
+                End If
 
-                    If IsNumeric(Command(1)) Then
-                        AddText "Usage: /warptome (name)", AlertColor
-                        GoTo continue
-                    End If
+                If Not IsNumeric(Command(1)) Then
+                    AddText "Usage: /setsprite (sprite #)", AlertColor
+                    GoTo continue
+                End If
 
-                    WarpToMe Command(1)
+                SendSetSprite CLng(Command(1))
 
-                    ' Warping to a map
-                Case "/warpto"
+                ' Map report
+            Case "/mapreport"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /warpto (map #)", AlertColor
-                        GoTo continue
-                    End If
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                SendMapReport
 
-                    If Not IsNumeric(Command(1)) Then
-                        AddText "Usage: /warpto (map #)", AlertColor
-                        GoTo continue
-                    End If
+                ' Respawn request
+            Case "/respawn"
 
-                    N = CLng(Command(1))
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                SendMapRespawn
 
-                    ' Check to make sure its a valid map #
-                    If N > 0 And N <= MAX_MAPS Then
-                        GettingMap = True
-                        Call WarpTo(N)
-                    Else
-                        Call AddText("Invalid map number.", Red)
-                    End If
+                ' MOTD change
+            Case "/motd"
 
-                    ' Setting sprite
-                Case "/setsprite"
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /motd (new motd)", AlertColor
+                    GoTo continue
+                End If
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /setsprite (sprite #)", AlertColor
-                        GoTo continue
-                    End If
+                SendMOTDChange Right$(chatText, Len(chatText) - 5)
 
-                    If Not IsNumeric(Command(1)) Then
-                        AddText "Usage: /setsprite (sprite #)", AlertColor
-                        GoTo continue
-                    End If
+                ' Check the ban list
+            Case "/banlist"
 
-                    SendSetSprite CLng(Command(1))
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                SendBanList
 
-                    ' Map report
-                Case "/mapreport"
+                ' Banning a player
+            Case "/ban"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    SendMapReport
+                If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
+                If UBound(Command) < 1 Then
+                    AddText "Usage: /ban (name)", AlertColor
+                    GoTo continue
+                End If
 
-                    ' Respawn request
-                Case "/respawn"
+                SendBan Command(1)
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    SendMapRespawn
+                ' // Developer Admin Commands //
+                ' Editing item request
+            Case "/edititem"
 
-                    ' MOTD change
-                Case "/motd"
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditItem
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /motd (new motd)", AlertColor
-                        GoTo continue
-                    End If
+                ' editing conv request
+            Case "/editconv"
 
-                    SendMOTDChange Right$(chatText, Len(chatText) - 5)
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditConv
 
-                    ' Check the ban list
-                Case "/banlist"
+                ' Editing animation request
+            Case "/editanimation"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    SendBanList
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditAnimation
 
-                    ' Banning a player
-                Case "/ban"
+                ' Editing npc request
+            Case "/editnpc"
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_MAPPER Then GoTo continue
-                    If UBound(Command) < 1 Then
-                        AddText "Usage: /ban (name)", AlertColor
-                        GoTo continue
-                    End If
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditNpc
 
-                    SendBan Command(1)
+            Case "/editresource"
 
-                    ' // Developer Admin Commands //
-                    ' Editing item request
-                Case "/edititem"
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditResource
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditItem
+                ' Editing shop request
+            Case "/editshop"
 
-                    ' editing conv request
-                Case "/editconv"
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditShop
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditConv
+                ' Editing spell request
+            Case "/editspell"
 
-                    ' Editing animation request
-                Case "/editanimation"
+                If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
+                SendRequestEditSpell
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditAnimation
+                ' // Creator Admin Commands //
+                ' Giving another player access
+            Case "/setaccess"
 
-                    ' Editing npc request
-                Case "/editnpc"
+                If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
+                If UBound(Command) < 2 Then
+                    AddText "Usage: /setaccess (name) (access)", AlertColor
+                    GoTo continue
+                End If
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditNpc
+                If IsNumeric(Command(1)) Or Not IsNumeric(Command(2)) Then
+                    AddText "Usage: /setaccess (name) (access)", AlertColor
+                    GoTo continue
+                End If
 
-                Case "/editresource"
+                SendSetAccess Command(1), CLng(Command(2))
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditResource
+                ' Ban destroy
+            Case "/destroybanlist"
 
-                    ' Editing shop request
-                Case "/editshop"
+                If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
+                SendBanDestroy
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditShop
+                ' Packet debug mode
+            Case "/debug"
 
-                    ' Editing spell request
-                Case "/editspell"
+                If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
+                DEBUG_MODE = (Not DEBUG_MODE)
 
-                    If GetPlayerAccess(MyIndex) < ADMIN_DEVELOPER Then GoTo continue
-                    SendRequestEditSpell
-
-                    ' // Creator Admin Commands //
-                    ' Giving another player access
-                Case "/setaccess"
-
-                    If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
-                    If UBound(Command) < 2 Then
-                        AddText "Usage: /setaccess (name) (access)", AlertColor
-                        GoTo continue
-                    End If
-
-                    If IsNumeric(Command(1)) Or Not IsNumeric(Command(2)) Then
-                        AddText "Usage: /setaccess (name) (access)", AlertColor
-                        GoTo continue
-                    End If
-
-                    SendSetAccess Command(1), CLng(Command(2))
-
-                    ' Ban destroy
-                Case "/destroybanlist"
-
-                    If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
-                    SendBanDestroy
-
-                    ' Packet debug mode
-                Case "/debug"
-
-                    If GetPlayerAccess(MyIndex) < ADMIN_CREATOR Then GoTo continue
-                    DEBUG_MODE = (Not DEBUG_MODE)
-
-                Case Else
-                    AddText "Not a valid command!", HelpColor
+            Case Else
+                AddText "Not a valid command!", HelpColor
             End Select
 
             'continue label where we go instead of exiting the sub
@@ -574,12 +576,12 @@ continue:
         End If
 
         Windows(GetWindowIndex("winChat")).Controls(GetControlIndex("winChat", "txtChat")).text = vbNullString
-        
+
         ' hide/show chat window
         If Windows(GetWindowIndex("winChat")).Window.visible Then HideChat
         Exit Sub
     End If
-    
+
     ' hide/show chat window
     If Windows(GetWindowIndex("winChatSmall")).Window.visible Then
         Exit Sub

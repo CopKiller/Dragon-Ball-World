@@ -61,8 +61,6 @@ Public autoNW(1 To 4) As PointRec
 Public autoNE(1 To 4) As PointRec
 Public autoSW(1 To 4) As PointRec
 Public autoSE(1 To 4) As PointRec
-' menu
-Public inMenu As Boolean
 ' Cursor
 Public GlobalX As Long
 Public GlobalY As Long
@@ -119,7 +117,7 @@ Public PlayerInv(1 To MAX_INV) As PlayerInvRec   ' Inventory
 Public PlayerSpells(1 To MAX_PLAYER_SPELLS) As PlayerSpellRec
 Public InventoryItemSelected As Long
 Public SpellBuffer As Long
-Public SpellBufferTimer As Long
+Public SpellBuffertimer As Long
 Public SpellCD(1 To MAX_PLAYER_SPELLS) As Long
 Public StunDuration As Long
 Public TNL As Long
@@ -130,7 +128,6 @@ Public DEBUG_MODE As Boolean
 ' TCP variables
 Public PlayerBuffer As String
 ' Controls main gameloop
-Public InGame As Boolean
 Public isLogging As Boolean
 ' Game direction vars
 Public ShiftDown As Boolean
@@ -148,7 +145,6 @@ Public GettingMap As Boolean
 Public BFPS As Boolean
 Public BLoc As Boolean
 ' FPS and Time-based movement vars
-Public ElapsedTime As Long
 Public GameFPS As Long
 ' Text vars
 Public vbQuote As String
@@ -245,24 +241,5 @@ Public selTileY As Long
 ' Map
 Public applyingMap As Boolean
 Public MapEditorAppearDistance As Long
-
-' Timers
-Public Tick As Single
-Public FrameTime As Long
-Public TickFPS As Long
-Public FPS As Long
-Public WalkTimer As Long
-Public tmr25 As Long
-Public tmr45 As Long
-Public tmr100 As Long
-Public tmr10000 As Long
-Public mapTimer As Long
-Public chatTmr As Long
-Public targetTmr As Long
-Public fogTmr As Long
-Public barTmr As Long
-Public Loops As Long
-Public GameLooptmr As Long
-Public Thread As Boolean
 ' Projectile
 Public LastProjectile As Integer
